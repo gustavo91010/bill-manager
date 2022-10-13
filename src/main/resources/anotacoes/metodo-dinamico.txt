@@ -1,0 +1,35 @@
+Metodo Busca Dinamica:
+1- Na classe Repository:
+
+Extender a classe JpaSpecificationExecutor<classe> para liberar o metodo Specifications
+
+2- Criar Specification Classe:
+
+a classe onde estara a logica das especificações
+
+//	public static Specification<Funcionario> nome(String nome) {
+//		return (root, criteriaQuery, criteriaBuilder) -> 
+//			criteriaBuilder.like(root.get("nome"), "%" + nome + "%"); 
+//	}
+
+3- chamar o metodo na classe controller:
+
+@GetMapping("/dinamico")
+	List<BoletoVO> findByBuscaDinamica(@RequestBody BoletoFrom boletoFrom){
+		
+		Specification<Boleto> spefications = Specification.where(
+				 BoletoSpecification.descricao(boletoFrom.getDescricao())
+//					.or(BoletoSpecification.status(boletoFrom.getStatus()))
+				 );
+		
+		List<Boleto> boletos= repository.findAll(spefications);
+		
+		List<BoletoVO> boletosVO=new  ArrayList<>();
+		boletos.forEach(b->{
+			boletosVO.add(new BoletoVO(b));
+		});
+		
+		return boletosVO;
+		
+	};
+	

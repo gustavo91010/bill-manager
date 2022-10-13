@@ -1,0 +1,24 @@
+-------------- Adicionando o Swagger ----------------------
+
+1- Adicionando dependencias:
+
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.9.2</version>
+</dependency>
+
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.9.2</version>
+</dependency>
+
+2- Na classe Aplication, adicionar a anotação de classe @EnableSwagger2
+
+2.1- adicionar o seguinte codigo ao properties:
+
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
+
+
+3- criar a classe SwaggerConfig com a anotação de classe @Configuration e o metod de configuração
