@@ -21,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
+import com.ajudaqui.controle.de.pagamentos30.entity.ValidarStatus;
 import com.ajudaqui.controle.de.pagamentos30.entity.Vo.BoletoVO;
 import com.ajudaqui.controle.de.pagamentos30.from.BoletoFrom;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
@@ -52,6 +53,8 @@ public class BoletoController {
 	@ApiOperation(value = "Chama todos os boletos registrados." )
 	public List<Boleto> consultar() {
 		List<Boleto> boletos = repository.findAll();
+		atualizarStatus(boletos);
+		
 
 		return boletos;
 
@@ -142,21 +145,6 @@ public class BoletoController {
 		});
 		return boletosVO;
 	}
-
-	@PutMapping("/{id}")
-	@ApiOperation(value = "Atualiza qualquer dado de um boleto" )
-	public ResponseEntity<BoletoVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
-		
-		Optional<Boleto> boleto = repository.findById(id);
-		if (boleto.isPresent()) {
-			boleto.get().setDescricao(from.getDescricao());
-			boleto.get().setValor(from.getValor());
-			boleto.get().setVencimento(from.getVencimento());
-			return ResponseEntity.ok(new BoletoVO(boleto.get()));
-		}
-		return ResponseEntity.notFound().build();
-	}
-	
 	@GetMapping("/dinamico")
 	@ApiOperation(value = "Faz uma consulta com dados variados sobre o boleto" )
 	List<BoletoVO> findByBuscaDinamica(@RequestBody BoletoFrom boletoFrom){
@@ -178,15 +166,24 @@ public class BoletoController {
 		return boletosVO;
 		
 	};
+
+	@PutMapping("/{id}")
+	@ApiOperation(value = "Atualiza qualquer dado de um boleto" )
+	public ResponseEntity<BoletoVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
+		
+		Optional<Boleto> boleto = repository.findById(id);
+		if (boleto.isPresent()) {
+			boleto.get().setDescricao(from.getDescricao());
+			boleto.get().setValor(from.getValor());
+			boleto.get().setVencimento(from.getVencimento());
+			
+			return ResponseEntity.ok(new BoletoVO(boleto.get()));
+		}
+		return ResponseEntity.notFound().build();
+	}
 	
-//	List<Funcionario> funcionarios = funcionarioRepository.findAll(Specification
-//			.where(
-//					SpecificationFuncionario.nome(nome))
-//					.or(SpecificationFuncionario.cpf(cpf))
-//					.or(SpecificationFuncionario.salario(salario))
-//					.or(SpecificationFuncionario.dataContratacao(dataContratacao))
-//			);
-//	funcionarios.forEach(System.out::println);
+
+	
 	
 	@PutMapping("/pagar/{id}")
 	@ApiOperation(value = "Metodo para informar o pagamento de um boleto" )
@@ -198,6 +195,20 @@ public class BoletoController {
 		return ResponseEntity.ok(new BoletoVO(boleto.get()));
 		}
 		return ResponseEntity.notFound().build();
+	}
+	
+//	@PutMapping
+	public List<Boleto> atualizarStatus(List<Boleto> boletos) {
+//		ValidarStatus.statusAtualizado(StatusBoleto status, LocalDate vencimento);
+//		return ValidarStatus.statusAtualizado(boleto, repository);
+		
+		boletos.forEach(b->{
+			ValidarStatus.statusAtualizado(b, repository);
+
+		});
+		return boletos;
+//		return
+		
 	}
 	
 	

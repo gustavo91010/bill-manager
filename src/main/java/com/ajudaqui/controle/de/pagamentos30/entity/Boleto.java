@@ -76,13 +76,15 @@ public class Boleto {
 	}
 
 	public StatusBoleto getStatus() {
-		return status;
+		return  status;
 	}
 
 	public void setStatus(StatusBoleto status) {
 		this.status = status;
 
 	}
+
+	
 
 	@Override
 	public int hashCode() {
