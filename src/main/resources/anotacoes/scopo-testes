@@ -1,0 +1,13 @@
+- Adicionei o application-test.properties com as configurações nescecarias oara rodar.
+no banco de dados tive que ativar o "MODE=MySQL" ainda nao sei o por que...
+(spring.datasource.url=jdbc:h2:mem:controle-de-pagamentos-test;MODE=MySQL)
+
+- Na classe teste ativar o perfil test com a anotação: @ActiveProfiles("test") e as anotações
+para teste:
+@RunWith(SpringRunner.class)
+@DataJpaTest //ou @SpringBootTest
+@AutoConfigureTestDatabase(replace =AutoConfigureTestDatabase.Replace.NONE )
+
+- Observar a anotação do @Test "import org.junit.jupiter.api.Test;"
+
+

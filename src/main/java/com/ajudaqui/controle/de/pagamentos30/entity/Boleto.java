@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ajudaqui.controle.de.pagamentos30.validacao.ValidacaoStatusBoleto;
+
 @Entity
 @Table(name = "boleto")
 public class Boleto {
@@ -20,16 +21,18 @@ public class Boleto {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(nullable = false)
+//	@Column(nullable = false)
 	private String descricao;
-	@Column(nullable = false)
+//	@Column(nullable = false)
 	private BigDecimal valor;
 //	@Column(nullable = false)
 	private LocalDate vencimento;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable =true)
-	private StatusBoleto status = StatusBoleto.NAO_PAGO;
+//	@Column(nullable =true)
+//	private StatusBoleto status= ValidacaoStatusBoleto.validacao(this.vencimento);
+//	private StatusBoleto status = StatusBoleto.NAO_PAGO;
+	private StatusBoleto status ;
 
 	public Boleto() {
 		// TODO Auto-generated constructor stub
@@ -40,7 +43,7 @@ public class Boleto {
 		this.descricao = descricao;
 		this.valor = valor;
 		this.vencimento = vencimento;
-//		this.status = statusBoleto(vencimento);
+		this.status = ValidacaoStatusBoleto.validacao(vencimento);
 	}
 
 	public Long getId() {

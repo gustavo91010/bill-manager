@@ -53,6 +53,7 @@ public class BoletoController {
 	@ApiOperation(value = "Chama todos os boletos registrados." )
 	public List<Boleto> consultar() {
 		List<Boleto> boletos = repository.findAll();
+		
 		atualizarStatus(boletos);
 		
 
@@ -192,6 +193,7 @@ public class BoletoController {
 		if(boleto.isPresent()) {
 			
 		boleto.get().setStatus(StatusBoleto.PAGO);
+		repository.save(boleto.get());
 		return ResponseEntity.ok(new BoletoVO(boleto.get()));
 		}
 		return ResponseEntity.notFound().build();
