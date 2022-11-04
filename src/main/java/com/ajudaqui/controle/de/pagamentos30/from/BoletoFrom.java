@@ -5,13 +5,14 @@ import java.time.LocalDate;
 
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
+import com.ajudaqui.controle.de.pagamentos30.validacao.ValidacaoStatusBoleto;
 
 public class BoletoFrom {
 
 	private String descricao;
 	private BigDecimal valor;
 	private LocalDate vencimento;
-	private StatusBoleto status;
+//	private StatusBoleto status= ValidacaoStatusBoleto.validacao(this.vencimento);
 
 	public String getDescricao() {
 		return descricao;
@@ -39,19 +40,19 @@ public class BoletoFrom {
 	
 
 	public StatusBoleto getStatus() {
-		return status;
+		return ValidacaoStatusBoleto.validacao(this.vencimento);
 	}
 
-	public void setStatus(StatusBoleto status) {
-		this.status = status;
-	}
+//	public void setStatus(StatusBoleto status) {
+//		this.status = status;
+//	}
 
 	public Boleto convert() {
 		Boleto boleto= new Boleto();
 		boleto.setDescricao(this.descricao);
 		boleto.setValor(this.valor);
 		boleto.setVencimento(this.vencimento);
-		boleto.setStatus(this.status);
+		boleto.setStatus(ValidacaoStatusBoleto.validacao(this.vencimento));
 
 		return boleto;
 	}

@@ -13,6 +13,7 @@ public class ValidarStatus {
 		boolean a_vencer = boleto.getVencimento().compareTo(hoje) > 0;
 		boolean vencido = boleto.getVencimento().compareTo(hoje) < 0;
 		boolean vencendo_hoje = boleto.getVencimento().compareTo(hoje) == 0;
+		
 		if (boleto.getStatus() != StatusBoleto.PAGO) {
 
 			if (a_vencer) {

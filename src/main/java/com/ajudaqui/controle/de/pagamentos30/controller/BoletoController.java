@@ -51,46 +51,77 @@ public class BoletoController {
 
 	@GetMapping
 	@ApiOperation(value = "Chama todos os boletos registrados." )
-	public List<Boleto> consultar() {
+	public ResponseEntity<List<BoletoVO>> consultar() {
 		List<Boleto> boletos = repository.findAll();
 		
 		atualizarStatus(boletos);
-		
-
-		return boletos;
-
-	}
-
-	@GetMapping(value = "/id/{id}")
-	@ApiOperation(value = "Chama os boletos filtrando pelo Id" )
-	public BoletoVO consultarPorId(@PathVariable("id") Long id) {
-		Boleto boleto = repository.findById(id).orElseThrow();
-
-		return new BoletoVO(boleto);
-
-	}
-	@GetMapping(value = "/descricao/{descricao}")
-	@ApiOperation(value = "Chama os boletos filtrando pela Descrição" )
-	public List<BoletoVO> consultarPorDescricao(@PathVariable("descricao") String descricao) {
-		List<Boleto> boletos = repository.findByDescricao(descricao);
 		List<BoletoVO> boletosVO= new ArrayList<>();
 		boletos.forEach(b->{
 			boletosVO.add(new BoletoVO(b));
 		});
 		
-		return boletosVO;
+
+		return ResponseEntity.ok(boletosVO);
+
+	}
+//	public List<Boleto> consultar() {
+//		List<Boleto> boletos = repository.findAll();
+//		
+//		atualizarStatus(boletos);
+//		
+//		
+//		return boletos;
+//		
+//	}
+
+	@GetMapping(value = "/id/{id}")
+	@ApiOperation(value = "Chama os boletos filtrando pelo Id" )
+	public ResponseEntity<BoletoVO> consultarPorId(@PathVariable("id") Long id) {
+		Optional<Boleto> boleto = repository.findById(id);
+		if(boleto.isPresent()) {
+			return ResponseEntity.ok(new BoletoVO(boleto.get()));
+		}
+
+		return ResponseEntity.notFound().build();
+
+	}
+
+	@GetMapping(value = "/descricao/{descricao}")
+	@ApiOperation(value = "Chama os boletos filtrando pela Descrição" )
+	public ResponseEntity< List<BoletoVO>> consultarPorDescricao(@PathVariable("descricao") String descricao) {
+		List<Boleto> boletos = repository.findByDescricao(descricao);
+		List<BoletoVO> boletosVO= new ArrayList<>();
+		boletos.forEach(b->{
+			boletosVO.add(new BoletoVO(b));
+		});
+		if(boletosVO.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(boletosVO);
 		
 	}
 	@GetMapping(value= "/pago")
 	@ApiOperation(value = "Mostra os boletos que ja foram pago " )
-	public List<BoletoVO> mostrarBoletosPagos() {
+	public ResponseEntity<List<BoletoVO>> mostrarBoletosPagos() {
 		List<Boleto> b= repository.findBoletosPagos();;
-	List<BoletoVO> boletos= new ArrayList<>();
+	List<BoletoVO> boletosVO= new ArrayList<>();
 	b.forEach(bo->{
-		boletos.add(new BoletoVO(bo));
+		boletosVO.add(new BoletoVO(bo));
 	});
-	return boletos;
+	if(boletosVO.isEmpty()) {
+		return ResponseEntity.notFound().build();
+		
 	}
+	return ResponseEntity.ok(boletosVO);
+	}
+//	public List<BoletoVO> mostrarBoletosPagos() {
+//		List<Boleto> b= repository.findBoletosPagos();;
+//		List<BoletoVO> boletos= new ArrayList<>();
+//		b.forEach(bo->{
+//			boletos.add(new BoletoVO(bo));
+//		});
+//		return boletos;
+//	}
 	
 	@GetMapping(value= "/vencido")
 	@ApiOperation(value = "Chama os boletos que estao vencidos" )
@@ -104,12 +135,12 @@ public class BoletoController {
 	}
 	
 	@GetMapping(value="/mes")
-	@ApiOperation(value = "Chama os boletos a serem pagos no mes atual" )
-	public List<BoletoVO> mostrarBoletosMes() {
+	@ApiOperation(value = "Chama os boletos do no mes atual" )
+	public List<BoletoVO> consultarBoletosMes() {
 		
 		LocalDate inicioMes= LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
 		LocalDate fimMes= LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), inicioMes.lengthOfMonth());
-		List<Boleto> boletos= repository.findBoletosVencimentoProximo(inicioMes, fimMes);
+		List<Boleto> boletos= repository.findBoletosDoMes(inicioMes, fimMes);
 		
 		
 		List<BoletoVO> boletosVO= new ArrayList<>();
@@ -117,26 +148,48 @@ public class BoletoController {
 		boletos.forEach(b->{
 			boletosVO.add(new BoletoVO(b));
 		});
-//		List<Boleto> boletos= repository.findAll();
-//		System.out.println("Quantos boletos antes : "+boletos.size());
-//		boletos.forEach(b->{
-//			System.out.println("dentro do laço: "+b.getVencimento());
-//			if(b.getVencimento().compareTo(inicioMes)>=1 && b.getVencimento().compareTo(fimMes)<0) {
-//				System.out.println("dentro do if: "+b.getVencimento());
-//				boletosVO.add(new BoletoVO(b));
-//			}
-//		});
-//
-//		System.out.println("Quantos boletos depois: "+boletosVO.size());
 		return boletosVO;
 	}
 	@GetMapping(value="/mes/{mes}")
-	@ApiOperation(value = "Chama os boletos que serao pagos no mes especificado pelo usuario (de 1  a12)" )
-	public List<BoletoVO> mostrarBoletosMes(@PathVariable int mes) {
+	@ApiOperation(value = "Chama os boletos do mes especificado pelo usuario (de 1 a 12)" )
+	public List<BoletoVO> consultarBoletosMes(@PathVariable int mes) {
 		
 		LocalDate inicioMes= LocalDate.of(LocalDate.now().getYear(), mes, 1);
 		LocalDate fimMes= LocalDate.of(LocalDate.now().getYear(), mes, inicioMes.lengthOfMonth());
-		List<Boleto> boletos= repository.findBoletosVencimentoProximo(inicioMes, fimMes);
+		List<Boleto> boletos= repository.findBoletosDoMes(inicioMes, fimMes);
+		
+		
+		List<BoletoVO> boletosVO= new ArrayList<>();
+		
+		boletos.forEach(b->{
+			boletosVO.add(new BoletoVO(b));
+		});
+		return boletosVO;
+	}
+	
+	@GetMapping(value="/naoPagos/mes")
+	@ApiOperation(value = "Chama os boletos a serem pagos no mes atual" )
+	public List<BoletoVO> consultarBoletosASeremPagosMes() {
+		
+		LocalDate inicioMes= LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), 1);
+		LocalDate fimMes= LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), inicioMes.lengthOfMonth());
+		List<Boleto> boletos= repository.findBoletosASeremPagosNoMes(inicioMes, fimMes);
+		
+		
+		List<BoletoVO> boletosVO= new ArrayList<>();
+		
+		boletos.forEach(b->{
+			boletosVO.add(new BoletoVO(b));
+		});
+		return boletosVO;
+	}
+	@GetMapping(value="/naoPagos/mes/{mes}")
+	@ApiOperation(value = "Chama os boletos  a serem pagos no mes especificado pelo usuario (de 1 a 12)" )
+	public List<BoletoVO> consultarBoletosASeremPagosMes(@PathVariable int mes) {
+		
+		LocalDate inicioMes= LocalDate.of(LocalDate.now().getYear(), mes, 1);
+		LocalDate fimMes= LocalDate.of(LocalDate.now().getYear(), mes, inicioMes.lengthOfMonth());
+		List<Boleto> boletos= repository.findBoletosASeremPagosNoMes(inicioMes, fimMes);
 		
 		
 		List<BoletoVO> boletosVO= new ArrayList<>();

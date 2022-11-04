@@ -38,8 +38,22 @@ public class Boleto {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Boleto(String descricao, BigDecimal valor, LocalDate vencimento) {
-		super();
+	public Boleto(Long id, String descricao, BigDecimal valor, LocalDate vencimento,StatusBoleto status) {
+		this.id = id;
+		this.descricao = descricao;
+		this.valor = valor;
+		this.vencimento = vencimento;
+		this.status = status;
+	}
+	public Boleto(Long id, String descricao, BigDecimal valor, LocalDate vencimento) {
+		this.id = id;
+		this.descricao = descricao;
+		this.valor = valor;
+		this.vencimento = vencimento;
+		this.status = ValidacaoStatusBoleto.validacao(vencimento);
+	}
+
+	public Boleto( String descricao, BigDecimal valor, LocalDate vencimento) {
 		this.descricao = descricao;
 		this.valor = valor;
 		this.vencimento = vencimento;

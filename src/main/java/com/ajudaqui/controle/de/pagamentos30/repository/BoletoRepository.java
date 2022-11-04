@@ -20,7 +20,10 @@ public interface BoletoRepository extends JpaRepository<Boleto, Long>,JpaSpecifi
 	List<Boleto> findBoletosVencidos();
 	
 	@Query("SELECT b FROM Boleto b WHERE b.vencimento >= :inicioMes AND b.vencimento <= :finalMes")
-	List<Boleto> findBoletosVencimentoProximo(LocalDate inicioMes, LocalDate finalMes );
+	List<Boleto> findBoletosDoMes(LocalDate inicioMes, LocalDate finalMes );
+	
+	@Query("SELECT b FROM Boleto b WHERE b.status !='PAGO' AND b.vencimento >= :inicioMes AND b.vencimento <= :finalMes")
+	List<Boleto> findBoletosASeremPagosNoMes(LocalDate inicioMes, LocalDate finalMes );
 	
 	
 ;

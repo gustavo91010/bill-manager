@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
-import com.ajudaqui.controle.de.pagamentos30.validacao.ValidacaoStatusBoleto;
 
 public class BoletoVO {
 
@@ -20,7 +19,8 @@ public class BoletoVO {
 		this.descricao = boleto.getDescricao();
 		this.valor = boleto.getValor();
 		this.vencimento = boleto.getVencimento();
-		this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
+//		this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
+		this.status = boleto.getStatus();
 	}
 
 	public Long getId() {
