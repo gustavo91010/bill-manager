@@ -4,16 +4,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -23,16 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
@@ -48,15 +34,15 @@ class BoletoRepositoryTest {
 	@Autowired
 	private BoletoRepository repository;
 
-	@Test
-	void contextLoad2s() {
-		Assert.assertFalse(false);
-	}
-
-	@Test
-	void contextLoad3s() {
-		Assert.assertTrue(true);
-	}
+//	@Test
+//	void contextLoad2s() {
+//		Assert.assertFalse(false);
+//	}
+//
+//	@Test
+//	void contextLoad3s() {
+//		Assert.assertTrue(true);
+//	}
 
 	@Test
 	public void deveriaBuscarBoltoPelaDescricao() {

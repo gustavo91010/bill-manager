@@ -131,6 +131,7 @@ class BoletoControllerTest {
 		;
  
 	}
+	
 	@Test
 	public void deveriaRetornar404SeListaEstiverVazia() throws Exception {
 //		https://www.bezkoder.com/spring-boot-webmvctest/
@@ -157,7 +158,35 @@ class BoletoControllerTest {
 		.andExpect(jsonPath("$[0].status").value("PAGO"))
 		.andExpect(status().isOk())
 		.andDo(MockMvcResultHandlers.print());
+	}
+	@Test
+	void deveriaRetornar404SeListaDeBoletosPagosEstiverVazia() throws Exception {
+		URI uri= new URI("/boletos/pago");
+		when(mocRepository.findBoletosPagos()).thenReturn(Collections.emptyList());
+		mockMvc.perform(get(uri))
+		.andExpect(status().isNotFound());	
 		
+	}
+	@Test
+	public void deveriaRetornarSomenteBoletosVencidos() throws Exception {
+		Boleto boleto= new Boleto( "vencido", new BigDecimal("222.11"), LocalDate.of(2000, 1, 1));
+//		boleto.setStatus(StatusBoleto.PAGO);
+		List<Boleto> boletos= new ArrayList<>();
+		boletos.add(boleto);
+		
+		when(mocRepository.findBoletosVencidos()).thenReturn(boletos);
+		mockMvc.perform(
+				get("/boletos/vencido"))
+		.andExpect(jsonPath("$[0].status").value("VENCIDO"))
+		.andExpect(status().isOk())
+		.andDo(MockMvcResultHandlers.print());
+	}
+	@Test
+	void deveriaRetornar404SeListaDeBoletosVencidosEstiverVazia() throws Exception {
+		URI uri= new URI("/boletos/vencido");
+		when(mocRepository.findBoletosVencidos()).thenReturn(Collections.emptyList());
+		mockMvc.perform(get(uri))
+		.andExpect(status().isNotFound());	
 		
 	}
 

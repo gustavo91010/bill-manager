@@ -114,25 +114,29 @@ public class BoletoController {
 	}
 	return ResponseEntity.ok(boletosVO);
 	}
-//	public List<BoletoVO> mostrarBoletosPagos() {
-//		List<Boleto> b= repository.findBoletosPagos();;
+	
+	@GetMapping(value= "/vencido")
+	@ApiOperation(value = "Chama os boletos que estao vencidos" )
+	public ResponseEntity<List<BoletoVO>> mostrarBoletosVencidos() {
+	List<Boleto> b= repository.findBoletosVencidos();;
+	List<BoletoVO> boletosVO= new ArrayList<>();
+	b.forEach(bo->{
+		boletosVO.add(new BoletoVO(bo));
+	});
+	if(boletosVO.isEmpty()) {
+		return ResponseEntity.notFound().build();
+		
+	}
+	return ResponseEntity.ok(boletosVO);
+	}
+//	public List<BoletoVO> mostrarBoletosVencidos() {
+//		List<Boleto> b= repository.findBoletosVencidos();
 //		List<BoletoVO> boletos= new ArrayList<>();
 //		b.forEach(bo->{
 //			boletos.add(new BoletoVO(bo));
 //		});
 //		return boletos;
 //	}
-	
-	@GetMapping(value= "/vencido")
-	@ApiOperation(value = "Chama os boletos que estao vencidos" )
-	public List<BoletoVO> mostrarBoletosVencidos() {
-		List<Boleto> b= repository.findBoletosVencidos();
-		List<BoletoVO> boletos= new ArrayList<>();
-		b.forEach(bo->{
-			boletos.add(new BoletoVO(bo));
-		});
-		return boletos;
-	}
 	
 	@GetMapping(value="/mes")
 	@ApiOperation(value = "Chama os boletos do no mes atual" )
@@ -256,9 +260,9 @@ public class BoletoController {
 	public List<Boleto> atualizarStatus(List<Boleto> boletos) {
 //		ValidarStatus.statusAtualizado(StatusBoleto status, LocalDate vencimento);
 //		return ValidarStatus.statusAtualizado(boleto, repository);
-		
+		ValidarStatus validarStatus= new ValidarStatus();
 		boletos.forEach(b->{
-			ValidarStatus.statusAtualizado(b, repository);
+			validarStatus.statusAtualizado(b, repository);
 
 		});
 		return boletos;
