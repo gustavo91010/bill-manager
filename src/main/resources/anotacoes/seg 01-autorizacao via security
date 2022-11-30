@@ -1,0 +1,137 @@
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+-------------------------------------------------------------------------
+	1- criar uma classe para fazer a configuração (SecurityConfigurations)
+	com anotações:
+	@EnableWebSecurity // habilita o modulo de seguranca
+	@Configurable // para o spring ler as configurações que estao dentro desta classe
+	e extenção: WebSecurityConfigurerAdapter
+	
+	Configurar os metodos de permissão, Ex:
+	
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+		// configuração de autrização, url. Ex: quem pode acessar cada url, perfil de
+		// acesso...
+		
+		http.authorizeRequests()
+		.antMatchers(HttpMethod.GET, "/topicos").permitAll() // o metodo antMatchers diz quais urls serao permitidas e quais serão bloqueadas
+		.antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
+		/* o acesso esta liberado para chamadas tipo get com as requisições 
+		 * "/topicos" e "/topicos/algumId"
+		 */
+		.anyRequest().authenticated() // todos os outros metodos tem que estarem autenticado para serema acessados,
+		//as URLs que não foram configuradas devem ter acesso restrito
+		
+		.and().formLogin();// diz ao spring para gerar um formulario de identifição"tela de login"
+	
+		Se não indicarmos o método HTTP, todos seriam permitidos.
+		/* o acesso esta liberado para chamadas tipo get com as requisições 
+		 * "/topicos" e "/topicos/algumId"
+		 
+		 
+		 -------------------------------------------------------------------------
+		2- Autenticação do Usuario:
+		
+		
+		
+		2.1 -  criar a classe Perfil:
+		
+		2.1.1- implements GrantedAuthority e @Entity
+		2.1.2- atributos: id, nome e metod que vem com a interface
+		2.1.3- 		@Override
+					public String getAuthority() {
+					return nome;}
+		
+		
+		2.2 - criar uma classe Usuario com a interface UserDetails
+		2.2.1- Com @Entity, id, nome, email, senha e 
+		2.2.2- List<Perfil>(@ManyToMany(fetch = FetchType.EAGER) soblre o perfil) que implementarar a interface: UserDetails
+		2.2.3- getPassword retur this.senha;
+		2.2.4- getUserName returm this.emal
+		2.2.5- metodos isAccountNon recebem true... sao 4 metodos
+		
+		Crirar um Repository para o usuario e o metodo:
+		Optional<Usuario> findByEmail(String email);
+		 para buscar ousuario pelo email
+		
+		
+	
+					
+		-------------------------------------------------------------------------
+		3- Login e senha:
+		
+		3.1- Criar a classe que tem alogica de autenticaçao
+		
+		3.1.1- AutenticacaoService com a implementação UserDetailsService e a anotação @Service
+		3.1.2- configura o metodo que vem com a interface: UserDetails loadUserByUsername:
+		
+		3.1.3- atribue o repository usuario com @autoWired
+		
+		@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Optional<Usuario> usuario = repository.findByEmail(username);
+		if (usuario.isPresent()) {
+			return usuario.get();
+		}throw new UsernameNotFoundException("Dados invalidos");
+	
+		
+		-------------------------------------------------------------------------
+		
+		
+	
+	Para Teste da senha:
+	System.out.println(new BCryptPasswordEncoder().encode("123456") ); 
+	para ter acesso ao hash da senha, o spring pega a senha digitada, poe pra gerar o hash ai, se bater, ele aceita
+		
+		3.2- interface a classe usuarioRepository 
+		criar o metodd Optional<Usuario> findByEmail(String email);
+		 para encontar o usuario pelo emal no banco de dados
+		 
+		 voltar a classe security :
+		 @Autowired
+	private AutenticacaoService autenticacaoService;
+	
+			-------------------------------------------------------------------------
+	
+	
+	Na calsse securityConfgi implementar o metodo:
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(autenticacaoService)// qual a classe que tem a logica de autenticação? AutenticacaoService
+		.passwordEncoder(new BCryptPasswordEncoder());
+	}
+	
+	
+	----------------- resumo ------------------
+	
+- Para utilizar o módulo do Spring Security, devemos adicioná-lo como dependência do projeto no arquivo pom.xml;
+
+- Para habilitar e configurar o controle de autenticação e autorização do projeto,
+	devemos criar uma classe e anotá-la com @Configuration e @EnableWebSecurity;
+ 
+- Para liberar acesso a algum endpoint da nossa API, devemos chamar o método:
+	http.authorizeRequests().antMatchers().permitAll() dentro do método configure(HttpSecurity http),
+	que está na classe SecurityConfigurations;
+	
+- O método anyRequest().authenticated() indica ao Spring Security para bloquear todos os endpoints que não foram liberados
+	anteriormente com o método permitAll();
+	
+- Para implementar o controle de autenticação na API, devemos implementar a interface UserDetails na classe Usuario
+	e também implementar a interface GrantedAuthority na classe Perfil;
+	
+- Para o Spring Security gerar automaticamente um formulário de login, devemos chamar o método and().formLogin(),
+	dentro do método configure(HttpSecurity http), que está na classe SecurityConfigurations;
+	
+- A lógica de autenticação, que consulta o usuário no banco de dados, deve implementar a interface UserDetailsService;
+
+- Devemos indicar ao Spring Security qual o algoritmo de hashing de senha que utilizaremos na API,
+	chamando o método passwordEncoder(), dentro do método configure(AuthenticationManagerBuilder auth),
+ 	que está na classe SecurityConfigurations.
+		
+		
+	
+	

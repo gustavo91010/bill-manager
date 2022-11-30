@@ -155,6 +155,7 @@ class BoletoControllerTest {
 		when(mocRepository.findBoletosPagos()).thenReturn(boletos);
 		mockMvc.perform(
 				get("/boletos/pago"))
+	
 		.andExpect(jsonPath("$[0].status").value("PAGO"))
 		.andExpect(status().isOk())
 		.andDo(MockMvcResultHandlers.print());

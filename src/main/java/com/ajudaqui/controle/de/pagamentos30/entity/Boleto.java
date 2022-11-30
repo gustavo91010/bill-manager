@@ -29,10 +29,11 @@ public class Boleto {
 	private LocalDate vencimento;
 
 	@Enumerated(EnumType.STRING)
+	private StatusBoleto status ;
+	
 //	@Column(nullable =true)
 //	private StatusBoleto status= ValidacaoStatusBoleto.validacao(this.vencimento);
 //	private StatusBoleto status = StatusBoleto.NAO_PAGO;
-	private StatusBoleto status ;
 
 	public Boleto() {
 		// TODO Auto-generated constructor stub
