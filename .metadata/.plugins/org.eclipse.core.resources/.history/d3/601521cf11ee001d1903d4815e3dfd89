@@ -1,0 +1,35 @@
+package com.ajudaqui.controle.de.pagamentos30.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.ajudaqui.controle.de.pagamentos30.dto.BoletoDto;
+import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
+import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
+
+public class BoletoService {
+	
+	@Autowired
+	private BoletoRepository boletoRepository;
+
+	public Boleto cadastrar(BoletoDto boletoDto) {
+
+		return boletoRepository.save( boletoDto.toDatabase());
+		
+	}
+
+	public List<Boleto> findAll() {
+		// TODO Auto-generated method stub
+		return boletoRepository.findAll();
+	}
+
+	public Boleto findById(Long id) {
+
+		Boleto boleto = boletoRepository.findById(id)
+				.orElseThrow(()->  new RuntimeException("Boleto não encontrado."));
+		return boleto;
+	}
+
+}

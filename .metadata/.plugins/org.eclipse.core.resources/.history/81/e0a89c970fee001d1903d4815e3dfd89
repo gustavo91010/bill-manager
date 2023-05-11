@@ -1,0 +1,5 @@
+package com.ajudaqui.controle.de.pagamentos30.service;
+
+public class BoletoService {
+
+}
