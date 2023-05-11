@@ -21,5 +21,6 @@ public class StatusBoletoVencendoHoje extends Status {
 		}
 		return proximo.validar(boleto);
 	}
+	
 
 }

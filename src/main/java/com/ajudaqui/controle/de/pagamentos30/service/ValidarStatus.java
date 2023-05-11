@@ -1,20 +1,23 @@
-package com.ajudaqui.controle.de.pagamentos30.entity;
+package com.ajudaqui.controle.de.pagamentos30.service;
 
+import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
 import com.ajudaqui.controle.de.pagamentos30.validacao.Status;
 import com.ajudaqui.controle.de.pagamentos30.validacao.StatusBoletoAVencer;
+import com.ajudaqui.controle.de.pagamentos30.validacao.BoletosEmDias;
 import com.ajudaqui.controle.de.pagamentos30.validacao.StatusBoletoPago;
 import com.ajudaqui.controle.de.pagamentos30.validacao.StatusBoletoVencendoHoje;
 import com.ajudaqui.controle.de.pagamentos30.validacao.StatusBoletoVencido;
 
 public class ValidarStatus {
 
-	public Boleto statusAtualizado(Boleto boleto, BoletoRepository repository) {
+	public static Boleto statusAtualizado(Boleto boleto, BoletoRepository repository) {
 		
 		Status status= new StatusBoletoPago(
-				new StatusBoletoVencido(
-						new StatusBoletoVencendoHoje(
-								new StatusBoletoAVencer())));
+						   new StatusBoletoVencido(
+							   new StatusBoletoVencendoHoje(
+								   new StatusBoletoAVencer(
+										new BoletosEmDias()))));
 		
 		boleto.setStatus(status.validar(boleto));
 		return repository.save(boleto);

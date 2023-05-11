@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.ajudaqui.controle.de.pagamentos30.dto.BoletoDto;
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
-import com.ajudaqui.controle.de.pagamentos30.entity.ValidarStatus;
 import com.ajudaqui.controle.de.pagamentos30.entity.Vo.BoletoVO;
 import com.ajudaqui.controle.de.pagamentos30.from.BoletoFrom;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
@@ -24,7 +23,7 @@ public class BoletoService {
 
 	public Boleto cadastrar(BoletoDto boletoDto) {
 
-		return boletoRepository.save( boletoDto.toDatabase());
+		return boletoRepository.save( boletoDto.toDatabase(boletoRepository));
 		
 	}
 
@@ -34,7 +33,7 @@ public class BoletoService {
 				);
 		
 		List<Boleto> boletos = boletoRepository.findAll(spefications);
-		 atualizarStatus(boletos);
+//		 atualizarStatus(boletos);
 			List<BoletoVO> boletosVO = new ArrayList<>();
 			boletos.forEach(b -> {
 				boletosVO.add(new BoletoVO(b));
@@ -50,22 +49,17 @@ public class BoletoService {
 		return boleto;
 	}
 
-	public List<Boleto> findByDescricao(String descricao) {
+	public List<BoletoVO> findByDescricao(String descricao) {
 		List<Boleto> boletos = boletoRepository.findByDescricao(descricao);
-		
-		
-		 return boletos;
-	}
-	
-	public List<Boleto> atualizarStatus(List<Boleto> boletos) {
-		ValidarStatus validarStatus = new ValidarStatus();
+		List<BoletoVO> boletosVO = new ArrayList<>();
 		boletos.forEach(b -> {
-			validarStatus.statusAtualizado(b, boletoRepository);
-
+			boletosVO.add(new BoletoVO(b));
 		});
-		return boletos;
-
+		
+		
+		 return boletosVO;
 	}
+
 
 	public List<BoletoVO> findBoletosPagos(int mes,int ano) {
 		LocalDate inicio= LocalDate.of(ano, mes, 1);
@@ -120,6 +114,20 @@ public class BoletoService {
 		Boleto boleto = findById(id);
 		boletoRepository.delete(boleto);
 		
+	}
+	public void performStatusUpdate() {
+		List<Boleto> pagamentos = boletoRepository.nextPayments(LocalDate.now().plusDays(10));
+		atualizarStatus(pagamentos);
+	}
+	
+	public List<Boleto> atualizarStatus(List<Boleto> boletos) {
+		ValidarStatus validarStatus = new ValidarStatus();
+		boletos.forEach(b -> {
+			validarStatus.statusAtualizado(b, boletoRepository);
+
+		});
+		return boletos;
+
 	}
 
 }
