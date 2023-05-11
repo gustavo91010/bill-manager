@@ -9,16 +9,12 @@ import com.ajudaqui.controle.de.pagamentos30.validacao.StatusBoletoVencido;
 
 public class ValidarStatus {
 
-//	public static StatusBoleto statusAtualizado(StatusBoleto status, LocalDate vencimento) {
-//	public static Boleto statusAtualizado(Boleto boleto, BoletoRepository repository) {
-
 	public Boleto statusAtualizado(Boleto boleto, BoletoRepository repository) {
 		
 		Status status= new StatusBoletoPago(
 				new StatusBoletoVencido(
 						new StatusBoletoVencendoHoje(
 								new StatusBoletoAVencer())));
-//		Status tatus= new StatusBoletoAVencer();
 		
 		boleto.setStatus(status.validar(boleto));
 		return repository.save(boleto);

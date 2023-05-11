@@ -13,6 +13,9 @@ public class BoletoVO {
 	private BigDecimal valor;
 	private LocalDate vencimento;
 	private StatusBoleto status;
+	public BoletoVO() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public BoletoVO(Boleto boleto) {
 		this.id = boleto.getId();

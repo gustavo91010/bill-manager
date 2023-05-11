@@ -13,8 +13,8 @@ public interface BoletoRepository extends JpaRepository<Boleto, Long>,JpaSpecifi
 
 	List<Boleto> findByDescricao(String descricao);
 
-	@Query(value="SELECT * FROM boleto WHERE status='PAGO'", nativeQuery = true)
-	List<Boleto> findBoletosPagos();
+	@Query(value="SELECT * FROM boleto WHERE status='PAGO' and BETWEEN :inicio AND :fim ", nativeQuery = true)
+	List<Boleto> findBoletosPagos(LocalDate inicio, LocalDate fim);
 	
 	@Query(value="SELECT * FROM boleto WHERE status='VENCIDO'", nativeQuery = true)
 	List<Boleto> findBoletosVencidos();
