@@ -121,9 +121,8 @@ public class BoletoService {
 	}
 	
 	public List<Boleto> atualizarStatus(List<Boleto> boletos) {
-		ValidarStatus validarStatus = new ValidarStatus();
 		boletos.forEach(b -> {
-			validarStatus.statusAtualizado(b, boletoRepository);
+			ValidarStatus.statusAtualizado(b, boletoRepository);
 
 		});
 		return boletos;

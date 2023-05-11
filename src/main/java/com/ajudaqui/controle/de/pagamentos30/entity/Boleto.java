@@ -31,9 +31,6 @@ public class Boleto {
 	@Enumerated(EnumType.STRING)
 	private StatusBoleto status ;
 	
-//	@Column(nullable =true)
-//	private StatusBoleto status= ValidacaoStatusBoleto.validacao(this.vencimento);
-//	private StatusBoleto status = StatusBoleto.NAO_PAGO;
 
 	public Boleto() {
 		// TODO Auto-generated constructor stub

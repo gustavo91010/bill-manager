@@ -143,6 +143,7 @@ public class BoletoController {
 	@PutMapping("/{id}")
 //	@ApiOperation(value = "Atualiza qualquer dado de um boleto" )
 	public ResponseEntity<BoletoVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
+		
 		//Falta testar
 		Boleto boleto = boletoSerivce.findById(id);
 		if (!(boleto == null)) {
@@ -159,6 +160,7 @@ public class BoletoController {
 	@DeleteMapping("/{id}")
 //	@ApiOperation(value = "Metodo para remover um boleto especifico" )
 	public ResponseEntity<?> remover(@PathVariable Long id) {
+		
 		//Falta testar
 		boletoSerivce.deleteById(id);
 		return ResponseEntity.ok().build();
@@ -167,13 +169,13 @@ public class BoletoController {
 	@PutMapping("/status-update")
 	public ResponseEntity<?> atualizarSt() {
 		
-//		try {
+		try {
 			boletoSerivce.performStatusUpdate();
 			return ResponseEntity.ok().build();
 			
-//		} catch (Exception e) {
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
-//		}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
+		}
 	}
 	
 

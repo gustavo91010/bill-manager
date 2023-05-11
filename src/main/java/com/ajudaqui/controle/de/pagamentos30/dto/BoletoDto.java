@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
-import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
 import com.ajudaqui.controle.de.pagamentos30.service.ValidarStatus;
 
