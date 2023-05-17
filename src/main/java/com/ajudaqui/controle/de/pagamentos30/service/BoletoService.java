@@ -1,25 +1,57 @@
 package com.ajudaqui.controle.de.pagamentos30.service;
 
+import static java.time.LocalDate.now;
+
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ajudaqui.controle.de.pagamentos30.dto.BoletoDto;
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
+import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.Vo.BoletoVO;
 import com.ajudaqui.controle.de.pagamentos30.from.BoletoFrom;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
 import com.ajudaqui.controle.de.pagamentos30.specification.BoletoSpecification;
+import com.ajudaqui.controle.de.pagamentos30.utils.Xlsx;
 
 @Service
 public class BoletoService {
 	
 	@Autowired
 	private BoletoRepository boletoRepository;
+	@Autowired
+	private ModelMapper modelMapper;
+	
+	public Boleto pagamento(Long id) {
+		Boleto boleto = findById(id);
+		boleto.setStatus(StatusBoleto.PAGO);
+		boletoRepository.save(boleto);
+		return boleto;
+		
+	}
+	public void boletosRecorrentes(BoletoDto boletoDto, Long repeticao) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		
+		for(int i=0;i< repeticao; i++ ) {
+			
+			LocalDate vencimento=LocalDate.parse(boletoDto.getVencimento(), formatter);
+			boletoDto.setVencimento(vencimento.plusMonths(i).toString());
+			cadastrar(boletoDto);
+		}
+		
+	}
+	public static void main(String[] args) {
+		System.out.println(LocalDate.now());
+	}
 
 	public Boleto cadastrar(BoletoDto boletoDto) {
 
@@ -115,6 +147,7 @@ public class BoletoService {
 		boletoRepository.delete(boleto);
 		
 	}
+	//actualização do estado em execução
 	public void performStatusUpdate() {
 		List<Boleto> pagamentos = boletoRepository.nextPayments(LocalDate.now().plusDays(10));
 		atualizarStatus(pagamentos);
@@ -127,6 +160,16 @@ public class BoletoService {
 		});
 		return boletos;
 
+	}
+	
+	public void resumoDoMesXlsx(String nome) throws IOException {
+		List<Boleto> boletos= new ArrayList<>();
+		
+		List<BoletoVO> boletosVO = findBoletosDoMes(now().getMonthValue(), now().getYear());
+		boletosVO.forEach(b -> {
+			boletos.add(modelMapper.map(b, Boleto.class));
+		});
+		Xlsx.planilhaBoletos(boletos, nome);
 	}
 
 }

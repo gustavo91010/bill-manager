@@ -37,7 +37,8 @@ public class BoletoDto {
 		
 		boleto.setDescricao(this.descricao);
 		boleto.setValor(this.valor);
-		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyy");
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 		boleto.setVencimento(LocalDate.parse(this.vencimento, formato));
 		ValidarStatus.statusAtualizado(boleto, boletoRepository);
 		return boleto;

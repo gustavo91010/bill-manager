@@ -1,5 +1,6 @@
 package com.ajudaqui.controle.de.pagamentos30.controller;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -30,6 +31,13 @@ public class BoletoController {
 	@Autowired
 	private BoletoService boletoSerivce;
 
+	@PutMapping("/pagamento/{id}")
+	public ResponseEntity<?> pagamento(@PathVariable("id") Long id) {
+		Boleto boleto = boletoSerivce.pagamento(id);
+
+		return new ResponseEntity<>(boleto, HttpStatus.OK);
+	}
+
 	@PostMapping
 //	@ApiOperation(value = "Salva um novo boleto no banco de dados" )
 	public ResponseEntity<?> cadastrar(@RequestBody BoletoDto boletoDto, UriComponentsBuilder uriBuilder) {
@@ -40,6 +48,21 @@ public class BoletoController {
 
 			URI uri = uriBuilder.path("/boletos").buildAndExpand(boleto.getId()).toUri();
 			return ResponseEntity.created(uri).body(new BoletoVO(boleto));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não cadastrado");
+		}
+
+	}
+
+	@PostMapping("/recorrente/{repet}")
+	public ResponseEntity<?> boletosRecorrentes(@RequestBody BoletoDto boletoDto, @PathVariable("repet") Long repet,
+			UriComponentsBuilder uriBuilder) {
+
+		try {
+
+			boletoSerivce.boletosRecorrentes(boletoDto, repet);
+
+			return ResponseEntity.status(HttpStatus.CREATED).body("Boleto cadastrado com sucesso");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não cadastrado");
 		}
@@ -118,7 +141,6 @@ public class BoletoController {
 //	@ApiOperation(value = "Chama os boletos a serem pagos no mes atual" )
 	public ResponseEntity<?> consultarBoletosASeremPagosMes(@RequestParam int mes, @RequestParam int ano) {
 
-
 		try {
 			List<BoletoVO> boletosVO = boletoSerivce.findBoletosASeremPagosNoMes(mes, ano);
 
@@ -133,7 +155,7 @@ public class BoletoController {
 //	@ApiOperation(value = "Faz uma consulta com dados variados sobre o boleto" )
 	List<BoletoVO> findByBuscaDinamica(@RequestBody BoletoFrom boletoFrom) {
 
-		//Falta testar
+		// Falta testar
 		List<BoletoVO> boletosVO = boletoSerivce.findAll(boletoFrom);
 
 		return boletosVO;
@@ -143,8 +165,8 @@ public class BoletoController {
 	@PutMapping("/{id}")
 //	@ApiOperation(value = "Atualiza qualquer dado de um boleto" )
 	public ResponseEntity<BoletoVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
-		
-		//Falta testar
+
+		// Falta testar
 		Boleto boleto = boletoSerivce.findById(id);
 		if (!(boleto == null)) {
 			boleto.setDescricao(from.getDescricao());
@@ -156,27 +178,36 @@ public class BoletoController {
 		return ResponseEntity.notFound().build();
 	}
 
-
 	@DeleteMapping("/{id}")
 //	@ApiOperation(value = "Metodo para remover um boleto especifico" )
 	public ResponseEntity<?> remover(@PathVariable Long id) {
-		
-		//Falta testar
+
+		// Falta testar
 		boletoSerivce.deleteById(id);
 		return ResponseEntity.ok().build();
 
 	}
+
 	@PutMapping("/status-update")
 	public ResponseEntity<?> atualizarSt() {
-		
+
 		try {
 			boletoSerivce.performStatusUpdate();
 			return ResponseEntity.ok().build();
-			
+
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
 		}
 	}
-	
+
+	@GetMapping("/xlsx/{nome}")
+	public void resumoDoMesXlsx(@PathVariable("nome") String nome) {
+		try {
+			boletoSerivce.resumoDoMesXlsx(nome);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
