@@ -200,7 +200,7 @@ public class BoletoController {
 		}
 	}
 
-	@GetMapping("/xlsx/{nome}")
+	@PostMapping("/xlsx/{nome}")
 	public void resumoDoMesXlsx(@PathVariable("nome") String nome) {
 		try {
 			boletoSerivce.resumoDoMesXlsx(nome);

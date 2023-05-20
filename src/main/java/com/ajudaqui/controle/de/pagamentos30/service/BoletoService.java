@@ -14,10 +14,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ajudaqui.controle.de.pagamentos30.dto.BoletoDto;
+import com.ajudaqui.controle.de.pagamentos30.dto.EmailDto;
 import com.ajudaqui.controle.de.pagamentos30.entity.Boleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.StatusBoleto;
 import com.ajudaqui.controle.de.pagamentos30.entity.Vo.BoletoVO;
 import com.ajudaqui.controle.de.pagamentos30.from.BoletoFrom;
+import com.ajudaqui.controle.de.pagamentos30.http.EmailClient;
 import com.ajudaqui.controle.de.pagamentos30.repository.BoletoRepository;
 import com.ajudaqui.controle.de.pagamentos30.specification.BoletoSpecification;
 import com.ajudaqui.controle.de.pagamentos30.utils.Xlsx;
@@ -29,6 +31,9 @@ public class BoletoService {
 	private BoletoRepository boletoRepository;
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private EmailClient emailClient;
 	
 	public Boleto pagamento(Long id) {
 		Boleto boleto = findById(id);
@@ -170,6 +175,14 @@ public class BoletoService {
 			boletos.add(modelMapper.map(b, Boleto.class));
 		});
 		Xlsx.planilhaBoletos(boletos, nome);
+		EmailDto email= new EmailDto();
+		email.setEmailTo("gustavo91010@gmail.com");
+		email.setSubject("testando micro servicos");
+		email.setText("opa lel, opa lala, ta na hora de pegar!");
+		email.setUser_id(1l);
+		
+		emailClient.sendingEmail(email);
+	System.err.println(email.toString());
 	}
 
 }

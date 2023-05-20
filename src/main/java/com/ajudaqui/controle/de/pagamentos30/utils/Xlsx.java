@@ -21,7 +21,8 @@ public class Xlsx {
 		// cria uma nova planilha
 		Workbook planilha = new XSSFWorkbook();
 
-		Sheet folha = planilha.createSheet("Boletos do mes " + boletos.get(0).getVencimento().getMonth());
+//		Sheet folha = planilha.createSheet("Boletos do mes " + boletos.get(0).getVencimento().getMonth());
+		Sheet folha = planilha.createSheet("Boletos do mes ");
 		int posicaoLinha = 1;
 		Cell celula;
 		Row linha = folha.createRow(posicaoLinha++);
