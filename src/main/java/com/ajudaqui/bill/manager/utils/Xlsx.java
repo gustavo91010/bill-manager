@@ -13,11 +13,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 
 public class Xlsx {
 
-	public static Path planilhaBoletos(List<Boleto> boletos, String nome) throws IOException {
+	public static Path planilhaBoletos(List<Payament> boletos, String nome) throws IOException {
 		// cria uma nova planilha
 		Workbook planilha = new XSSFWorkbook();
 
@@ -47,7 +47,7 @@ public class Xlsx {
 		celula.setCellValue("status");
 		folha.autoSizeColumn(4);
 
-		for (Boleto boleto : boletos) {
+		for (Payament boleto : boletos) {
 			linha = folha.createRow(posicaoLinha++);
 
 			// Linha de valores:
@@ -55,14 +55,14 @@ public class Xlsx {
 			celula.setCellValue(boleto.getId());
 			celula = linha.createCell(1);
 			
-			celula.setCellValue(boleto.getDescricao());
+			celula.setCellValue(boleto.getDescription());
 			celula = linha.createCell(2);
 			
-			celula.setCellValue(boleto.getValor().toString());
+			celula.setCellValue(boleto.getValue().toString());
 			celula = linha.createCell(3);
 			folha.autoSizeColumn(3);
 			
-			celula.setCellValue(boleto.getVencimento().toString());
+			celula.setCellValue(boleto.getDue_date().toString());
 			celula = linha.createCell(4);
 			celula.setCellValue(boleto.getStatus().toString());
 			folha.autoSizeColumn(4);
@@ -72,7 +72,7 @@ public class Xlsx {
 		return path.toAbsolutePath(); 
 
 	}
-	private static Path escreverPanilha(Workbook planilha,List<Boleto> boletos, String nome) throws IOException {
+	private static Path escreverPanilha(Workbook planilha,List<Payament> boletos, String nome) throws IOException {
 		// Retira caracters especiais que nao podem estar no titulo da planilha
 		String userHome = System.getProperty("user.home");
 		String subDir = "controle-de-pagamentos";

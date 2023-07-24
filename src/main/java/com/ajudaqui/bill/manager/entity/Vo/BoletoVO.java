@@ -3,27 +3,27 @@ package com.ajudaqui.bill.manager.entity.Vo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class BoletoVO {
 
 	private Long id;
-	private String descricao;
-	private BigDecimal valor;
-	private LocalDate vencimento;
+	private String description;
+	private BigDecimal value;
+	private LocalDate due_date;
 	private StatusBoleto status;
 	public BoletoVO() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public BoletoVO(Boleto boleto) {
-		this.id = boleto.getId();
-		this.descricao = boleto.getDescricao();
-		this.valor = boleto.getValor();
-		this.vencimento = boleto.getVencimento();
+	public BoletoVO(Payament payaments) {
+		this.id = payaments.getId();
+		this.description = payaments.getDescription();
+		this.value = payaments.getValue();
+		this.due_date = payaments.getDue_date();
 //		this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
-		this.status = boleto.getStatus();
+		this.status = payaments.getStatus();
 	}
 
 	public Long getId() {
@@ -34,28 +34,28 @@ public class BoletoVO {
 		this.id = id;
 	}
 
-	public String getDescricao() {
-		return descricao;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public BigDecimal getValor() {
-		return valor;
+	public BigDecimal getValue() {
+		return value;
 	}
 
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
+	public void setValue(BigDecimal value) {
+		this.value = value;
 	}
 
-	public LocalDate getVencimento() {
-		return vencimento;
+	public LocalDate getDue_date() {
+		return due_date;
 	}
 
-	public void setVencimento(LocalDate vencimento) {
-		this.vencimento = vencimento;
+	public void setDue_date(LocalDate due_date) {
+		this.due_date = due_date;
 	}
 
 	public StatusBoleto getStatus() {
@@ -65,6 +65,10 @@ public class BoletoVO {
 	public void setStatus(StatusBoleto status) {
 		this.status = status;
 	}
+	
+	
+	
+
 
 	
 

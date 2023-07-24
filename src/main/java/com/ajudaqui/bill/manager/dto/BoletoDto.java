@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
-import com.ajudaqui.bill.manager.repository.BoletoRepository;
+import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.repository.PayamentsRepository;
 import com.ajudaqui.bill.manager.service.ValidarStatus;
 
 public class BoletoDto {
@@ -32,14 +32,14 @@ public class BoletoDto {
 	public void setVencimento(String vencimento) {
 		this.vencimento = vencimento;
 	}
-	public Boleto toDatabase(BoletoRepository boletoRepository) {
-		Boleto boleto= new Boleto();
+	public Payament toDatabase(PayamentsRepository boletoRepository) {
+		Payament boleto= new Payament();
 		
-		boleto.setDescricao(this.descricao);
-		boleto.setValor(this.valor);
+		boleto.setDescription(this.descricao);
+		boleto.setValue(this.valor);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		boleto.setVencimento(LocalDate.parse(this.vencimento, formato));
+		boleto.setDue_date(LocalDate.parse(this.vencimento, formato));
 		ValidarStatus.statusAtualizado(boleto, boletoRepository);
 		return boleto;
 	}

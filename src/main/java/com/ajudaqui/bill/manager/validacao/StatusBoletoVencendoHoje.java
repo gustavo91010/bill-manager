@@ -2,7 +2,7 @@ package com.ajudaqui.bill.manager.validacao;
 
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class StatusBoletoVencendoHoje extends Status {
@@ -14,8 +14,8 @@ public class StatusBoletoVencendoHoje extends Status {
 	}
 
 	@Override
-	public StatusBoleto validar(Boleto boleto) {
-		boolean vencendo_hoje = boleto.getVencimento().compareTo(hoje) == 0;
+	public StatusBoleto validar(Payament boleto) {
+		boolean vencendo_hoje = boleto.getDue_date().compareTo(hoje) == 0;
 		if(vencendo_hoje) {
 			return StatusBoleto.VENCENDO_HOJE;
 		}

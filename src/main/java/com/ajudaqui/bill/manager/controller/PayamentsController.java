@@ -19,21 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ajudaqui.bill.manager.dto.BoletoDto;
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.Vo.BoletoVO;
 import com.ajudaqui.bill.manager.from.BoletoFrom;
-import com.ajudaqui.bill.manager.service.BoletoService;
+import com.ajudaqui.bill.manager.service.PayamentService;
 
 @RestController
 @RequestMapping("/boletos")
-public class BoletoController {
+public class PayamentsController {
 
 	@Autowired
-	private BoletoService boletoSerivce;
+	private PayamentService boletoSerivce;
 
 	@PutMapping("/pagamento/{id}")
 	public ResponseEntity<?> pagamento(@PathVariable("id") Long id) {
-		Boleto boleto = boletoSerivce.pagamento(id);
+		Payament boleto = boletoSerivce.pagamento(id);
 
 		return new ResponseEntity<>(boleto, HttpStatus.OK);
 	}
@@ -44,7 +44,7 @@ public class BoletoController {
 
 		try {
 
-			Boleto boleto = boletoSerivce.cadastrar(boletoDto);
+			Payament boleto = boletoSerivce.cadastrar(boletoDto);
 
 			URI uri = uriBuilder.path("/boletos").buildAndExpand(boleto.getId()).toUri();
 			return ResponseEntity.created(uri).body(new BoletoVO(boleto));
@@ -74,7 +74,7 @@ public class BoletoController {
 	public ResponseEntity<?> consultarPorId(@PathVariable("id") Long id) {
 		try {
 
-			Boleto boleto = boletoSerivce.findById(id);
+			Payament boleto = boletoSerivce.findById(id);
 			return ResponseEntity.ok(new BoletoVO(boleto));
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -97,59 +97,6 @@ public class BoletoController {
 		}
 	}
 
-	@GetMapping(value = "/pago")
-//	@ApiOperation(value = "Mostra os boletos que ja foram pago " )
-	public ResponseEntity<?> mostrarBoletosPagos(@RequestParam int mes, @RequestParam int ano) {
-		try {
-
-			List<BoletoVO> boletosVO = boletoSerivce.findBoletosPagos(mes, ano);
-
-			return ResponseEntity.ok(boletosVO);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
-		}
-	}
-
-	@GetMapping(value = "/vencido")
-//	@ApiOperation(value = "Chama os boletos que estao vencidos" )
-	public ResponseEntity<?> mostrarBoletosVencidos() {
-		try {
-			List<BoletoVO> boletosVO = boletoSerivce.findBoletosVencidos();
-
-			return ResponseEntity.ok(boletosVO);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
-
-		}
-	}
-
-	@GetMapping(value = "/data")
-//	@ApiOperation(value = "Chama os boletos do no mes " )
-	public ResponseEntity<?> consultarBoletosMes(@RequestParam int mes, @RequestParam int ano) {
-		try {
-			List<BoletoVO> boletosVO = boletoSerivce.findBoletosDoMes(mes, ano);
-
-			return ResponseEntity.ok(boletosVO);
-
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
-		}
-
-	}
-
-	@GetMapping(value = "/a-serem-pagos-no-mes")
-//	@ApiOperation(value = "Chama os boletos a serem pagos no mes atual" )
-	public ResponseEntity<?> consultarBoletosASeremPagosMes(@RequestParam int mes, @RequestParam int ano) {
-
-		try {
-			List<BoletoVO> boletosVO = boletoSerivce.findBoletosASeremPagosNoMes(mes, ano);
-
-			return ResponseEntity.ok(boletosVO);
-
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
-		}
-	}
 
 	@GetMapping("/dinamico")
 //	@ApiOperation(value = "Faz uma consulta com dados variados sobre o boleto" )
@@ -167,11 +114,11 @@ public class BoletoController {
 	public ResponseEntity<BoletoVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
 
 		// Falta testar
-		Boleto boleto = boletoSerivce.findById(id);
+		Payament boleto = boletoSerivce.findById(id);
 		if (!(boleto == null)) {
-			boleto.setDescricao(from.getDescricao());
-			boleto.setValor(from.getValor());
-			boleto.setVencimento(from.getVencimento());
+			boleto.setDescription( (from.getDescricao()));
+			boleto.setValue(from.getValor());
+			boleto.setDue_date(from.getVencimento());
 
 			return ResponseEntity.ok(new BoletoVO(boleto));
 		}

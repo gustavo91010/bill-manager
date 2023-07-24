@@ -2,7 +2,7 @@ package com.ajudaqui.bill.manager.validacao;
 
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class StatusBoletoVencido extends Status {
@@ -13,8 +13,8 @@ public class StatusBoletoVencido extends Status {
 	}
 
 	@Override
-	public StatusBoleto validar(Boleto boleto) {
-		boolean vencido = boleto.getVencimento().compareTo(hoje) < 0;
+	public StatusBoleto validar(Payament boleto) {
+		boolean vencido = boleto.getDue_date().compareTo(hoje) < 0;
 		if (vencido) {
 			return StatusBoleto.VENCIDO;
 		}

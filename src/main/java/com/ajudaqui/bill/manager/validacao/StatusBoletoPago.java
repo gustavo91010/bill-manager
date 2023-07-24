@@ -1,6 +1,6 @@
 package com.ajudaqui.bill.manager.validacao;
 
-import com.ajudaqui.bill.manager.entity.Boleto;
+import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class StatusBoletoPago extends Status {
@@ -10,7 +10,7 @@ public class StatusBoletoPago extends Status {
 	}
 
 	@Override
-	public StatusBoleto validar(Boleto boleto) {
+	public StatusBoleto validar(Payament boleto) {
 		if(boleto.getStatus()== StatusBoleto.PAGO) {
 			return StatusBoleto.PAGO;
 		}
