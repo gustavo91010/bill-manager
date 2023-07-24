@@ -10,10 +10,10 @@
 		<relativePath />
 	</parent>
 	<groupId>com.ajudaqui</groupId>
-	<artifactId>controle-de-pagamentos-3.0</artifactId>
+	<artifactId>bill-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>controle-de-pagamentos-3.0</name>
-	<description>uma atalização do projeto ControleDePagamentos_2.0</description>
+	<name>bill-manager</name>
+	<description>Um gerenciador de contas</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
