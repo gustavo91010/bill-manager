@@ -35,6 +35,7 @@ public class PayamentService {
 	@Autowired
 	private EmailClient emailClient;
 	
+	
 	public Payament pagamento(Long id) {
 		Payament boleto = findById(id);
 		boleto.setStatus(StatusBoleto.PAGO);
