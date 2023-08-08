@@ -13,11 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.ajudaqui.bill.manager.dto.BoletoDto;
+import com.ajudaqui.bill.manager.dto.PayamentDto;
 import com.ajudaqui.bill.manager.dto.EmailDto;
 import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
-import com.ajudaqui.bill.manager.entity.Vo.BoletoVO;
+import com.ajudaqui.bill.manager.entity.Users;
+import com.ajudaqui.bill.manager.entity.Vo.PayamentVO;
 import com.ajudaqui.bill.manager.from.BoletoFrom;
 import com.ajudaqui.bill.manager.http.EmailClient;
 import com.ajudaqui.bill.manager.repository.PayamentsRepository;
@@ -29,6 +30,8 @@ public class PayamentService {
 	
 	@Autowired
 	private PayamentsRepository boletoRepository;
+	@Autowired
+	private UsersService usersService;
 	@Autowired
 	private ModelMapper modelMapper;
 	
@@ -43,7 +46,8 @@ public class PayamentService {
 		return boleto;
 		
 	}
-	public void boletosRecorrentes(BoletoDto boletoDto, Long repeticao) {
+	public void boletosRecorrentes(PayamentDto boletoDto, Long repeticao) {
+		
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 		
@@ -55,26 +59,24 @@ public class PayamentService {
 		}
 		
 	}
-	public static void main(String[] args) {
-		System.out.println(LocalDate.now());
-	}
 
-	public Payament cadastrar(BoletoDto boletoDto) {
+	public Payament cadastrar(PayamentDto payamentDto) {
+		Users users = usersService.findById(payamentDto.getUsersId());
 
-		return boletoRepository.save( boletoDto.toDatabase(boletoRepository));
+		return boletoRepository.save( payamentDto.toDatabase(boletoRepository,users));
 		
 	}
 
-	public List<BoletoVO> findAll(BoletoFrom boletoFrom) {
+	public List<PayamentVO> findAll(BoletoFrom boletoFrom) {
 		Specification<Payament> spefications = Specification
 				.where(BoletoSpecification.descricao(boletoFrom.getDescricao())
 				);
 		
 		List<Payament> boletos = boletoRepository.findAll(spefications);
 //		 atualizarStatus(boletos);
-			List<BoletoVO> boletosVO = new ArrayList<>();
+			List<PayamentVO> boletosVO = new ArrayList<>();
 			boletos.forEach(b -> {
-				boletosVO.add(new BoletoVO(b));
+				boletosVO.add(new PayamentVO(b));
 			});
 		 
 		 return boletosVO;
@@ -86,13 +88,18 @@ public class PayamentService {
 				.orElseThrow(()->  new RuntimeException("Boleto não encontrado."));
 		return boleto;
 	}
+	public List<Payament> findByPayamentsForUser(Long userId) {
+		return boletoRepository.findByPayamentsForUser(userId);
+		
+		
+	}
 
-	public List<BoletoVO> findByDescricao(String descricao) {
+	public List<PayamentVO> findByDescricao(String descricao) {
 		List<Payament> boletos =new ArrayList<>();
 //				boletoRepository.findByDescricao(descricao);
-		List<BoletoVO> boletosVO = new ArrayList<>();
+		List<PayamentVO> boletosVO = new ArrayList<>();
 		boletos.forEach(b -> {
-			boletosVO.add(new BoletoVO(b));
+			boletosVO.add(new PayamentVO(b));
 		});
 		
 		
@@ -127,7 +134,7 @@ public class PayamentService {
 	public void resumoDoMesXlsx(String nome) throws IOException {
 		List<Payament> boletos= new ArrayList<>();
 		
-		List<BoletoVO> boletosVO =new ArrayList<>();
+		List<PayamentVO> boletosVO =new ArrayList<>();
 //				findBoletosDoMes(now().getMonthValue(), now().getYear());
 		boletosVO.forEach(b -> {
 			boletos.add(modelMapper.map(b, Payament.class));

@@ -6,18 +6,18 @@ import java.time.LocalDate;
 import com.ajudaqui.bill.manager.entity.Payament;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
-public class BoletoVO {
+public class PayamentVO {
 
 	private Long id;
 	private String description;
 	private BigDecimal value;
 	private LocalDate due_date;
 	private StatusBoleto status;
-	public BoletoVO() {
+	public PayamentVO() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public BoletoVO(Payament payaments) {
+	public PayamentVO(Payament payaments) {
 		this.id = payaments.getId();
 		this.description = payaments.getDescription();
 		this.value = payaments.getValue();

@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.ajudaqui.bill.manager.validacao.ValidacaoStatusBoleto;
@@ -22,6 +23,8 @@ public class Payament {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@ManyToOne
+	private Users users;
 //	@Column(nullable = false)
 	private String description;
 //	@Column(nullable = false)
@@ -39,16 +42,9 @@ public class Payament {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Payament(Long id, String description, BigDecimal value, LocalDate due_date,StatusBoleto status) {
+	public Payament(Long id, Users user,String description, BigDecimal value, LocalDate due_date) {
 		this.id = id;
-		this.description = description;
-		this.value = value;
-		this.due_date = due_date;
-		this.status = status;
-		this.created_at= LocalDateTime.now();
-	}
-	public Payament(Long id, String description, BigDecimal value, LocalDate due_date) {
-		this.id = id;
+		this.users= user;
 		this.description = description;
 		this.value = value;
 		this.due_date = due_date;
@@ -57,7 +53,8 @@ public class Payament {
 
 	}
 
-	public Payament( String description, BigDecimal value, LocalDate due_date) {
+	public Payament(Users user, String description, BigDecimal value, LocalDate due_date) {
+		this.users= user;
 		this.description = description;
 		this.value = value;
 		this.due_date = due_date;
@@ -120,6 +117,14 @@ public class Payament {
 
 	public void setStatus(StatusBoleto status) {
 		this.status = status;
+	}
+
+	public Users getUsers() {
+		return users;
+	}
+
+	public void setUsers(Users users) {
+		this.users = users;
 	}
 
 	@Override

@@ -1,11 +1,14 @@
 package com.ajudaqui.bill.manager.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -21,6 +24,8 @@ public class Users {
 	private Boolean active;
 	private LocalDateTime created_at;
 	private LocalDateTime updated_at ;
+	@OneToMany
+	private List<Payament> payaments = new ArrayList<>();
 	public Long getId() {
 		return id;
 	}
@@ -57,6 +62,13 @@ public class Users {
 	public void setUpdated_at(LocalDateTime updated_at) {
 		this.updated_at = updated_at;
 	}
+	public List<Payament> getPayaments() {
+		return payaments;
+	}
+	public void setPayaments(List<Payament> payaments) {
+		this.payaments = payaments;
+	}
+	
 	
 	
 

@@ -5,14 +5,24 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Users;
 import com.ajudaqui.bill.manager.repository.PayamentsRepository;
 import com.ajudaqui.bill.manager.service.ValidarStatus;
 
-public class BoletoDto {
+public class PayamentDto {
+	private Long usersId;
 	private String descricao;
 	private BigDecimal valor;
 	private String vencimento;
 	
+	
+	
+	public Long getUsersId() {
+		return usersId;
+	}
+	public void setUsersId(Long usersId) {
+		this.usersId = usersId;
+	}
 	public String getDescricao() {
 		return descricao;
 	}
@@ -32,16 +42,17 @@ public class BoletoDto {
 	public void setVencimento(String vencimento) {
 		this.vencimento = vencimento;
 	}
-	public Payament toDatabase(PayamentsRepository boletoRepository) {
-		Payament boleto= new Payament();
+	public Payament toDatabase(PayamentsRepository boletoRepository, Users users) {
+		Payament payament= new Payament();
 		
-		boleto.setDescription(this.descricao);
-		boleto.setValue(this.valor);
+		payament.setUsers(users);
+		payament.setDescription(this.descricao);
+		payament.setValue(this.valor);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		boleto.setDue_date(LocalDate.parse(this.vencimento, formato));
-		ValidarStatus.statusAtualizado(boleto, boletoRepository);
-		return boleto;
+		payament.setDue_date(LocalDate.parse(this.vencimento, formato));
+		ValidarStatus.statusAtualizado(payament, boletoRepository);
+		return payament;
 	}
 	
 	

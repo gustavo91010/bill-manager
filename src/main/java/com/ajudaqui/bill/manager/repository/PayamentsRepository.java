@@ -28,6 +28,10 @@ public interface PayamentsRepository extends JpaRepository<Payament, Long>,JpaSp
 	@Query(value="select * from payament where status <> 'PAGO' AND due_date  > :deadline ", nativeQuery = true)
 	List<Payament> nextPayments(LocalDate deadline);
 	
+	@Query(value="select * from payament where users_id= :userId ", nativeQuery = true)
+	List<Payament> findByPayamentsForUser(Long userId);
+	
+	
 ;
 	
 
