@@ -118,11 +118,6 @@
     </dependency>
 
 
-    <dependency>
-    	<groupId>mesa_de_estudos</groupId>
-    	<artifactId>mesa_de_estudos</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
-    </dependency>
 	</dependencies>
 
 
