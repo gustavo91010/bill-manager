@@ -10,7 +10,6 @@ public class BillManagerApplication {
 
 	public static void main(String[] args) {
 //		http://localhost:8080/swagger-ui.html
-		
 		SpringApplication.run(BillManagerApplication.class, args);
 		System.err.println("foi!!");
 	}
