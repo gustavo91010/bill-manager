@@ -1,6 +1,6 @@
 package com.ajudaqui.bill.manager.validacao;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public abstract class Status {
@@ -11,7 +11,7 @@ public abstract class Status {
 		this.proximo = proximo;
 	}
 	
-	public abstract StatusBoleto validar(Payament boleto);
+	public abstract StatusBoleto validar(Payment boleto);
 	
 	
 

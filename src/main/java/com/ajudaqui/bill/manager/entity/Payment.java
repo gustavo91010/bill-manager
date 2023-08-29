@@ -12,13 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.ajudaqui.bill.manager.validacao.ValidacaoStatusBoleto;
 
 @Entity
-@Table(name = "payament")
-public class Payament {
+@Table(name = "payment")
+public class Payment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +39,11 @@ public class Payament {
 	private StatusBoleto status ;
 	
 
-	public Payament() {
+	public Payment() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Payament(Long id, Users user,String description, BigDecimal value, LocalDate due_date) {
+	public Payment(Long id, Users user,String description, BigDecimal value, LocalDate due_date) {
 		this.id = id;
 		this.users= user;
 		this.description = description;
@@ -53,7 +54,7 @@ public class Payament {
 
 	}
 
-	public Payament(Users user, String description, BigDecimal value, LocalDate due_date) {
+	public Payment(Users user, String description, BigDecimal value, LocalDate due_date) {
 		this.users= user;
 		this.description = description;
 		this.value = value;
@@ -140,7 +141,7 @@ public class Payament {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Payament other = (Payament) obj;
+		Payment other = (Payment) obj;
 		return Objects.equals(created_at, other.created_at) && Objects.equals(description, other.description)
 				&& Objects.equals(due_date, other.due_date) && Objects.equals(id, other.id) && status == other.status
 				&& Objects.equals(updated_at, other.updated_at) && Objects.equals(value, other.value);

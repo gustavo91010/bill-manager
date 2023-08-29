@@ -3,7 +3,7 @@ package com.ajudaqui.bill.manager.from;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 import com.ajudaqui.bill.manager.validacao.ValidacaoStatusBoleto;
 
@@ -47,8 +47,8 @@ public class BoletoFrom {
 //		this.status = status;
 //	}
 
-	public Payament convert() {
-		Payament payament= new Payament();
+	public Payment convert() {
+		Payment payament= new Payment();
 		payament.setDescription(this.descricao);
 		payament.setValue(this.valor);
 		payament.setDue_date(this.vencimento);

@@ -1,7 +1,7 @@
 package com.ajudaqui.bill.manager.service;
 
-import com.ajudaqui.bill.manager.entity.Payament;
-import com.ajudaqui.bill.manager.repository.PayamentsRepository;
+import com.ajudaqui.bill.manager.entity.Payment;
+import com.ajudaqui.bill.manager.repository.PaymentsRepository;
 import com.ajudaqui.bill.manager.validacao.BoletosEmDias;
 import com.ajudaqui.bill.manager.validacao.Status;
 import com.ajudaqui.bill.manager.validacao.StatusBoletoAVencer;
@@ -11,7 +11,7 @@ import com.ajudaqui.bill.manager.validacao.StatusBoletoVencido;
 
 public class ValidarStatus {
 
-	public static Payament statusAtualizado(Payament boleto, PayamentsRepository repository) {
+	public static Payment statusAtualizado(Payment boleto, PaymentsRepository repository) {
 		
 		Status status= new StatusBoletoPago(
 						   new StatusBoletoVencido(

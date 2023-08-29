@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ajudaqui.bill.manager.dto.PayamentDto;
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.Vo.PayamentVO;
 import com.ajudaqui.bill.manager.from.BoletoFrom;
 import com.ajudaqui.bill.manager.service.PayamentService;
@@ -33,7 +33,7 @@ public class PayamentsController {
 
 	@PutMapping("/pagamento/{id}")
 	public ResponseEntity<?> pagamento(@PathVariable("id") Long id) {
-		Payament boleto = payamentSerivce.pagamento(id);
+		Payment boleto = payamentSerivce.pagamento(id);
 
 		return new ResponseEntity<>(boleto, HttpStatus.OK);
 	}
@@ -44,7 +44,7 @@ public class PayamentsController {
 
 		try {
 
-			Payament boleto = payamentSerivce.cadastrar(payamentDto);
+			Payment boleto = payamentSerivce.cadastrar(payamentDto);
 
 			URI uri = uriBuilder.path("/boletos").buildAndExpand(boleto.getId()).toUri();
 			return ResponseEntity.created(uri).body(new PayamentVO(boleto));
@@ -74,7 +74,7 @@ public class PayamentsController {
 	public ResponseEntity<?> consultarPorId(@PathVariable("id") Long id) {
 		try {
 
-			Payament boleto = payamentSerivce.findById(id);
+			Payment boleto = payamentSerivce.findById(id);
 			return ResponseEntity.ok(new PayamentVO(boleto));
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -114,7 +114,7 @@ public class PayamentsController {
 	public ResponseEntity<PayamentVO> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
 
 		// Falta testar
-		Payament boleto = payamentSerivce.findById(id);
+		Payment boleto = payamentSerivce.findById(id);
 		if (!(boleto == null)) {
 			boleto.setDescription( (from.getDescricao()));
 			boleto.setValue(from.getValor());

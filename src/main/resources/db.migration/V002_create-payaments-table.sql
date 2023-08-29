@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE TABLE IF NOT EXISTS public.payament
+CREATE TABLE IF NOT EXISTS public.payment
 (
     status character varying(20) NOT NULL,
     id bigserial NOT NULL,
@@ -13,11 +13,6 @@ CREATE TABLE IF NOT EXISTS public.payament
     PRIMARY KEY (id)
 );
 
-ALTER TABLE IF EXISTS public.payament
-    ADD FOREIGN KEY (id)
-    REFERENCES public.users (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
+
     
 END;

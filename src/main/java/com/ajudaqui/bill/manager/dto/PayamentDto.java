@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.Users;
-import com.ajudaqui.bill.manager.repository.PayamentsRepository;
+import com.ajudaqui.bill.manager.repository.PaymentsRepository;
 import com.ajudaqui.bill.manager.service.ValidarStatus;
 
 public class PayamentDto {
@@ -42,8 +42,8 @@ public class PayamentDto {
 	public void setVencimento(String vencimento) {
 		this.vencimento = vencimento;
 	}
-	public Payament toDatabase(PayamentsRepository boletoRepository, Users users) {
-		Payament payament= new Payament();
+	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
+		Payment payament= new Payment();
 		
 		payament.setUsers(users);
 		payament.setDescription(this.descricao);

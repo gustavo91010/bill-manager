@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.Users;
 import com.ajudaqui.bill.manager.entity.Vo.PayamentVO;
 import com.ajudaqui.bill.manager.entity.Vo.UsersVO;

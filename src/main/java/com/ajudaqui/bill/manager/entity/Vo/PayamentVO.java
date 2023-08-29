@@ -3,7 +3,7 @@ package com.ajudaqui.bill.manager.entity.Vo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class PayamentVO {
@@ -17,7 +17,7 @@ public class PayamentVO {
 		// TODO Auto-generated constructor stub
 	}
 
-	public PayamentVO(Payament payaments) {
+	public PayamentVO(Payment payaments) {
 		this.id = payaments.getId();
 		this.description = payaments.getDescription();
 		this.value = payaments.getValue();

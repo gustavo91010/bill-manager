@@ -13,11 +13,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 
 public class Xlsx {
 
-	public static Path planilhaBoletos(List<Payament> boletos, String nome) throws IOException {
+	public static Path planilhaBoletos(List<Payment> boletos, String nome) throws IOException {
 		// cria uma nova planilha
 		Workbook planilha = new XSSFWorkbook();
 
@@ -47,7 +47,7 @@ public class Xlsx {
 		celula.setCellValue("status");
 		folha.autoSizeColumn(4);
 
-		for (Payament boleto : boletos) {
+		for (Payment boleto : boletos) {
 			linha = folha.createRow(posicaoLinha++);
 
 			// Linha de valores:
@@ -72,7 +72,7 @@ public class Xlsx {
 		return path.toAbsolutePath(); 
 
 	}
-	private static Path escreverPanilha(Workbook planilha,List<Payament> boletos, String nome) throws IOException {
+	private static Path escreverPanilha(Workbook planilha,List<Payment> boletos, String nome) throws IOException {
 		// Retira caracters especiais que nao podem estar no titulo da planilha
 		String userHome = System.getProperty("user.home");
 		String subDir = "controle-de-pagamentos";

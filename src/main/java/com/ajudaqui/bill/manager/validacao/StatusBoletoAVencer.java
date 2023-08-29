@@ -2,7 +2,7 @@ package com.ajudaqui.bill.manager.validacao;
 
 import java.time.LocalDate;
 
-import com.ajudaqui.bill.manager.entity.Payament;
+import com.ajudaqui.bill.manager.entity.Payment;
 import com.ajudaqui.bill.manager.entity.StatusBoleto;
 
 public class StatusBoletoAVencer extends Status{
@@ -13,7 +13,7 @@ public class StatusBoletoAVencer extends Status{
 	}
 
 	@Override
-	public StatusBoleto validar(Payament boleto) {
+	public StatusBoleto validar(Payment boleto) {
 		if(LocalDate.now().plusDays(7).isAfter(boleto.getDue_date())) {
 			return StatusBoleto.A_VENCER;
 		}

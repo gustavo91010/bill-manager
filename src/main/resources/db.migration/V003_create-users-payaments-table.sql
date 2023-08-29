@@ -1,6 +1,6 @@
-CREATE TABLE users_payaments (
+CREATE TABLE users_payments (
     users_id bigserial REFERENCES users(id),
-    payament_id bigserial REFERENCES payament(id),
-    PRIMARY KEY (users_id, payament_id)
+    payment_id bigserial REFERENCES payment(id),
+    PRIMARY KEY (users_id, payment_id)
 );
 

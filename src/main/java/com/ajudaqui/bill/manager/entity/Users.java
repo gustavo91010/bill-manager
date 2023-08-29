@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -25,7 +26,7 @@ public class Users {
 	private LocalDateTime created_at;
 	private LocalDateTime updated_at ;
 	@OneToMany
-	private List<Payament> payaments = new ArrayList<>();
+	private List<Payment> payaments = new ArrayList<>();
 	public Long getId() {
 		return id;
 	}
@@ -62,10 +63,10 @@ public class Users {
 	public void setUpdated_at(LocalDateTime updated_at) {
 		this.updated_at = updated_at;
 	}
-	public List<Payament> getPayaments() {
+	public List<Payment> getPayaments() {
 		return payaments;
 	}
-	public void setPayaments(List<Payament> payaments) {
+	public void setPayaments(List<Payment> payaments) {
 		this.payaments = payaments;
 	}
 	
