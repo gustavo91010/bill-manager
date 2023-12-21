@@ -2,4 +2,7 @@
 <dirs>
     <entry loc="C:\Users\Gustavo\.p2\pool\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.6.v20230204-1729\jre" stamp="1679743217732"/>
     <entry loc="C:\Users\Gustavo\.p2\pool\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.6.v20230204-1729" stamp="1679743217736"/>
+    <entry loc="/snap/eclipse/73/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.linux.x86_64_17.0.8.v20230831-1047/jre" stamp="1696404015000"/>
+    <entry loc="/snap/eclipse/73/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.linux.x86_64_17.0.8.v20230831-1047" stamp="1696404015000"/>
+    <entry loc="/usr/lib/jvm/java-8-openjdk-amd64" stamp="1701492811574"/>
 </dirs>

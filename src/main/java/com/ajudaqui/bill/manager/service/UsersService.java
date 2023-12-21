@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ajudaqui.bill.manager.entity.Users;
+import com.ajudaqui.bill.manager.entity.Vo.UserUpdateVo;
 import com.ajudaqui.bill.manager.entity.Vo.UsersVO;
 import com.ajudaqui.bill.manager.exception.NotFoundEntityException;
 import com.ajudaqui.bill.manager.repository.UsersRepository;
@@ -32,8 +33,14 @@ public class UsersService {
 	}
 
 	public Users findById(Long id) {
-		Users users = usersRepository.findById(id).get();
-		return users;
+		
+		 Optional<Users> users = usersRepository.findById(id);
+		 if(!users.isPresent()) {
+				throw new NotFoundEntityException("Usuario não encontrado.");
+
+		 }
+		 
+		return users.get();
 	}
 
 	public List<Users> findAll() {
@@ -51,6 +58,27 @@ public class UsersService {
 		return users.get();
 
 	}
+	public Users update(Long id,UserUpdateVo userUpdateVo) {
+		
+		Users user = findById(id);
+	
+		if(userUpdateVo.getName() !=null) {
+			user.setName(userUpdateVo.getName());
+		}
+		if(userUpdateVo.getEmail() !=null) {
+			user.setEmail(userUpdateVo.getEmail());
+		}
+		usersRepository.save(user);
+		return user;
+	}
+	public Users changeStats(Long id) {
+		Users user = findById(id);
+		user.setActive(!user.getActive());
+		usersRepository.save(user);
+		return user;
+		
+	}
+	
 
 	public void delete(Long id) {
 		
