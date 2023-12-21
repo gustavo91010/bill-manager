@@ -20,10 +20,11 @@ public interface PaymentsRepository extends JpaRepository<Payment, Long>,JpaSpec
 	List<Payment> findpayamentsVencidos();
 	
 	@Query("SELECT b FROM Payment b WHERE b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
-	List<Payment> findpayamentsDoMes(LocalDate inicioMes, LocalDate finalMes );
+	List<Payment> findPayamentsInMonth(LocalDate inicioMes, LocalDate finalMes );
 	
-	@Query("SELECT b FROM Payment b WHERE b.status !='PAGO' AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
-	List<Payment> findpayamentsASeremPagosNoMes(LocalDate inicioMes, LocalDate finalMes );
+	// 	@Query("SELECT b FROM Payment b WHERE b.status !='PAGO' AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
+	@Query("SELECT b FROM Payment b WHERE b.status != :status AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
+	List<Payment> findForPaymentsByMonthAndStatus(LocalDate inicioMes, LocalDate finalMes, String status );
 	
 	@Query(value="select * from payment where status <> 'PAGO' AND due_date  > :deadline ", nativeQuery = true)
 	List<Payment> nextPayments(LocalDate deadline);
