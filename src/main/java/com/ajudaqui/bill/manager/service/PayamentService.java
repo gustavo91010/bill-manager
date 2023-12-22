@@ -48,10 +48,11 @@ public class PayamentService {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		for (int i = 0; i < repeticao; i++) {
+		for (int i = 1; i < repeticao; i++) {
 
 			LocalDate vencimento = LocalDate.parse(boletoDto.getVencimento(), formatter);
-			boletoDto.setVencimento(vencimento.plusMonths(i).toString());
+			System.err.println(vencimento);
+			boletoDto.setVencimento(vencimento.plusMonths(1).toString());
 			cadastrar(boletoDto);
 		}
 
@@ -84,13 +85,19 @@ public class PayamentService {
 		return boletoRepository.findByPayamentsForUser(userId);
 	}
 
+	public List<Payment> searcheByMonthAndStatus(Long id, Integer month, Integer year, String status) {
+		System.err.println("service");
 
-	public List<Payment> searcheByMonthAndStatus(Long id, int month, int year, String status) {
-System.err.println("service");
-		System.err.println(month);
+		if (year == 0) {
+			year = LocalDate.now().getYear();
+		}
+		if (month == 0) {
+			month = LocalDate.now().getMonthValue();
+		}
+
 		LocalDate startMonth = LocalDate.of(year, month, 1);
-		System.err.println(startMonth);
 		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
+		
 		List<Payment> boletos = new ArrayList<Payment>();
 
 		if (status.isEmpty()) {
@@ -101,8 +108,8 @@ System.err.println("service");
 		return boletos;
 	}
 
-	public List<PayamentVO> findByDescricao( String descricao) {
-		
+	public List<PayamentVO> findByDescricao(String descricao) {
+
 		List<Payment> boletos = new ArrayList<>();
 		List<PayamentVO> boletosVO = new ArrayList<>();
 		boletos.forEach(b -> {

@@ -45,7 +45,7 @@ public class PayamentDto {
 	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
 		Payment payament= new Payment();
 		
-		payament.setUsers(users);
+//		payament.setUsers(users);
 		payament.setDescription(this.descricao);
 		payament.setValue(this.valor);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");

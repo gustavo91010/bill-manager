@@ -110,11 +110,11 @@ public class PayamentsController {
 	
 	@GetMapping(value = "/all/id/{id}")
 	public ResponseEntity<?> findAll(@PathVariable("id") Long id
-			,@RequestParam("month") int month,
-			@RequestParam("year") int year,
+			,@RequestParam(value= "month", defaultValue="0") Integer month,
+			@RequestParam(value= "year",defaultValue="0") Integer year,
 			@RequestParam("status") String status) {
 	//	try {
-		System.err.println("service");
+		System.err.println("controller");
 
 		List<Payment> payments = payamentSerivce.searcheByMonthAndStatus(id, month, year, status);
 		LOGGER.info("busca do id {} realizado com sucesso.", id);
