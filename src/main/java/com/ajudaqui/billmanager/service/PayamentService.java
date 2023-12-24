@@ -1,16 +1,21 @@
 package com.ajudaqui.billmanager.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
+import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
@@ -20,10 +25,10 @@ import com.ajudaqui.billmanager.utils.ValidarStatus;
 public class PayamentService {
 
 	@Autowired
-	private PaymentsRepository boletoRepository;
+	private PaymentsRepository paymentRepository;
 	@Autowired
 	private UsersService usersService;
-	
+
 //	@Autowired
 //	private ModelMapper modelMapper;
 //
@@ -32,20 +37,19 @@ public class PayamentService {
 
 	public Payment cadastrar(PayamentDto paymentDto, Long userId) {
 		Users users = usersService.findById(userId);
-		
-//		payment already registered
-		
-		List<Payment> paymentForMonth = findAllMonth(userId, paymentDto.getDue_date().getMonthValue(), paymentDto.getDue_date().getYear());
+
+		List<Payment> paymentForMonth = findAllMonth(userId, paymentDto.getDue_date().getMonthValue(),
+				paymentDto.getDue_date().getYear());
 
 		boolean alrreadRegistered = paymentForMonth.stream()
-		    .anyMatch(
-		    p -> p.getDescription().equals(paymentDto.getDescription())
-		     && p.getValue().equals(paymentDto.getValue()));
-		if(alrreadRegistered) {
+				.anyMatch(p -> p.getDescription().equals(paymentDto.getDescription())
+						&& p.getValue().equals(paymentDto.getValue()));
+
+		if (alrreadRegistered) {
 			throw new MsgException("pagamento já cadastrado");
 		}
-		
-		return boletoRepository.save(paymentDto.toDatabase(boletoRepository, users));
+		Payment payment = paymentRepository.save(paymentDto.toDatabase(paymentRepository, users));
+		return payment;
 
 	}
 
@@ -53,12 +57,23 @@ public class PayamentService {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		for (int i = 1; i < repeticao; i++) {
-
+//		for (int i = 0; i < repeticao; i++) {
+//
+//			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
+//			boletoDto.setDue_date(vencimento.plusMonths(1));
+//			System.err.println(boletoDto.toString());
+//			cadastrar(boletoDto,userId);
+//		}
+		int index = 0;
+		do {
 			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
-			boletoDto.setDue_date(vencimento);
-			cadastrar(boletoDto,userId);
-		}
+			if (index > 0) {
+				boletoDto.setDue_date(vencimento.plusMonths(1));
+			}
+			System.err.println(boletoDto.toString());
+			cadastrar(boletoDto, userId);
+			index++;
+		} while (index < repeticao);
 
 	}
 
@@ -77,29 +92,38 @@ public class PayamentService {
 //		return boletosVO;
 //	}
 
-	public Payment findById(Long id) {
+	public Payment findByIdForUsers(Long usersId, Long paymentId) {
 
-		Payment boleto = boletoRepository.findById(id)
+		Payment boleto = paymentRepository.findByIdForUsers(usersId, paymentId)
+				.orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
+		return boleto;
+	}
+
+	public Payment findById(Long paymentId) {
+
+		Payment boleto = paymentRepository.findById(paymentId)
 				.orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
 		return boleto;
 	}
 
 	public List<Payment> findByPayamentsForUser(Long userId) {
 
-		return boletoRepository.findByPayamentsForUser(userId);
-	}
-	
-	public List<Payment>  findAllMonth(Long userId, Integer month, Integer year) {
-		LocalDate startMonth = LocalDate.of(year, month, 1);
-		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
-		List<Payment> resultt = boletoRepository.findAllMonth(userId, startMonth, endMonth);
-		return resultt;
-		
-		
+		return paymentRepository.findByPayamentsForUser(userId);
 	}
 
-	public List<Payment> searcheByMonthAndStatus(Long id, Integer month, Integer year, String status) {
-		System.err.println("service");
+	public List<Payment> findAllMonth(Long userId, Integer month, Integer year) {
+
+		if (!usersService.userExist(userId)) {
+			throw new NotFoundEntityException("usuario não cadastrado");
+		}
+		LocalDate startMonth = LocalDate.of(year, month, 1);
+		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
+		List<Payment> resultt = paymentRepository.findAllMonth(userId, startMonth, endMonth);
+		return resultt;
+
+	}
+
+	public List<Payment> searcheByUsersByMonthAndStatus(Long usersId, Integer month, Integer year, String status) {
 
 		if (year == 0) {
 			year = LocalDate.now().getYear();
@@ -110,26 +134,22 @@ public class PayamentService {
 
 		LocalDate startMonth = LocalDate.of(year, month, 1);
 		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
-		
+
 		List<Payment> boletos = new ArrayList<Payment>();
 
 		if (status.isEmpty()) {
-			boletos = boletoRepository.findPayamentsInMonth(startMonth, endMonth);
+			boletos = paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
 		} else {
-			boletos = boletoRepository.findForPaymentsByMonthAndStatus(startMonth, endMonth, status);
+			boletos = paymentRepository.findForPaymentsByMonthAndStatus(usersId, startMonth, endMonth, status);
 		}
 		return boletos;
 	}
 
-	public List<PayamentDto> findByDescricao(String descricao) {
+	public List<Payment> findByDescricao(Long usersId, String descricao) {
 
-		List<Payment> boletos = new ArrayList<>();
-		List<PayamentDto> boletosVO = new ArrayList<>();
-		boletos.forEach(b -> {
-			boletosVO.add(new PayamentDto(b));
-		});
+		List<Payment> boletos = paymentRepository.findByDescriptionForUsers(usersId, descricao);
+		return boletos;
 
-		return boletosVO;
 	}
 
 //	public void resumoDoMesXlsx(String nome) throws IOException {
@@ -155,20 +175,36 @@ public class PayamentService {
 	public Payment makePayment(Long id) {
 		Payment boleto = findById(id);
 		boleto.setStatus(StatusBoleto.PAGO);
-		boletoRepository.save(boleto);
+		paymentRepository.save(boleto);
 		return boleto;
 
 	}
 
-	// actualização do estado em execução
+	public Payment update(Long userId, Long paymentId, BoletoFrom from) {
+		Payment payment = findByIdForUsers(userId, paymentId);
+
+		if (!from.getDescricao().isEmpty()) {
+			payment.setDescription(from.getDescricao());
+		}
+		if (from.getValor() != null) {
+			payment.setValue(from.getValor());
+		}
+		if (from.getVencimento() != null) {
+			payment.setDue_date(from.getVencimento());
+		}
+		payment.setUpdated_at(LocalDateTime.now());
+		return paymentRepository.save(payment);
+	}
+
+	// atualização do estado em execução
 	public void performStatusUpdate() {
-		List<Payment> pagamentos = boletoRepository.nextPayments(LocalDate.now().plusDays(10));
+		List<Payment> pagamentos = paymentRepository.nextPayments(LocalDate.now().plusDays(10));
 		atualizarStatus(pagamentos);
 	}
 
 	public List<Payment> atualizarStatus(List<Payment> boletos) {
 		boletos.forEach(b -> {
-			ValidarStatus.statusAtualizado(b, boletoRepository);
+			ValidarStatus.statusAtualizado(b, paymentRepository);
 
 		});
 		return boletos;
@@ -177,7 +213,7 @@ public class PayamentService {
 
 	public void deleteById(Long id) {
 		Payment boleto = findById(id);
-		boletoRepository.delete(boleto);
+		paymentRepository.delete(boleto);
 
 	}
 

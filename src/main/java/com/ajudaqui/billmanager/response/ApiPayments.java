@@ -1,4 +1,4 @@
-package com.ajudaqui.billmanager.utils.validacao;
+package com.ajudaqui.billmanager.response;
 
 import java.util.ArrayList;
 import java.util.List;

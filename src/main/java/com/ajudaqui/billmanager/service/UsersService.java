@@ -46,12 +46,15 @@ public class UsersService {
 	public Users findById(Long id) {
 		
 		 Optional<Users> users = usersRepository.findById(id);
-		 if(!users.isPresent()) {
+		 if(!userExist(id)) {
 				throw new NotFoundEntityException("Usuario não encontrado.");
 
 		 }
 		 
 		return users.get();
+	}
+public boolean userExist(Long userID) {
+	return usersRepository.existsById(userID);
 	}
 
 	public List<Users> findAll() {

@@ -62,12 +62,9 @@ public class PayamentDto {
 
 	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
 		Payment payament = new Payment();
-//		private LocalDateTime created_at;
-//		private LocalDateTime updated_at ;
 		payament.setUsers(users);
 		payament.setDescription(this.description);
 		payament.setValue(this.value);
-//		DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		payament.setCreated_at(LocalDateTime.now());
 		payament.setUpdated_at(LocalDateTime.now());
 
@@ -76,5 +73,12 @@ public class PayamentDto {
 		ValidarStatus.statusAtualizado(payament, boletoRepository);
 		return payament;
 	}
+
+	@Override
+	public String toString() {
+		return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
+				+ status + "]";
+	}
+	
 
 }

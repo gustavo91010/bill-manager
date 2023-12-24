@@ -1,6 +1,5 @@
 package com.ajudaqui.billmanager.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,37 +20,34 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.exception.MsgException;
+import com.ajudaqui.billmanager.response.ApiPayment;
+import com.ajudaqui.billmanager.response.ApiPayments;
 import com.ajudaqui.billmanager.service.PayamentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
-import com.ajudaqui.billmanager.utils.validacao.ApiPayments;
 
 @RestController
-@RequestMapping("/payament")
+@RequestMapping("/payment")
 public class PaymentController {
 
 	@Autowired
 	private PayamentService paymentSerivce;
 	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
-	@PostMapping("/{userId}")
+	@PostMapping("/{userId}") // ok
 	public ResponseEntity<?> cadastrar(@RequestBody PayamentDto payamentDto, @PathVariable("userId") Long userId) {
 		try {
 
-		 paymentSerivce.cadastrar(payamentDto,userId);
+			Payment payment = paymentSerivce.cadastrar(payamentDto, userId);
 
-			return new ResponseEntity<>("Pagamento cadastrado com sucesso.",
-					HttpStatus.CREATED);
+			return new ResponseEntity<>(new ApiPayment(payment), HttpStatus.CREATED);
 		} catch (MsgException msg) {
-			return new ResponseEntity<>(msg.getMessage(),
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(msg.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 
 	}
 
-	@PostMapping("/{repet}/{userId}")
-	public ResponseEntity<?> boletosRecorrentes(
-			@RequestBody PayamentDto payamentDto,
-			@PathVariable("repet") Long repet,
+	@PostMapping("/{repet}/{userId}") // ok
+	public ResponseEntity<?> boletosRecorrentes(@RequestBody PayamentDto payamentDto, @PathVariable("repet") Long repet,
 			@PathVariable("userId") Long userId) {
 
 		try {
@@ -60,32 +56,33 @@ public class PaymentController {
 
 			return ResponseEntity.status(HttpStatus.CREATED).body("Boleto cadastrado com sucesso");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não cadastrado");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 
 	}
 
-	@GetMapping(value = "/id/{id}")
-	public ResponseEntity<?> consultarPorId(@PathVariable("id") Long id) {
+	@GetMapping(value = "/usersId") // ok
+	public ResponseEntity<?> consultarPorId(@RequestParam("usersId") Long usersId,
+			@RequestParam("paymentId") Long paymentId) {
 		try {
-// TODO adicionar o id do usuario
-			Payment boleto = paymentSerivce.findById(id);
+
+			Payment boleto = paymentSerivce.findByIdForUsers(usersId, paymentId);
 			return ResponseEntity.ok(new PayamentDto(boleto));
+
 		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Ocorreu um erro ao consultar o boleto.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 
 	}
 
-	@GetMapping(value = "/descricao/{descricao}")
-	public ResponseEntity<?> consultarPorDescricao(@PathVariable("descricao") String descricao) {
+	@GetMapping(value = "/descricao") //ok
+	public ResponseEntity<?> consultarPorDescricao(@RequestParam("usersId") Long usersId,
+			@RequestParam("description") String description) {
 		try {
-			// TODO adicionar o id do usuario
 
-			List<PayamentDto> boletosVO = paymentSerivce.findByDescricao(descricao);
+			List<Payment> payments = paymentSerivce.findByDescricao(usersId, description);
 
-			return ResponseEntity.ok(boletosVO);
+			return ResponseEntity.ok(new ApiPayments(payments));
 		} catch (RuntimeException e) {
 
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -102,39 +99,43 @@ public class PaymentController {
 
 		return null;
 	};
-	
-	@GetMapping(value = "/all/id/{id}")
-	public ResponseEntity<?> findAll(@PathVariable("id") Long id
-			,@RequestParam(value= "month", defaultValue="0") Integer month,
-			@RequestParam(value= "year",defaultValue="0") Integer year,
+
+//	specific search
+	@GetMapping(value = "/search") // ok
+	public ResponseEntity<?> searcheByUsersByMonthAndStatus(
+			@RequestParam("usersId") Long usersId,
+			@RequestParam(value = "month", defaultValue = "0") Integer month,
+			@RequestParam(value = "year", defaultValue = "0") Integer year,
 			@RequestParam("status") String status) {
-	//	try {
+		 try {
 
-		List<Payment> payments = paymentSerivce.searcheByMonthAndStatus(id, month, year, status);
-		LOGGER.info("busca do id {} realizado com sucesso.", id);
+		List<Payment> payments = paymentSerivce.searcheByUsersByMonthAndStatus(usersId, month, year, status);
+		LOGGER.info("pagamentos do user com  id {} realizado com sucesso.", usersId);
 
+		return ResponseEntity.ok(new ApiPayments(payments));
+		 } catch (RuntimeException msg) { return
+		 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body(msg.getMessage()); }
+	}
+
+	@GetMapping(value = "/month") // ok
+	public ResponseEntity<?> findAllMonth(@RequestParam(value = "usersId") Long usersId,
+			@RequestParam(value = "month") Integer month, @RequestParam(value = "year") Integer year) {
+		try {
+			List<Payment> payments = paymentSerivce.findAllMonth(usersId, month, year);
 			return ResponseEntity.ok(new ApiPayments(payments));
-		//} catch (RuntimeException e) {			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)					.body("Ocorreu um erro com a consulta.");		}
-	}
-	@GetMapping(value = "/month")
-	public List<Payment> findAllMonth(@RequestParam(value= "usersId") Long usersId, @RequestParam(value= "month")Integer month,@RequestParam(value= "year")Integer year) {
-	return	paymentSerivce.findAllMonth(usersId, month,year);
-	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<PayamentDto> atualizar(@PathVariable Long id, @RequestBody BoletoFrom from) {
-
-		// Falta testar
-		Payment boleto = paymentSerivce.findById(id);
-		if (!(boleto == null)) {
-			boleto.setDescription( (from.getDescricao()));
-			boleto.setValue(from.getValor());
-			boleto.setDue_date(from.getVencimento());
-
-			return ResponseEntity.ok(new PayamentDto(boleto));
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
-		return ResponseEntity.notFound().build();
 	}
+
+	@PutMapping("/{userId}/{paymentId}")
+	public ResponseEntity<?> atualizar(@PathVariable("userId") Long userId,@PathVariable("paymentId") Long paymentId, @RequestBody BoletoFrom from) {
+		Payment paymentAtt = paymentSerivce.update(userId, paymentId, from);
+	
+		return new ResponseEntity<>(new ApiPayment(paymentAtt), HttpStatus.OK);
+	}
+
 	@PutMapping("/pagamento/{id}")
 	public ResponseEntity<?> makePayment(@PathVariable("id") Long id) {
 		Payment boleto = paymentSerivce.makePayment(id);
@@ -143,7 +144,6 @@ public class PaymentController {
 	}
 
 	@DeleteMapping("/{id}")
-//	@ApiOperation(value = "Metodo para remover um boleto especifico" )
 	public ResponseEntity<?> remover(@PathVariable Long id) {
 
 		// Falta testar
