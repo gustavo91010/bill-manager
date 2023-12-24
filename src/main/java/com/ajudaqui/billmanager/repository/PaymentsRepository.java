@@ -31,4 +31,8 @@ public interface PaymentsRepository extends JpaRepository<Payment, Long>,JpaSpec
 	
 	@Query(value="select * from payment where users_id= :userId ", nativeQuery = true)
 	List<Payment> findByPayamentsForUser(Long userId);
+
+	
+	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.due_date  >= :startMonth AND b.due_date  <= :endMonth")
+	List<Payment> findAllMonth(Long userId, LocalDate startMonth, LocalDate endMonth);
 }

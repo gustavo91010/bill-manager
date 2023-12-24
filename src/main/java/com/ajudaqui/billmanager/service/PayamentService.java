@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
+import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
@@ -29,10 +30,22 @@ public class PayamentService {
 //	@Autowired
 //	private EmailClient emailClient;
 
-	public Payment cadastrar(PayamentDto payamentDto, Long userId) {
-		System.err.println("service");
+	public Payment cadastrar(PayamentDto paymentDto, Long userId) {
 		Users users = usersService.findById(userId);
-		return boletoRepository.save(payamentDto.toDatabase(boletoRepository, users));
+		
+//		payment already registered
+		
+		List<Payment> paymentForMonth = findAllMonth(userId, paymentDto.getDue_date().getMonthValue(), paymentDto.getDue_date().getYear());
+
+		boolean alrreadRegistered = paymentForMonth.stream()
+		    .anyMatch(
+		    p -> p.getDescription().equals(paymentDto.getDescription())
+		     && p.getValue().equals(paymentDto.getValue()));
+		if(alrreadRegistered) {
+			throw new MsgException("pagamento já cadastrado");
+		}
+		
+		return boletoRepository.save(paymentDto.toDatabase(boletoRepository, users));
 
 	}
 
@@ -43,7 +56,6 @@ public class PayamentService {
 		for (int i = 1; i < repeticao; i++) {
 
 			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
-			System.err.println(vencimento);
 			boletoDto.setDue_date(vencimento);
 			cadastrar(boletoDto,userId);
 		}
@@ -75,6 +87,15 @@ public class PayamentService {
 	public List<Payment> findByPayamentsForUser(Long userId) {
 
 		return boletoRepository.findByPayamentsForUser(userId);
+	}
+	
+	public List<Payment>  findAllMonth(Long userId, Integer month, Integer year) {
+		LocalDate startMonth = LocalDate.of(year, month, 1);
+		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
+		List<Payment> resultt = boletoRepository.findAllMonth(userId, startMonth, endMonth);
+		return resultt;
+		
+		
 	}
 
 	public List<Payment> searcheByMonthAndStatus(Long id, Integer month, Integer year, String status) {

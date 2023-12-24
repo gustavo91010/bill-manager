@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.payment
     due_date timestamp with time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NULL,
-	user_id bigserial REFERENCES users(id),
+	users_id bigserial REFERENCES users(id),
     PRIMARY KEY (id)
 );
 
