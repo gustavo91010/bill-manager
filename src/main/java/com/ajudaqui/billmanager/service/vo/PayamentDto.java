@@ -62,7 +62,7 @@ public class PayamentDto {
 
 	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
 		Payment payament = new Payment();
-		payament.setUsers(users);
+		payament.setUserId(users.getId());
 		payament.setDescription(this.description);
 		payament.setValue(this.value);
 		payament.setCreated_at(LocalDateTime.now());

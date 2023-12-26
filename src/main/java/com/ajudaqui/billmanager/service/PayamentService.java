@@ -48,7 +48,11 @@ public class PayamentService {
 		if (alrreadRegistered) {
 			throw new MsgException("pagamento já cadastrado");
 		}
-		Payment payment = paymentRepository.save(paymentDto.toDatabase(paymentRepository, users));
+		Payment payment= paymentDto.toDatabase(paymentRepository, users);
+		
+		payment = paymentRepository.save(payment);
+		users.getPayaments().add(payment);
+		
 		return payment;
 
 	}
@@ -128,12 +132,14 @@ public class PayamentService {
 		if (year == 0) {
 			year = LocalDate.now().getYear();
 		}
-		if (month == 0) {
-			month = LocalDate.now().getMonthValue();
-		}
 
-		LocalDate startMonth = LocalDate.of(year, month, 1);
-		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
+		LocalDate startMonth = LocalDate.of(year, month==0 ?1: month, 1);
+		LocalDate endMonth = LocalDate.of(year,  month==0 ?12: month, startMonth.lengthOfMonth());
+//		if (month == 0) {
+////			month = LocalDate.now().getMonthValue();
+//			 startMonth = LocalDate.of(year, 1, 1);
+//			 endMonth = LocalDate.of(year, 12, startMonth.lengthOfMonth());
+//		}
 
 		List<Payment> boletos = new ArrayList<Payment>();
 

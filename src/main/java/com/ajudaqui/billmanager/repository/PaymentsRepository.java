@@ -20,11 +20,11 @@ public interface PaymentsRepository extends JpaRepository<Payment, Long>,JpaSpec
 	@Query(value="SELECT * FROM payment WHERE status='VENCIDO'", nativeQuery = true)
 	List<Payment> findpayamentsVencidos();
 	
-	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
+	@Query("SELECT b FROM Payment b WHERE b.userId= :userId AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
 	List<Payment> findPayamentsInMonth(Long userId, LocalDate inicioMes, LocalDate finalMes );
 	
-	// 	@Query("SELECT b FROM Payment b WHERE b.status !='PAGO' AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
-	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.status != :status AND b.due_date  >= :inicioMes AND b.due_date  <= :finalMes")
+	@Query("SELECT b FROM Payment b WHERE b.userId = :userId AND b.status != :status AND b.due_date >= :inicioMes AND b.due_date <= :finalMes")
+
 	List<Payment> findForPaymentsByMonthAndStatus(Long userId,LocalDate inicioMes, LocalDate finalMes, String status );
 	
 	@Query(value="select * from payment where status <> 'PAGO' AND due_date  > :deadline ", nativeQuery = true)
@@ -34,12 +34,12 @@ public interface PaymentsRepository extends JpaRepository<Payment, Long>,JpaSpec
 	List<Payment> findByPayamentsForUser(Long userId);
 
 	
-	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.due_date  >= :startMonth AND b.due_date  <= :endMonth")
+	@Query("SELECT b FROM Payment b WHERE  b.userId= :userId AND b.due_date  >= :startMonth AND b.due_date  <= :endMonth")
 	List<Payment> findAllMonth(Long userId, LocalDate startMonth, LocalDate endMonth);
 
-	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.id= :paymentId ")
+	@Query("SELECT b FROM Payment b WHERE  b.userId= :userId AND b.id= :paymentId ")
 	Optional<Payment> findByIdForUsers(Long userId, Long paymentId);
 
-	@Query("SELECT b FROM Payment b WHERE b.users.id= :userId AND b.description= :description ")
+	@Query("SELECT b FROM Payment b WHERE  b.userId= :userId AND b.description= :description ")
 	List<Payment> findByDescriptionForUsers(Long userId, String description);
 }
