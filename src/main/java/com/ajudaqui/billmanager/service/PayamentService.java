@@ -5,10 +5,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
@@ -29,12 +27,6 @@ public class PayamentService {
 	@Autowired
 	private UsersService usersService;
 
-//	@Autowired
-//	private ModelMapper modelMapper;
-//
-//	@Autowired
-//	private EmailClient emailClient;
-
 	public Payment cadastrar(PayamentDto paymentDto, Long userId) {
 		Users users = usersService.findById(userId);
 
@@ -43,16 +35,17 @@ public class PayamentService {
 
 		boolean alrreadRegistered = paymentForMonth.stream()
 				.anyMatch(p -> p.getDescription().equals(paymentDto.getDescription())
-						&& p.getValue().equals(paymentDto.getValue()));
+						&& p.getValue().equals(paymentDto.getValue())
+						&& p.getDue_date().equals(paymentDto.getDue_date()));
 
 		if (alrreadRegistered) {
 			throw new MsgException("pagamento já cadastrado");
 		}
-		Payment payment= paymentDto.toDatabase(paymentRepository, users);
-		
+		Payment payment = paymentDto.toDatabase(paymentRepository, users);
+
 		payment = paymentRepository.save(payment);
 		users.getPayaments().add(payment);
-		
+
 		return payment;
 
 	}
@@ -60,14 +53,6 @@ public class PayamentService {
 	public void boletosRecorrentes(PayamentDto boletoDto, Long repeticao, Long userId) {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-//		for (int i = 0; i < repeticao; i++) {
-//
-//			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
-//			boletoDto.setDue_date(vencimento.plusMonths(1));
-//			System.err.println(boletoDto.toString());
-//			cadastrar(boletoDto,userId);
-//		}
 		int index = 0;
 		do {
 			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
@@ -80,21 +65,10 @@ public class PayamentService {
 		} while (index < repeticao);
 
 	}
-
-//// não lembro bem o que esse cara faz...
-//	public List<PayamentVO> findAll(BoletoFrom boletoFrom) {
-//		Specification<Payment> spefications = Specification
-//				.where(BoletoSpecification.descricao(boletoFrom.getDescricao()));
-//
-//		List<Payment> boletos = boletoRepository.findAll(spefications);
-////		 atualizarStatus(boletos);
-//		List<PayamentVO> boletosVO = new ArrayList<>();
-//		boletos.forEach(b -> {
-//			boletosVO.add(new PayamentVO(b));
-//		});
-//
-//		return boletosVO;
-//	}
+	public List<Payment> searchLatePayments(Long usersId) {
+		return paymentRepository.searchLatePayments(usersId);
+		
+	}
 
 	public Payment findByIdForUsers(Long usersId, Long paymentId) {
 
@@ -127,19 +101,16 @@ public class PayamentService {
 
 	}
 
+	//
 	public List<Payment> searcheByUsersByMonthAndStatus(Long usersId, Integer month, Integer year, String status) {
-
+// Se o ano vinher vazio sera o ano atual
 		if (year == 0) {
 			year = LocalDate.now().getYear();
 		}
 
-		LocalDate startMonth = LocalDate.of(year, month==0 ?1: month, 1);
-		LocalDate endMonth = LocalDate.of(year,  month==0 ?12: month, startMonth.lengthOfMonth());
-//		if (month == 0) {
-////			month = LocalDate.now().getMonthValue();
-//			 startMonth = LocalDate.of(year, 1, 1);
-//			 endMonth = LocalDate.of(year, 12, startMonth.lengthOfMonth());
-//		}
+		// se o mesm vinher vazio, sera o periodo de 12 meses
+		LocalDate startMonth = LocalDate.of(year, month == 0 ? 1 : month, 1);
+		LocalDate endMonth = LocalDate.of(year, month == 0 ? 12 : month, startMonth.lengthOfMonth());
 
 		List<Payment> boletos = new ArrayList<Payment>();
 
@@ -157,25 +128,6 @@ public class PayamentService {
 		return boletos;
 
 	}
-
-//	public void resumoDoMesXlsx(String nome) throws IOException {
-//		List<Payment> boletos = new ArrayList<>();
-//
-//		List<PayamentVO> boletosVO = new ArrayList<>();
-////				findBoletosDoMes(now().getMonthValue(), now().getYear());
-//		boletosVO.forEach(b -> {
-//			boletos.add(modelMapper.map(b, Payment.class));
-//		});
-//		Xlsx.planilhaBoletos(boletos, nome);
-//		EmailDto email = new EmailDto();
-//		email.setEmailTo("gustavo91010@gmail.com");
-//		email.setSubject("testando micro servicos");
-//		email.setText("opa lele, opa lala, ta na hora de pegar!");
-//		email.setUser_id(1l);
-//
-//		emailClient.sendingEmail(email);
-//		System.err.println(email.toString());
-//	}
 
 	// Efetivar Pagamento
 	public Payment makePayment(Long id) {

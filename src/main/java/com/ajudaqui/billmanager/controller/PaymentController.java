@@ -60,7 +60,18 @@ public class PaymentController {
 		}
 
 	}
+	@GetMapping(value = "/delay")
+	public ResponseEntity<?> searchLatePayments(@RequestParam("usersId") Long usersId) {
+		try {
 
+			List<Payment> boletos = paymentSerivce.searchLatePayments(usersId);
+			return ResponseEntity.ok(new ApiPayments(boletos));
+
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+
+	}
 	@GetMapping(value = "/usersId") // ok
 	public ResponseEntity<?> consultarPorId(@RequestParam("usersId") Long usersId,
 			@RequestParam("paymentId") Long paymentId) {
