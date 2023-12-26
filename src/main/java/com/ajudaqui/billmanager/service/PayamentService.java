@@ -1,5 +1,7 @@
 package com.ajudaqui.billmanager.service;
 
+import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -52,22 +54,25 @@ public class PayamentService {
 
 	public void boletosRecorrentes(PayamentDto boletoDto, Long repeticao, Long userId) {
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		int index = 0;
 		do {
-			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
+//			LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(), formatter);
+
 			if (index > 0) {
-				boletoDto.setDue_date(vencimento.plusMonths(1));
+//				boletoDto.setDue_date(vencimento.plusMonths(1));
+				boletoDto.setDue_date(boletoDto.getDue_date().plusMonths(1));
+
 			}
-			System.err.println(boletoDto.toString());
 			cadastrar(boletoDto, userId);
 			index++;
 		} while (index < repeticao);
 
 	}
+
 	public List<Payment> searchLatePayments(Long usersId) {
 		return paymentRepository.searchLatePayments(usersId);
-		
+
 	}
 
 	public Payment findByIdForUsers(Long usersId, Long paymentId) {
@@ -89,6 +94,26 @@ public class PayamentService {
 		return paymentRepository.findByPayamentsForUser(userId);
 	}
 
+	public List<Payment> findPaymentsWeek(Long usersId, String date, String status) {
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate dayWeek = LocalDate.parse(date, formatter);
+		LocalDate monday = dayWeek.minusDays(dayWeek.getDayOfWeek().getValue() - 1);
+		LocalDate sunday = monday.plusDays(6);
+		
+		List<Payment> payments = new ArrayList<Payment>();
+
+		if (status.isEmpty()) {
+			payments = paymentRepository.findPayamentsInMonth(usersId, monday, sunday);
+			
+		} else {
+			payments = paymentRepository.findForPaymentsByMonthAndStatus(usersId, monday, sunday,
+					valueOf(status));
+		}
+		return payments;
+
+	}
+
 	public List<Payment> findAllMonth(Long userId, Integer month, Integer year) {
 
 		if (!usersService.userExist(userId)) {
@@ -101,25 +126,22 @@ public class PayamentService {
 
 	}
 
-	//
 	public List<Payment> searcheByUsersByMonthAndStatus(Long usersId, Integer month, Integer year, String status) {
-// Se o ano vinher vazio sera o ano atual
-		if (year == 0) {
-			year = LocalDate.now().getYear();
-		}
 
-		// se o mesm vinher vazio, sera o periodo de 12 meses
-		LocalDate startMonth = LocalDate.of(year, month == 0 ? 1 : month, 1);
-		LocalDate endMonth = LocalDate.of(year, month == 0 ? 12 : month, startMonth.lengthOfMonth());
+		// se o mes tiver vazio, sera o periodo de 12 meses, o ano, sera 1900
+		LocalDate startMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 1 : month, 1);
+		LocalDate endMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 12 : month, startMonth.lengthOfMonth());
 
-		List<Payment> boletos = new ArrayList<Payment>();
+		List<Payment> payments = new ArrayList<Payment>();
 
 		if (status.isEmpty()) {
-			boletos = paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
+			payments = paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
 		} else {
-			boletos = paymentRepository.findForPaymentsByMonthAndStatus(usersId, startMonth, endMonth, status);
+
+			payments = paymentRepository.findForPaymentsByMonthAndStatus(usersId, startMonth, endMonth,
+					valueOf(status));
 		}
-		return boletos;
+		return payments;
 	}
 
 	public List<Payment> findByDescricao(Long usersId, String descricao) {
@@ -132,7 +154,10 @@ public class PayamentService {
 	// Efetivar Pagamento
 	public Payment makePayment(Long id) {
 		Payment boleto = findById(id);
+
 		boleto.setStatus(StatusBoleto.PAGO);
+		boleto.setUpdated_at(LocalDateTime.now());
+
 		paymentRepository.save(boleto);
 		return boleto;
 

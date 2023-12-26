@@ -60,7 +60,7 @@ public class PaymentController {
 		}
 
 	}
-	@GetMapping(value = "/delay")
+	@GetMapping(value = "/delay") //ok 
 	public ResponseEntity<?> searchLatePayments(@RequestParam("usersId") Long usersId) {
 		try {
 
@@ -100,18 +100,22 @@ public class PaymentController {
 					.body("Ocorreu um erro ao consultar o boleto.");
 		}
 	}
+	@GetMapping(value = "/week") //ok
+	public ResponseEntity<?> findPaymentsWeek(
+			@RequestParam("usersId") Long usersId,
+			@RequestParam(value = "date") String date,
+			@RequestParam("status") String status) {
+		 try {
 
-	@GetMapping("/dinamico")
-//	@ApiOperation(value = "Faz uma consulta com dados variados sobre o boleto" )
-	List<PayamentDto> findByBuscaDinamica(@RequestBody BoletoFrom payamentFrom) {
+		List<Payment> payments = paymentSerivce.findPaymentsWeek(usersId, date, status);
+		LOGGER.info("consulta para o user {} realizado com sucesso.", usersId);
 
-		// Falta testar
-//		List<PayamentDto> boletosVO = payamentSerivce.findAll(payamentFrom);
+		return ResponseEntity.ok(new ApiPayments(payments));
+		 } catch (RuntimeException msg) { return
+		 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) .body(msg.getMessage()); }
+	}
 
-		return null;
-	};
 
-//	specific search
 	@GetMapping(value = "/search") // ok
 	public ResponseEntity<?> searcheByUsersByMonthAndStatus(
 			@RequestParam("usersId") Long usersId,
@@ -147,9 +151,9 @@ public class PaymentController {
 		return new ResponseEntity<>(new ApiPayment(paymentAtt), HttpStatus.OK);
 	}
 
-	@PutMapping("/pagamento/{id}")
-	public ResponseEntity<?> makePayment(@PathVariable("id") Long id) {
-		Payment boleto = paymentSerivce.makePayment(id);
+	@PutMapping("/makePayment")
+	public ResponseEntity<?> makePayment(@RequestParam(value = "paymentId") Long paymentId) {
+		Payment boleto = paymentSerivce.makePayment(paymentId);
 
 		return new ResponseEntity<>(boleto, HttpStatus.OK);
 	}
@@ -174,15 +178,7 @@ public class PaymentController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocorreu um erro ao consultar o boleto.");
 		}
 	}
+	
 
-	@PostMapping("/xlsx/{nome}")
-	public void resumoDoMesXlsx(@PathVariable("nome") String nome) {
-//		try {
-//			payamentSerivce.resumoDoMesXlsx(nome);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
 
 }
