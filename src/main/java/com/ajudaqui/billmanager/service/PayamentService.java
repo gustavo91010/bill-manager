@@ -143,6 +143,16 @@ public class PayamentService {
 		}
 		return payments;
 	}
+	public List<Payment> findPaymentDaily(Long usersId) {
+		LocalDate startMonth = LocalDate.now();
+		LocalDate endMonth = startMonth;
+
+		return paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
+
+		
+
+		
+	}
 
 	public List<Payment> findByDescricao(Long usersId, String descricao) {
 

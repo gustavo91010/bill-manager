@@ -143,6 +143,18 @@ public class PaymentController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
+	@GetMapping(value = "/daily") 
+	public ResponseEntity<?> findPaymentDaily(@RequestParam(value = "usersId") Long usersId
+			) {
+		try {
+			List<Payment> payments = paymentSerivce.findPaymentDaily(usersId);
+			return ResponseEntity.ok(new ApiPayments(payments));
+
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
 
 	@PutMapping("/{userId}/{paymentId}")
 	public ResponseEntity<?> atualizar(@PathVariable("userId") Long userId,@PathVariable("paymentId") Long paymentId, @RequestBody BoletoFrom from) {
