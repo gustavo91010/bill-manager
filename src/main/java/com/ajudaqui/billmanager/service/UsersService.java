@@ -85,7 +85,7 @@ public boolean userExist(Long userID) {
 		usersRepository.save(user);
 		return user;
 	}
-	public Users changeStats(Long id) {
+	public Users changeStatus(Long id) {
 		Users user = findById(id);
 		user.setActive(!user.getActive());
 		usersRepository.save(user);

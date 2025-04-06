@@ -95,7 +95,7 @@ public class UsersController {
 	public ResponseEntity<?> changeDtatus(@PathVariable("id") Long id) {
 		try {
 
-			Users user = usersService.changeStats(id);
+			Users user = usersService.changeStatus(id);
 			LOGGER.info("Usuario {} esta com o status {}.", user.getName(), user.getActive());
 
 			return ResponseEntity.ok("Usuario atualizado.");
