@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import com.ajudaqui.billmanager.service.future.StoreService;
 import com.ajudaqui.billmanager.service.future.StoreServiceDeprecaed;
 
 public class CompleteFutureTest_03 {
@@ -15,6 +14,7 @@ public class CompleteFutureTest_03 {
   // Posso tambem passra o numero especifica de threads
   public void searchPriceSync(StoreServiceDeprecaed storeService) {
     long start = System.currentTimeMillis();
+    // Posso definir o numero de threadrs
     ExecutorService executor = Executors.newFixedThreadPool(3);
 
     List<String> stores = List.of("Store 01", "Store 02", "Store 03", "Store 04", "Store 05", "Store 06");
