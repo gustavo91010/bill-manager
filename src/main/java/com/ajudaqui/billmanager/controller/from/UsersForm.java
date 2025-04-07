@@ -1,4 +1,4 @@
-package com.ajudaqui.billmanager.controller;
+package com.ajudaqui.billmanager.controller.from;
 
 import com.ajudaqui.billmanager.entity.Users;
 
