@@ -22,6 +22,7 @@ public class UsersService {
 		String opa="opa!";
 		System.out.println(opa);
 		return opa;
+    saiugdaigu
 	}
 
 	public Users create(UsersVO usersVO) {
@@ -34,7 +35,9 @@ public class UsersService {
 		users.setName(usersVO.getName());
 		users.setEmail(usersVO.getEmail());
 		users.setActive(true);
-		users.setCreated_at(LocalDateTime.now());
+	ṕkpoiṕ´
+
+    users.setCreated_at(LocalDateTime.now());
 		users.setUpdated_at(users.getCreated_at());
 		users = usersRepository.save(users);
 		return users;
@@ -58,6 +61,10 @@ public boolean userExist(Long userID) {
 	}
 
 	public List<Users> findAll() {
+
+
+    adfdf
+
 		return usersRepository.findAll();
 
 	}
