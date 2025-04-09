@@ -3,82 +3,87 @@ package com.ajudaqui.billmanager.service.vo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
 
 public class PayamentDto {
-	private String description;
-	private BigDecimal value;
-	private LocalDate due_date;
-	private StatusBoleto status;
+  private Long userId;
+  private String description;
+  private BigDecimal value;
+  private LocalDate due_date;
+  private StatusBoleto status;
 
-	public PayamentDto() {
-	}
-	
-	public PayamentDto(Payment payaments) {
-		this.description = payaments.getDescription();
-		this.value = payaments.getValue();
-		this.due_date = payaments.getDue_date();
-//		this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
-		this.status = payaments.getStatus();
-	}
+  public PayamentDto() {
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public PayamentDto(Payment payaments) {
+    this.userId = payaments.getUserId();
+    this.description = payaments.getDescription();
+    this.value = payaments.getValue();
+    this.due_date = payaments.getDue_date();
+    // this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
+    this.status = payaments.getStatus();
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public BigDecimal getValue() {
-		return value;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
+  public BigDecimal getValue() {
+    return value;
+  }
 
-	public LocalDate getDue_date() {
-		return due_date;
-	}
+  public void setValue(BigDecimal value) {
+    this.value = value;
+  }
 
-	public void setDue_date(LocalDate due_date) {
-		this.due_date = due_date;
-	}
+  public LocalDate getDue_date() {
+    return due_date;
+  }
 
-	public StatusBoleto getStatus() {
-		return status;
-	}
+  public void setDue_date(LocalDate due_date) {
+    this.due_date = due_date;
+  }
 
-	public void setStatus(StatusBoleto status) {
-		this.status = status;
-	}
+  public StatusBoleto getStatus() {
+    return status;
+  }
 
-	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
-		Payment payament = new Payment();
-		payament.setUserId(users.getId());
-		payament.setDescription(this.description);
-		payament.setValue(this.value);
-		payament.setCreated_at(LocalDateTime.now());
-		payament.setUpdated_at(LocalDateTime.now());
+  public void setStatus(StatusBoleto status) {
+    this.status = status;
+  }
 
-		
-		payament.setDue_date(this.due_date);
-		ValidarStatus.statusAtualizado(payament, boletoRepository);
-		return payament;
-	}
+  public Payment toDatabase(PaymentsRepository boletoRepository) {
+    Payment payament = new Payment();
+    payament.setUserId(userId);
+    payament.setDescription(this.description);
+    payament.setValue(this.value);
+    payament.setCreated_at(LocalDateTime.now());
+    payament.setUpdated_at(LocalDateTime.now());
 
-	@Override
-	public String toString() {
-		return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
-				+ status + "]";
-	}
-	
+    payament.setDue_date(this.due_date);
+    ValidarStatus.statusAtualizado(payament, boletoRepository);
+    return payament;
+  }
 
+  @Override
+  public String toString() {
+    return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
+        + status + "]";
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }

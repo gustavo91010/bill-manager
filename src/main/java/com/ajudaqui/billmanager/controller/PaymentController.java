@@ -33,11 +33,11 @@ public class PaymentController {
 	private PayamentService paymentSerivce;
 	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
-	@PostMapping("/{userId}") // ok
-	public ResponseEntity<?> cadastrar(@RequestBody PayamentDto payamentDto, @PathVariable("userId") Long userId) {
+	@PostMapping() // ok
+	public ResponseEntity<?> cadastrar(@RequestBody PayamentDto payamentDto)  {
 		try {
 
-			Payment payment = paymentSerivce.cadastrar(payamentDto, userId);
+			Payment payment = paymentSerivce.cadastrar(payamentDto);
 
 			return new ResponseEntity<>(new ApiPayment(payment), HttpStatus.CREATED);
 		} catch (MsgException msg) {

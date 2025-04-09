@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
-import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
@@ -26,13 +24,12 @@ public class PayamentService {
 
 	@Autowired
 	private PaymentsRepository paymentRepository;
-	@Autowired
-	private UsersService usersService;
+	// @Autowired
+	// private UsersService usersService;
 
-	public Payment cadastrar(PayamentDto paymentDto, Long userId) {
-		Users users = usersService.findById(userId);
+	public Payment cadastrar(PayamentDto paymentDto) {
 
-		List<Payment> paymentForMonth = findAllMonth(userId, paymentDto.getDue_date().getMonthValue(),
+		List<Payment> paymentForMonth = findAllMonth(paymentDto.getUserId(), paymentDto.getDue_date().getMonthValue(),
 				paymentDto.getDue_date().getYear());
 
 		boolean alrreadRegistered = paymentForMonth.stream()
@@ -43,10 +40,9 @@ public class PayamentService {
 		if (alrreadRegistered) {
 			throw new MsgException("pagamento já cadastrado");
 		}
-		Payment payment = paymentDto.toDatabase(paymentRepository, users);
+		Payment payment = paymentDto.toDatabase(paymentRepository);
 
 		payment = paymentRepository.save(payment);
-		users.getPayaments().add(payment);
 
 		return payment;
 
@@ -116,9 +112,6 @@ public class PayamentService {
 
 	public List<Payment> findAllMonth(Long userId, Integer month, Integer year) {
 
-		if (!usersService.userExist(userId)) {
-			throw new NotFoundEntityException("usuario não cadastrado");
-		}
 		LocalDate startMonth = LocalDate.of(year, month, 1);
 		LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
 		List<Payment> resultt = paymentRepository.findAllMonth(userId, startMonth, endMonth);
@@ -148,18 +141,13 @@ public class PayamentService {
 		LocalDate endMonth = startMonth;
 
 		return paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
-
-		
-
-		
 	}
 
 	public List<Payment> findByDescricao(Long usersId, String descricao) {
 
 		List<Payment> boletos = paymentRepository.findByDescriptionForUsers(usersId, descricao);
 		return boletos;
-
-	}
+}
 
 	// Efetivar Pagamento
 	public Payment makePayment(Long id) {
