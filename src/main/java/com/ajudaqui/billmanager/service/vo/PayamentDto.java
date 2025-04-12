@@ -8,11 +8,15 @@ import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.constraints.NotBlank;
 
 public class PayamentDto {
-  private Long userId;
+  @NotBlank(message = "O campo descrição é obrigatorio")
   private String description;
   private BigDecimal value;
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate due_date;
   private StatusBoleto status;
 
@@ -20,7 +24,6 @@ public class PayamentDto {
   }
 
   public PayamentDto(Payment payaments) {
-    this.userId = payaments.getUserId();
     this.description = payaments.getDescription();
     this.value = payaments.getValue();
     this.due_date = payaments.getDue_date();
@@ -62,7 +65,6 @@ public class PayamentDto {
 
   public Payment toDatabase(PaymentsRepository boletoRepository) {
     Payment payament = new Payment();
-    payament.setUserId(userId);
     payament.setDescription(this.description);
     payament.setValue(this.value);
     payament.setCreated_at(LocalDateTime.now());
@@ -79,11 +81,4 @@ public class PayamentDto {
         + status + "]";
   }
 
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
 }

@@ -1,6 +1,5 @@
 package com.ajudaqui.billmanager.entity;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,65 +11,47 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class Users {
-	
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String name;
-	private String email;
-	private Boolean active;
-	private LocalDateTime created_at;
-	private LocalDateTime updated_at ;
-	@OneToMany
-	private List<Payment> payaments = new ArrayList<>();
-	
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public Boolean getActive() {
-		return active;
-	}
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-	public LocalDateTime getCreated_at() {
-		return created_at;
-	}
-	public void setCreated_at(LocalDateTime created_at) {
-		this.created_at = created_at;
-	}
-	public LocalDateTime getUpdated_at() {
-		return updated_at;
-	}
-	public void setUpdated_at(LocalDateTime updated_at) {
-		this.updated_at = updated_at;
-	}
-	public List<Payment> getPayaments() {
-		return payaments;
-	}
-	public void setPayaments(List<Payment> payaments) {
-		this.payaments = payaments;
-	}
-	
-	
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private Boolean active;
+  private String accessToken;
+  @OneToMany
+  private List<Payment> payaments = new ArrayList<>();
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  public List<Payment> getPayaments() {
+    return payaments;
+  }
+
+  public void setPayaments(List<Payment> payaments) {
+    this.payaments = payaments;
+  }
+
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
 
 }

@@ -8,5 +8,5 @@ import com.ajudaqui.billmanager.entity.Users;
 
 public interface UsersRepository extends JpaRepository<Users, Long> {
 
-	Optional<Users> findByEmail(String email);
+  Optional<Users> findByAccessToken(String accessToken);
 }
