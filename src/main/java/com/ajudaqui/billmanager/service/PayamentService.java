@@ -60,7 +60,7 @@ public class PayamentService {
 				boletoDto.setDue_date(boletoDto.getDue_date().plusMonths(1));
 
 			}
-			cadastrar(boletoDto, userId);
+			cadastrar(boletoDto);
 			index++;
 		} while (index < repeticao);
 
