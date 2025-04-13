@@ -21,7 +21,7 @@ import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
 
 @Service
-public class PayamentService {
+public class PaymentService {
 
   @Autowired
   private PaymentsRepository paymentRepository;
@@ -34,17 +34,27 @@ public class PayamentService {
     List<Payment> paymentForMonth = findAllMonth(users.getId(), paymentDto.getDue_date().getMonthValue(),
         paymentDto.getDue_date().getYear());
 
-    boolean alrreadRegistered = paymentForMonth.stream()
-        .anyMatch(p -> p.getDescription().equals(paymentDto.getDescription())
-            && p.getValue().equals(paymentDto.getValue())
-            && p.getDue_date().equals(paymentDto.getDue_date()));
+    if (!paymentForMonth.isEmpty()) {
 
-    if (alrreadRegistered) {
-      throw new MsgException("pagamento já cadastrado");
+      boolean alrreadRegistered = paymentForMonth.stream()
+          .anyMatch(p -> p.getDescription().equals(paymentDto.getDescription())
+              && p.getValue().equals(paymentDto.getValue())
+              && p.getDue_date().equals(paymentDto.getDue_date()));
+
+      if (alrreadRegistered) {
+        throw new MsgException("pagamento já cadastrado");
+      }
     }
-    Payment payment = paymentDto.toDatabase(paymentRepository);
+    Payment payment = paymentDto.toDatabase();
+    return save(payment);
+  }
 
+  private Payment save(Payment payment) {
     return paymentRepository.save(payment);
+  }
+
+  public Payment update(Payment payment) {
+    return save(payment);
   }
 
   public void boletosRecorrentes(PayamentDto boletoDto, Long repeticao, String accessToken) {
@@ -189,7 +199,7 @@ public class PayamentService {
 
   public List<Payment> atualizarStatus(List<Payment> boletos) {
     boletos.forEach(b -> {
-      ValidarStatus.statusAtualizado(b, paymentRepository);
+      ValidarStatus.statusAtualizado(b);
 
     });
     return boletos;
@@ -202,9 +212,9 @@ public class PayamentService {
 
   }
 
-public List<Payment> periodTime(String accessToken, LocalDate start, LocalDate finsh, String status) {
+  public List<Payment> periodTime(String accessToken, LocalDate start, LocalDate finsh, String status) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'periodTime'");
-}
+  }
 
 }

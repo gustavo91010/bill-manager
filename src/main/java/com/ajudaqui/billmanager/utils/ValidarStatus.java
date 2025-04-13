@@ -1,7 +1,6 @@
 package com.ajudaqui.billmanager.utils;
 
 import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.validacao.BoletosEmDias;
 import com.ajudaqui.billmanager.utils.validacao.Status;
 import com.ajudaqui.billmanager.utils.validacao.StatusBoletoAVencer;
@@ -10,7 +9,7 @@ import com.ajudaqui.billmanager.utils.validacao.StatusBoletoVencendoHoje;
 import com.ajudaqui.billmanager.utils.validacao.StatusBoletoVencido;
 
 public class ValidarStatus {
-	public static Payment statusAtualizado(Payment boleto, PaymentsRepository repository) {
+	public static Payment statusAtualizado(Payment boleto) {
 		
 		Status status= new StatusBoletoPago(
 						   new StatusBoletoVencido(
@@ -19,7 +18,8 @@ public class ValidarStatus {
 										new BoletosEmDias()))));
 		
 		boleto.setStatus(status.validar(boleto));
-		return repository.save(boleto);
+    return boleto;
+		// return repository.save(boleto);
 	}
 
 }

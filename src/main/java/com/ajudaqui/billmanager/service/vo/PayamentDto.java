@@ -1,6 +1,7 @@
 package com.ajudaqui.billmanager.service.vo;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -44,7 +45,7 @@ public class PayamentDto {
   }
 
   public void setValue(BigDecimal value) {
-    this.value = value;
+    this.value = value.setScale(2, RoundingMode.HALF_UP);
   }
 
   public LocalDate getDue_date() {
@@ -63,7 +64,7 @@ public class PayamentDto {
     this.status = status;
   }
 
-  public Payment toDatabase(PaymentsRepository boletoRepository) {
+  public Payment toDatabase() {
     Payment payament = new Payment();
     payament.setDescription(this.description);
     payament.setValue(this.value);
@@ -71,7 +72,7 @@ public class PayamentDto {
     payament.setUpdated_at(LocalDateTime.now());
 
     payament.setDue_date(this.due_date);
-    ValidarStatus.statusAtualizado(payament, boletoRepository);
+    ValidarStatus.statusAtualizado(payament);
     return payament;
   }
 

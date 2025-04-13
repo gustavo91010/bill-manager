@@ -28,7 +28,7 @@ import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.response.ApiPayment;
 import com.ajudaqui.billmanager.response.ApiPayments;
 import com.ajudaqui.billmanager.response.ApiResponse;
-import com.ajudaqui.billmanager.service.PayamentService;
+import com.ajudaqui.billmanager.service.PaymentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 
 @RestController
@@ -36,7 +36,7 @@ import com.ajudaqui.billmanager.service.vo.PayamentDto;
 public class PaymentController {
 
   @Autowired
-  private PayamentService paymentSerivce;
+  private PaymentService paymentSerivce;
   private Logger logger = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
   @PostMapping()
