@@ -84,11 +84,11 @@ public class PaymentService {
     return paymentForMonth.contains(payment);
   }
 
-  public List<Payment> searchLatePayments(String accessToken) {
-    Users users = usersService.findByAccessToken(accessToken);
-    return paymentRepository.searchLatePayments(users.getId());
+  // public List<Payment> searchLatePayments(String accessToken) {
+  // Users users = usersService.findByAccessToken(accessToken);
+  // return paymentRepository.searchLatePayments(users.getId());
 
-  }
+  // }
 
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
 
@@ -120,10 +120,10 @@ public class PaymentService {
     List<Payment> payments = new ArrayList<Payment>();
 
     if (status.isEmpty()) {
-      payments = paymentRepository.findPayamentsInMonth(usersId, monday, sunday);
+      payments = paymentRepository.findPayaments(usersId, monday, sunday);
 
     } else {
-      payments = paymentRepository.findForPaymentsByMonthAndStatus(usersId, monday, sunday,
+      payments = paymentRepository.findPayaments(usersId, monday, sunday,
           valueOf(status));
     }
     return payments;
@@ -134,41 +134,47 @@ public class PaymentService {
 
     LocalDate startMonth = LocalDate.of(year, month, 1);
     LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
-    List<Payment> resultt = paymentRepository.findAllMonth(userId, startMonth, endMonth);
+    List<Payment> resultt = paymentRepository.findPayaments(userId, startMonth, endMonth);
     return resultt;
 
   }
 
-  public List<Payment> searcheByUsersByMonthAndStatus(Long usersId, Integer month, Integer year, String status) {
+  // public List<Payment> searcheByUsersByMonthAndStatus(Long usersId, Integer
+  // month, Integer year, String status) {
 
-    // se o mes tiver vazio, sera o periodo de 12 meses, o ano, sera 1900
-    LocalDate startMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 1 : month, 1);
-    LocalDate endMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 12 : month, startMonth.lengthOfMonth());
+  // // se o mes tiver vazio, sera o periodo de 12 meses, o ano, sera 1900
+  // LocalDate startMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 1 :
+  // month, 1);
+  // LocalDate endMonth = LocalDate.of(year == 0 ? 1900 : year, month == 0 ? 12 :
+  // month, startMonth.lengthOfMonth());
 
-    List<Payment> payments = new ArrayList<Payment>();
+  // List<Payment> payments = new ArrayList<Payment>();
 
-    if (status.isEmpty()) {
-      payments = paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
-    } else {
+  // if (status.isEmpty()) {
+  // payments = paymentRepository.findPayamentsInMonth(usersId, startMonth,
+  // endMonth);
+  // } else {
 
-      payments = paymentRepository.findForPaymentsByMonthAndStatus(usersId, startMonth, endMonth,
-          valueOf(status));
-    }
-    return payments;
-  }
+  // payments = paymentRepository.findForPaymentsByMonthAndStatus(usersId,
+  // startMonth, endMonth,
+  // valueOf(status));
+  // }
+  // return payments;
+  // }
 
-  public List<Payment> findPaymentDaily(Long usersId) {
-    LocalDate startMonth = LocalDate.now();
-    LocalDate endMonth = startMonth;
+  // public List<Payment> findPaymentDaily(Long usersId) {
+  // LocalDate startMonth = LocalDate.now();
+  // LocalDate endMonth = startMonth;
 
-    return paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
-  }
+  // return paymentRepository.findPayamentsInMonth(usersId, startMonth, endMonth);
+  // }
 
-  public List<Payment> findByDescricao(String accessToken, String descricao) {
-    Users users = usersService.findByAccessToken(accessToken);
-    List<Payment> boletos = paymentRepository.findByDescriptionForUsers(users.getId(), descricao);
-    return boletos;
-  }
+  // public List<Payment> findByDescricao(String accessToken, String descricao) {
+  // Users users = usersService.findByAccessToken(accessToken);
+  // List<Payment> boletos =
+  // paymentRepository.findByDescriptionForUsers(users.getId(), descricao);
+  // return boletos;
+  // }
 
   // Efetivar Pagamento
   public Payment makePayment(Long id) {
@@ -214,15 +220,33 @@ public class PaymentService {
 
   }
 
-  public void deleteById(Long id) {
+  public void deleteById(String accessToken, Long id) {
     Payment boleto = findById(id);
     paymentRepository.delete(boleto);
 
   }
 
-  public List<Payment> periodTime(String accessToken, LocalDate start, LocalDate finsh, String status) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'periodTime'");
+  public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finsh,
+      String status) {
+
+    Users user = usersService.findByAccessToken(accessToken);
+    start = (start == null) ? LocalDate.now() : start;
+    finsh = (finsh == null) ? LocalDate.now() : finsh;
+    if (!description.isEmpty()) {
+      if (!status.isEmpty()) {
+        return paymentRepository.findPayaments(user.getId(), description, start, finsh, StatusBoleto.valueOf(status));
+      }
+      return paymentRepository.findPayaments(user.getId(), description, start, finsh);
+    } else {
+
+      if (status.isEmpty()) {
+
+        return paymentRepository.findPayaments(user.getId(), start, finsh);
+      }
+
+      return paymentRepository.findPayaments(user.getId(), start, finsh, StatusBoleto.valueOf(status));
+    }
+
   }
 
 }

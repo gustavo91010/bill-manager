@@ -9,6 +9,7 @@ import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.UsersRepository;
 import com.ajudaqui.billmanager.service.vo.UserUpdateVo;
+import com.ajudaqui.billmanager.service.vo.UsersVO;
 
 @Service
 public class UsersService {
@@ -55,6 +56,10 @@ public class UsersService {
 
     usersRepository.deleteById(id);
 
+  }
+
+  public Users create(UsersVO userVo) {
+    return new Users();
   }
 
 }

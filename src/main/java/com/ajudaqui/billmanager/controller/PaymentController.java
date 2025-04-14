@@ -39,20 +39,6 @@ public class PaymentController {
   private PaymentService paymentSerivce;
   private Logger logger = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
-  // @PostMapping()
-  // public ResponseEntity<?> register(@Valid @RequestBody PayamentDto
-  // payamentDto,
-  // @RequestHeader("Authorization") String accessToken) {
-  // logger.info("[POST] | /payment | accessToken: %s", accessToken);
-  // try {
-  // Payment payment = paymentSerivce.register(payamentDto, accessToken);
-  // return new ResponseEntity<>(new ApiPayment(payment), HttpStatus.CREATED);
-  // } catch (MsgException msg) {
-  // return new ResponseEntity<>(msg.getMessage(), HttpStatus.BAD_REQUEST);
-  // }
-
-  // }
-
   @PostMapping("/repeat/{repeat}")
   public ResponseEntity<?> boletosRecorrentes(@Valid @RequestBody PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,
@@ -70,25 +56,10 @@ public class PaymentController {
 
   }
 
-  @GetMapping(value = "/delay") // ok
-  public ResponseEntity<?> searchLatePayments(@RequestHeader("Authorization") String accessToken) {
-    logger.info("[GET] | /payment/delay | accessToken: %d", accessToken);
-
-    try {
-      // procura os vebcidose não pagos né/?
-      List<Payment> boletos = paymentSerivce.searchLatePayments(accessToken);
-      return ResponseEntity.ok(new ApiPayments(boletos));
-
-    } catch (RuntimeException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
-    }
-
-  }
-
-  @GetMapping(value = "/payment-id/{paymentId}") // ok
+  @GetMapping(value = "/id/{paymentId}") // ok
   public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken,
       @PathVariable("paymentId") Long paymentId) {
-    logger.info("[GET] | /payment-id/{paymentId} | accessToken: %s", accessToken);
+    logger.info("[GET] | /payment/id/{paymentId} | accessToken: %s", accessToken);
     try {
 
       Payment boleto = paymentSerivce.findByIdForUsers(accessToken, paymentId);
@@ -100,32 +71,17 @@ public class PaymentController {
 
   }
 
-  @GetMapping(value = "/description/{description}") // ok
-  public ResponseEntity<?> consultarPorDescricao(@RequestHeader("Authorization") String accessToken,
-      @PathVariable("description") String description) {
-    logger.info("[GET] | /description/{description} | accessToken: %s", accessToken);
-    try {
-
-      List<Payment> payments = paymentSerivce.findByDescricao(accessToken, description);
-
-      return ResponseEntity.ok(new ApiPayments(payments));
-    } catch (RuntimeException e) {
-
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new ApiResponse("Ocorreu um erro ao consultar o boleto."));
-    }
-  }
-
-  @GetMapping(value = "/period-time")
+  @GetMapping()
   public ResponseEntity<?> periodTime(
       @RequestHeader("Authorization") String accessToken,
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh,
-      @RequestParam(value = "status", defaultValue = "EM_DIAS") String status) {
-    logger.info("[GET] | /period-time | accessToken: %s", accessToken);
+      @RequestParam(value = "description", defaultValue = "") String description,
+      @RequestParam(value = "status", defaultValue = "") String status) {
+    logger.info("[GET] | /payment | accessToken: %s", accessToken);
     try {
 
-      List<Payment> payments = paymentSerivce.periodTime(accessToken, start, finsh, status);
+      List<Payment> payments = paymentSerivce.periodTime(accessToken, description, start, finsh, status);
 
       return ResponseEntity.ok(new ApiPayments(payments));
     } catch (RuntimeException msg) {
@@ -133,21 +89,24 @@ public class PaymentController {
     }
   }
 
-  @PutMapping("/{userId}/{paymentId}")
+  @PutMapping("/{paymentId}")
   public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
       @PathVariable("paymentId") Long paymentId,
       @RequestBody BoletoFrom from) {
-    logger.info("[GET] | /period-time | accessToken: %s", accessToken);
+    logger.info("[PUT] | /payment | accessToken: %s", accessToken);
+
     Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
 
     return new ResponseEntity<>(new ApiPayment(paymentAtt), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> remover(@PathVariable Long id) {
+  public ResponseEntity<?> remover(@RequestHeader("Authorization") String accessToken,
+      @PathVariable("paymentId") Long paymentId,
+      @RequestBody BoletoFrom from) {
 
-    // Falta testar
-    paymentSerivce.deleteById(id);
+    logger.info("[DELETE] | /payment | accessToken: %s", accessToken);
+    paymentSerivce.deleteById(accessToken, paymentId);
     return ResponseEntity.ok().build();
 
   }
