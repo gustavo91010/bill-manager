@@ -55,7 +55,7 @@ public class PaymentServiceTest {
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
 
     // Execução:
-    payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
+    List<Payment> response = payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
 
     verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
     List<Payment> capturedPayments = paymentCaptor.getAllValues();
@@ -64,6 +64,7 @@ public class PaymentServiceTest {
     assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
     assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
         capturedPayments.get(capturedPayments.size() - 1).getDue_date());
+    assertEquals(repeticao, response.size());
   }
 
   @Test
@@ -81,7 +82,7 @@ public class PaymentServiceTest {
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
 
     // Execução:
-    payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
+    List<Payment> response = payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
 
     verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
     List<Payment> capturedPayments = paymentCaptor.getAllValues();
@@ -92,6 +93,7 @@ public class PaymentServiceTest {
     assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
     assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
         capturedPayments.get(capturedPayments.size() - 1).getDue_date());
+    assertEquals(repeticao, response.size());
   }
 
   @Test
@@ -105,26 +107,15 @@ public class PaymentServiceTest {
     String accessToken = "";
     Users user = new Users();
 
-    List<Payment> payments = new ArrayList<>();
-
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
-    // when(payamentService.findAllMonth(any(), anyInt(), anyInt()))
-    when(payamentService
-        .findAllMonth(user.getId(), paymentDto.getDue_date().getMonthValue(),
-            paymentDto.getDue_date().getYear()))
-        .thenReturn(payments);
     // Execução:
-    Payment response = payamentService.register(paymentDto, accessToken);
+    payamentService.register(paymentDto, accessToken);
 
     // Verificação:
     verify(paymentsRepository).save(paymentCaptor.capture());
 
     assertEquals("test boleto", paymentCaptor.getValue().getDescription());
     assertEquals("23.40", paymentCaptor.getValue().getValue().toString());
-    // verify(payamentService, times(0)).findAllMonth(any(), anyInt(), anyInt());
-    // verify(payamentService, times(0)).findAllMonth(user.getId(),
-    // paymentDto.getDue_date().getMonthValue(),
-    // paymentDto.getDue_date().getYear());
   }
 
 }

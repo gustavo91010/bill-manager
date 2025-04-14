@@ -52,33 +52,24 @@ public class PaymentService {
     return save(payment);
   }
 
-  public void boletosRecorrentes(PayamentDto paymentDto, Long repeticao, String accessToken) {
-
-    int index = 1;
+  public List<Payment> boletosRecorrentes(PayamentDto paymentDto, Long repeticao, String accessToken) {
+    List<Payment> registeredPayments = new ArrayList<>();
+    int index = 0;
     Users users = usersService.findByAccessToken(accessToken);
-    Payment payment = paymentDto.toDatabase(users.getId());
-
-    if (isRegistery(payment)) {
-      throw new MsgException("pagamento já cadastrado");
-    }
-    save(payment);
-
     while (index < repeticao) {
-
       Payment newPayment = paymentDto.toDatabase(users.getId());
-
-      newPayment.setDue_date(payment.getDue_date().plusMonths(index));
+      newPayment.setDue_date(newPayment.getDue_date().plusMonths(index));
 
       if (isRegistery(newPayment)) {
-        // throw new MsgException("pagamento já cadastrado");
         logger.warn(String.format("Boleto descição: %s, valor: %s, Vencimento: %$ já registrado.",
             newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDue_date().toString()));
         continue;
       }
-      System.out.println("pra salvar " + newPayment.getDue_date());
-      save(newPayment);
+
+      registeredPayments.add(save(newPayment));
       index++;
     }
+    return registeredPayments;
   }
 
   private boolean isRegistery(Payment payment) {

@@ -39,30 +39,31 @@ public class PaymentController {
   private PaymentService paymentSerivce;
   private Logger logger = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
-  @PostMapping()
-  public ResponseEntity<?> register(@Valid @RequestBody PayamentDto payamentDto,
-      @RequestHeader("Authorization") String accessToken) {
-    logger.info("[POST] | /payment | accessToken: %s", accessToken);
-    try {
-      Payment payment = paymentSerivce.register(payamentDto, accessToken);
-      return new ResponseEntity<>(new ApiPayment(payment), HttpStatus.CREATED);
-    } catch (MsgException msg) {
-      return new ResponseEntity<>(msg.getMessage(), HttpStatus.BAD_REQUEST);
-    }
+  // @PostMapping()
+  // public ResponseEntity<?> register(@Valid @RequestBody PayamentDto
+  // payamentDto,
+  // @RequestHeader("Authorization") String accessToken) {
+  // logger.info("[POST] | /payment | accessToken: %s", accessToken);
+  // try {
+  // Payment payment = paymentSerivce.register(payamentDto, accessToken);
+  // return new ResponseEntity<>(new ApiPayment(payment), HttpStatus.CREATED);
+  // } catch (MsgException msg) {
+  // return new ResponseEntity<>(msg.getMessage(), HttpStatus.BAD_REQUEST);
+  // }
 
-  }
+  // }
 
-  @PostMapping("/repet/{repet}")
+  @PostMapping("/repeat/{repeat}")
   public ResponseEntity<?> boletosRecorrentes(@Valid @RequestBody PayamentDto payamentDto,
-      @PathVariable("repet") Long repet,
+      @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
 
     logger.info("[POST] | /payment/repet{repet} | accessToken: %d", accessToken);
     try {
 
-      paymentSerivce.boletosRecorrentes(payamentDto, repet, accessToken);
+      List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Boleto cadastrado com sucesso"));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new ApiPayments(response));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage()));
     }
@@ -133,8 +134,8 @@ public class PaymentController {
   }
 
   @PutMapping("/{userId}/{paymentId}")
-  public ResponseEntity<?> atualizar(  @RequestHeader("Authorization") String accessToken, 
-    @PathVariable("paymentId") Long paymentId,
+  public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
+      @PathVariable("paymentId") Long paymentId,
       @RequestBody BoletoFrom from) {
     logger.info("[GET] | /period-time | accessToken: %s", accessToken);
     Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
