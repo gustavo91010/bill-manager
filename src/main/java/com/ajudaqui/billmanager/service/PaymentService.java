@@ -8,6 +8,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,24 +31,16 @@ public class PaymentService {
   @Autowired
   private UsersService usersService;
 
+  private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
+
   public Payment register(PayamentDto paymentDto, String accessToken) {
     // ta criando reétido... testar isso...
     Users users = usersService.findByAccessToken(accessToken);
-    List<Payment> paymentForMonth = findAllMonth(users.getId(), paymentDto.getDue_date().getMonthValue(),
-        paymentDto.getDue_date().getYear());
+    Payment payment = paymentDto.toDatabase(users.getId());
 
-    if (!paymentForMonth.isEmpty()) {
-
-      boolean alrreadRegistered = paymentForMonth.stream()
-          .anyMatch(p -> p.getDescription().equals(paymentDto.getDescription())
-              && p.getValue().equals(paymentDto.getValue())
-              && p.getDue_date().equals(paymentDto.getDue_date()));
-
-      if (alrreadRegistered) {
-        throw new MsgException("pagamento já cadastrado");
-      }
+    if (isRegistery(payment)) {
+      throw new MsgException("pagamento já cadastrado");
     }
-    Payment payment = paymentDto.toDatabase();
     return save(payment);
   }
 
@@ -57,23 +52,45 @@ public class PaymentService {
     return save(payment);
   }
 
-  public void boletosRecorrentes(PayamentDto boletoDto, Long repeticao, String accessToken) {
+  public void boletosRecorrentes(PayamentDto paymentDto, Long repeticao, String accessToken) {
 
-    // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    int index = 0;
-    do {
-      // LocalDate vencimento = LocalDate.parse(boletoDto.getDue_date().toString(),
-      // formatter);
+    int index = 1;
+    Users users = usersService.findByAccessToken(accessToken);
+    Payment payment = paymentDto.toDatabase(users.getId());
 
-      if (index > 0) {
-        // boletoDto.setDue_date(vencimento.plusMonths(1));
-        boletoDto.setDue_date(boletoDto.getDue_date().plusMonths(1));
+    if (isRegistery(payment)) {
+      throw new MsgException("pagamento já cadastrado");
+    }
+    save(payment);
 
+    while (index < repeticao) {
+
+      Payment newPayment = paymentDto.toDatabase(users.getId());
+
+      newPayment.setDue_date(payment.getDue_date().plusMonths(index));
+
+      if (isRegistery(newPayment)) {
+        // throw new MsgException("pagamento já cadastrado");
+        logger.warn(String.format("Boleto descição: %s, valor: %s, Vencimento: %$ já registrado.",
+            newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDue_date().toString()));
+        continue;
       }
-      register(boletoDto, accessToken);
+      System.out.println("pra salvar " + newPayment.getDue_date());
+      save(newPayment);
       index++;
-    } while (index < repeticao);
-    // falta aqui né...
+    }
+  }
+
+  private boolean isRegistery(Payment payment) {
+    List<Payment> paymentForMonth = findAllMonth(payment.getUserId(), payment.getDue_date().getMonthValue(),
+        payment.getDue_date().getYear());
+
+    if (paymentForMonth.isEmpty()) {
+
+      return false;
+    }
+
+    return paymentForMonth.contains(payment);
   }
 
   public List<Payment> searchLatePayments(String accessToken) {

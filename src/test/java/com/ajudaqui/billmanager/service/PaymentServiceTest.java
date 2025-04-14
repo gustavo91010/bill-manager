@@ -43,35 +43,55 @@ public class PaymentServiceTest {
   private ArgumentCaptor<Payment> paymentCaptor;
 
   @Test
-  @DisplayName("Não deve ferificar os boletos do mes se a lista estiver vazia")
-  public void test() {
+  @DisplayName("Deve regsitrar uma vez com o recorrente")
+  public void mustRegisterOnceWithTheApplicant() {
+
+    PayamentDto paymentDto = new PayamentDto();
+    paymentDto.setDue_date(LocalDate.now());
+    Long repeticao = 1L;
+
+    String accessToken = "";
+    Users user = new Users();
+    when(usersService.findByAccessToken(accessToken)).thenReturn(user);
+
+    // Execução:
+    payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
+
+    verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
+    List<Payment> capturedPayments = paymentCaptor.getAllValues();
+
+    assertEquals(repeticao, capturedPayments.size());
+    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
+    assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
+        capturedPayments.get(capturedPayments.size() - 1).getDue_date());
+  }
+
+  @Test
+  @DisplayName("Deve regsitrar multiplos pagamentos para meses futuro")
+  public void shouldRegisterMultipleàymentsForFutureMonths() {
 
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDescription("test boleto");
     paymentDto.setValue(new BigDecimal(23.4));
     paymentDto.setDue_date(LocalDate.now());
+    Long repeticao = 7L;
 
     String accessToken = "";
     Users user = new Users();
-
-    List<Payment> payments = new ArrayList<>();
-
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
-    when(payamentService
-        .findAllMonth(user.getId(), paymentDto.getDue_date().getMonthValue(),
-            paymentDto.getDue_date().getYear()))
-        .thenReturn(payments);
 
     // Execução:
-    payamentService.register(paymentDto, accessToken);
+    payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
 
-    // Verificação:
-    assertTrue(paymentDto.getDue_date().getMonthValue() >= 1 && paymentDto.getDue_date().getMonthValue() <= 12);
+    verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
+    List<Payment> capturedPayments = paymentCaptor.getAllValues();
 
-    verify(payamentService, times(0)).findAllMonth(
-        any(),
-        argThat(i -> i >= 1 && i <= 12), // Limitando o intervalo de 1 a 12 para o mês
-        anyInt());
+    assertEquals("test boleto", paymentCaptor.getValue().getDescription());
+    assertEquals("23.40", paymentCaptor.getValue().getValue().toString());
+    assertEquals(repeticao, capturedPayments.size());
+    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
+    assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
+        capturedPayments.get(capturedPayments.size() - 1).getDue_date());
   }
 
   @Test
@@ -94,7 +114,7 @@ public class PaymentServiceTest {
             paymentDto.getDue_date().getYear()))
         .thenReturn(payments);
     // Execução:
-    payamentService.register(paymentDto, accessToken);
+    Payment response = payamentService.register(paymentDto, accessToken);
 
     // Verificação:
     verify(paymentsRepository).save(paymentCaptor.capture());

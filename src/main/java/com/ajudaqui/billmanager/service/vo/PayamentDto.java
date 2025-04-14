@@ -64,8 +64,9 @@ public class PayamentDto {
     this.status = status;
   }
 
-  public Payment toDatabase() {
+  public Payment toDatabase(Long userId) {
     Payment payament = new Payment();
+    payament.setUserId(userId);
     payament.setDescription(this.description);
     payament.setValue(this.value);
     payament.setCreated_at(LocalDateTime.now());
