@@ -6,16 +6,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class PayamentDto {
   @NotBlank(message = "O campo descrição é obrigatorio")
   private String description;
+  @NotNull(message = "O campo valor é obrigatório")
   private BigDecimal value;
   @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate due_date;

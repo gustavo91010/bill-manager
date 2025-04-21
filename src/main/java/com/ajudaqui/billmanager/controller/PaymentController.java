@@ -3,12 +3,21 @@ package com.ajudaqui.billmanager.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ajudaqui.billmanager.controller.from.BoletoFrom;
+import com.ajudaqui.billmanager.entity.Payment;
+import com.ajudaqui.billmanager.response.ApiPayment;
+import com.ajudaqui.billmanager.response.ApiPayments;
+import com.ajudaqui.billmanager.response.ApiResponse;
+import com.ajudaqui.billmanager.service.PaymentService;
+import com.ajudaqui.billmanager.service.vo.PayamentDto;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,17 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
-import com.ajudaqui.billmanager.controller.from.BoletoFrom;
-import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.exception.MsgException;
-import com.ajudaqui.billmanager.response.ApiPayment;
-import com.ajudaqui.billmanager.response.ApiPayments;
-import com.ajudaqui.billmanager.response.ApiResponse;
-import com.ajudaqui.billmanager.service.PaymentService;
-import com.ajudaqui.billmanager.service.vo.PayamentDto;
-
 @RestController
 @RequestMapping("/payment")
+@Validated
 public class PaymentController {
 
   @Autowired
@@ -40,11 +41,11 @@ public class PaymentController {
   private Logger logger = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
   @PostMapping("/repeat/{repeat}")
-  public ResponseEntity<?> boletosRecorrentes(@Valid @RequestBody PayamentDto payamentDto,
+  public ResponseEntity<?> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
 
-    logger.info("[POST] | /payment/repet{repet} | accessToken: %d", accessToken);
+    logger.info("[POST] | /payment/repet{repet} | accessToken: {}", accessToken);
     try {
 
       List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
@@ -59,7 +60,7 @@ public class PaymentController {
   @GetMapping(value = "/id/{paymentId}") // ok
   public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken,
       @PathVariable("paymentId") Long paymentId) {
-    logger.info("[GET] | /payment/id/{paymentId} | accessToken: %s", accessToken);
+    logger.info("[GET] | /payment/id/{paymentId} | accessToken: {}", accessToken);
     try {
 
       Payment boleto = paymentSerivce.findByIdForUsers(accessToken, paymentId);
@@ -78,7 +79,7 @@ public class PaymentController {
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh,
       @RequestParam(value = "description", defaultValue = "") String description,
       @RequestParam(value = "status", defaultValue = "") String status) {
-    logger.info("[GET] | /payment | accessToken: %s", accessToken);
+    logger.info("[GET] | /payment | accessToken: {}", accessToken);
     try {
 
       List<Payment> payments = paymentSerivce.periodTime(accessToken, description, start, finsh, status);
@@ -93,7 +94,7 @@ public class PaymentController {
   public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
       @PathVariable("paymentId") Long paymentId,
       @RequestBody BoletoFrom from) {
-    logger.info("[PUT] | /payment | accessToken: %s", accessToken);
+    logger.info("[PUT] | /payment | accessToken: {}", accessToken);
 
     Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
 
@@ -105,7 +106,7 @@ public class PaymentController {
       @PathVariable("paymentId") Long paymentId,
       @RequestBody BoletoFrom from) {
 
-    logger.info("[DELETE] | /payment | accessToken: %s", accessToken);
+    logger.info("[DELETE] | /payment | accessToken: {}", accessToken);
     paymentSerivce.deleteById(accessToken, paymentId);
     return ResponseEntity.ok().build();
 

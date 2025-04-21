@@ -52,22 +52,22 @@
       <version>3.0.4</version>
     </dependency>
     <!-- para achar a configuração no confi server -->
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-config</artifactId>
-    </dependency>
-    <!-- Parac ser sreconhecido pelo eureka -->
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-    </dependency>
-    <!-- Para reconhecer os endpoints -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
+    <!-- <dependency> -->
+    <!--   <groupId>org.springframework.cloud</groupId> -->
+    <!--   <artifactId>spring-cloud-starter-config</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <!-1- Parac ser sreconhecido pelo eureka -1-> -->
+    <!-- <dependency> -->
+    <!--   <groupId>org.springframework.cloud</groupId> -->
+    <!--   <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <!-1- Para reconhecer os endpoints -1-> -->
+    <!-- <dependency> -->
+    <!--   <groupId>org.springframework.boot</groupId> -->
+    <!--   <artifactId>spring-boot-starter-actuator</artifactId> -->
+    <!-- </dependency> -->
 
-      <!-- Para adicionar os validadores de parametro para o dto -->
+    <!-- Para adicionar os validadores de parametro para o dto -->
     <dependency>
       <groupId>jakarta.validation</groupId>
       <artifactId>jakarta.validation-api</artifactId>
@@ -78,6 +78,13 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <dependencyManagement>
