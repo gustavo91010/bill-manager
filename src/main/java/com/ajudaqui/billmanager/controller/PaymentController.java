@@ -11,8 +11,6 @@ import com.ajudaqui.billmanager.response.ApiResponse;
 import com.ajudaqui.billmanager.service.PaymentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -38,14 +36,12 @@ public class PaymentController {
 
   @Autowired
   private PaymentService paymentSerivce;
-  private Logger logger = LoggerFactory.getLogger(PaymentController.class.getSimpleName());
 
   @PostMapping("/repeat/{repeat}")
   public ResponseEntity<?> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
 
-    logger.info("[POST] | /payment/repet{repet} | accessToken: {}", accessToken);
     try {
 
       List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
@@ -57,10 +53,9 @@ public class PaymentController {
 
   }
 
-  @GetMapping(value = "/id/{paymentId}") // ok
+  @GetMapping(value = "/id/{id}") // ok
   public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken,
-      @PathVariable("paymentId") Long paymentId) {
-    logger.info("[GET] | /payment/id/{paymentId} | accessToken: {}", accessToken);
+      @PathVariable("id") Long paymentId) {
     try {
 
       Payment boleto = paymentSerivce.findByIdForUsers(accessToken, paymentId);
@@ -79,36 +74,44 @@ public class PaymentController {
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh,
       @RequestParam(value = "description", defaultValue = "") String description,
       @RequestParam(value = "status", defaultValue = "") String status) {
-    logger.info("[GET] | /payment | accessToken: {}", accessToken);
     try {
 
       List<Payment> payments = paymentSerivce.periodTime(accessToken, description, start, finsh, status);
 
       return ResponseEntity.ok(new ApiPayments(payments));
     } catch (RuntimeException msg) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
     }
   }
 
-  @PutMapping("/{paymentId}")
+  @PutMapping("/{id}")
   public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
-      @PathVariable("paymentId") Long paymentId,
+      @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
-    logger.info("[PUT] | /payment | accessToken: {}", accessToken);
 
-    Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
+    try {
 
-    return new ResponseEntity<>(new ApiPayment(paymentAtt), HttpStatus.OK);
+      Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
+
+      return ResponseEntity.ok(new ApiPayment(paymentAtt));
+    } catch (RuntimeException msg) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
+    }
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> remover(@RequestHeader("Authorization") String accessToken,
-      @PathVariable("paymentId") Long paymentId,
+      @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
 
-    logger.info("[DELETE] | /payment | accessToken: {}", accessToken);
-    paymentSerivce.deleteById(accessToken, paymentId);
-    return ResponseEntity.ok().build();
+    try {
+
+      paymentSerivce.deleteById(accessToken, paymentId);
+
+      return ResponseEntity.ok(new ApiResponse("Pagamento excluido com sucesso."));
+    } catch (RuntimeException msg) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
+    }
 
   }
 
