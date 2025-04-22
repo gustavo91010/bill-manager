@@ -1,4 +1,3 @@
-
 package com.ajudaqui.billmanager.config;
 
 import java.io.IOException;
