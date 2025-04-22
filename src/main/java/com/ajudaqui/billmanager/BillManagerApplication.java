@@ -9,7 +9,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 public class BillManagerApplication {
   public static void main(String[] args) {
     SpringApplication.run(BillManagerApplication.class, args);
-    System.err.println("foi!");
   }
 
 }
