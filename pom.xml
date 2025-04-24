@@ -84,12 +84,14 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- Dependência do SDK da AWS para SQS -->
+    <!-- dependencia necessari opara consumir mensagens da aws -->
+
     <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>sqs</artifactId>
-      <version>2.20.9</version> <!-- Verifique a versão mais recente -->
+      <groupId>io.awspring.cloud</groupId>
+      <artifactId>spring-cloud-aws-starter-sqs</artifactId>
+      <version>3.0.1</version>
     </dependency>
+
 
     <!-- Dependência do Spring Boot para trabalhar com o AWS SDK -->
     <dependency>
@@ -97,6 +99,7 @@
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
     <!-- - para o spring ter acesso as credencias da [[AWS]] -->
+    <!-- Dependência do SDK para produzer mensagens na AWS para SQS -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>sqs</artifactId>

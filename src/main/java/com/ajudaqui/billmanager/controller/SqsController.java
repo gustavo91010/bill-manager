@@ -1,6 +1,6 @@
 package com.ajudaqui.billmanager.controller;
 
-import com.ajudaqui.billmanager.service.SqsProducerService;
+import com.ajudaqui.billmanager.service.SqsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SqsController {
 
   @Autowired
-  private SqsProducerService sqsProducerService;
+  private SqsService sqsProducerService;
 
   @PostMapping("/send-message")
   public String senMessage(@RequestBody String message) {

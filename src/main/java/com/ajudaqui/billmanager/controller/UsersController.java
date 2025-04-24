@@ -21,16 +21,12 @@ import com.ajudaqui.billmanager.service.UsersService;
 import com.ajudaqui.billmanager.service.vo.UserUpdateVo;
 import com.ajudaqui.billmanager.service.vo.UsersVO;
 
-//
-//@RestController
-//@RequestMapping("/users")
 @RestController
 @RequestMapping("/users")
 public class UsersController {
 
   @Autowired
   private UsersService usersService;
-  private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class.getSimpleName());
 
   @PostMapping()
   public ResponseEntity<?> create(@RequestBody UsersVO userVo) {

@@ -27,7 +27,7 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
       logger.info("{} | {} : [{}] {}", controller, methodName, httpMethod, path);
     }
 
-    return true; // continua a execução
+    return true; 
   }
 
 }
