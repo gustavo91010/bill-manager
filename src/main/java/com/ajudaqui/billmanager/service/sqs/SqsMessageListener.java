@@ -1,4 +1,4 @@
-package com.ajudaqui.billmanager.service;
+package com.ajudaqui.billmanager.service.sqs;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
