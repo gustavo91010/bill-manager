@@ -2,6 +2,8 @@ package com.ajudaqui.billmanager.service.sqs;
 
 import java.util.List;
 
+import com.ajudaqui.billmanager.exception.MsgException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,19 +22,22 @@ public class SqsService {
   private static final Logger LOGGER = LoggerFactory.getLogger(SqsService.class.getSimpleName());
   @Value("${aws.id}")
   private String awsId;
-  @Value("${aws.fila}")
-  private String awsFila;
+
   @Value("${aws.region}")
   private String region;
-  private final SqsClient sqsClient;
 
-  public SqsService(SqsClient sqsClient) {
+  private final SqsClient sqsClient;
+  private final QueueService queueService;
+
+  public SqsService(SqsClient sqsClient, QueueService queueService) {
     this.sqsClient = sqsClient;
+    this.queueService = queueService;
   }
 
-  public void sendMessage(String messageBody) {
-    String queueUrl = String.format("https://sqs.%s.amazonaws.com/%s/%s", region, awsId, awsFila);
+  public void sendMessage(String awsFila, String messageBody) {
+    checkingFila(awsFila);
 
+    String queueUrl = String.format("https://sqs.%s.amazonaws.com/%s/%s", region, awsId, awsFila);
     SendMessageRequest request = SendMessageRequest.builder()
         .queueUrl(queueUrl)
         .messageBody(messageBody)
@@ -41,7 +46,17 @@ public class SqsService {
     sqsClient.sendMessage(request);
   }
 
-  public void receiveMessage() {
+  private void checkingFila(String awsFila) {
+    if (awsFila.isEmpty()) {
+      throw new MsgException("O campo fila é obrigatorio");
+    }
+
+    if (!queueService.queueNameList().contains(awsFila)) {
+      throw new MsgException("Fila não registrada.");
+    }
+  }
+
+  public void receiveMessage(String awsFila) {
     ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
         .queueUrl(awsFila)
         .waitTimeSeconds(20) // Tempo de espera para uma nova requisição a fila
@@ -55,12 +70,12 @@ public class SqsService {
       for (Message message : messages) {
 
         LOGGER.info("Mensagem da fila {} recebida.", awsFila);
-        deleteMessage(message);
+        deleteMessage(awsFila, message);
       }
     }
   }
 
-  private void deleteMessage(Message message) {
+  private void deleteMessage(String awsFila, Message message) {
     DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
         .queueUrl(awsFila)
         .receiptHandle(message.receiptHandle())

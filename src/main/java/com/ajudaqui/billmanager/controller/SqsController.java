@@ -1,16 +1,21 @@
 package com.ajudaqui.billmanager.controller;
 
+import java.util.List;
+
+import com.ajudaqui.billmanager.response.ApiResponse;
+import com.ajudaqui.billmanager.response.ApiResponseList;
 import com.ajudaqui.billmanager.service.sqs.QueueService;
 import com.ajudaqui.billmanager.service.sqs.SqsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import software.amazon.awssdk.services.sqs.endpoints.internal.Value.Str;
 
 @RestController
 @RequestMapping("/sqs")
@@ -22,16 +27,30 @@ public class SqsController {
   @Autowired
   private QueueService queueService;
 
-  @PostMapping("/send-message")
-  public String senMessage(@RequestBody String message) {
-    sqsProducerService.sendMessage(message);
-    return message;
+  @PostMapping("/send-message/{fila}")
+  public ApiResponse senMessage(@PathVariable(required = true) String fila, @RequestBody String message) {
+    sqsProducerService.sendMessage(fila, message);
+    return new ApiResponse("Messagem enviada com sucesso!");
   }
 
-  @PostMapping("/queue")
-  public String createQueue(@RequestParam String queueName) {
-  
-    return queueService.createQueue(queueName);
+  @PostMapping("/queue-create")
+  public ApiResponse createQueue(@RequestParam String queueName) {
+
+    String response = queueService.createQueue(queueName);
+    return new ApiResponse(response);
+  }
+
+  @GetMapping("/queue-list")
+  public ApiResponseList queueList() {
+    List<String> response = queueService.queueList();
+    return new ApiResponseList(response);
+  }
+
+  @DeleteMapping("/queue-delete")
+  public ApiResponse delete(@RequestParam String queueName) {
+    String response = queueService.deleteQueue(queueName);
+    return new ApiResponse(response);
+
   }
 
 }
