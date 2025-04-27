@@ -64,9 +64,7 @@ public class SqsService {
         .build();
     ReceiveMessageResponse response = sqsClient.receiveMessage(receiveMessageRequest);
     List<Message> messages = response.messages();
-    if (messages.isEmpty()) {
-      LOGGER.info("Não há mensagens para processar.");
-    } else {
+    if (!messages.isEmpty()) {
       for (Message message : messages) {
 
         LOGGER.info("Mensagem da fila {} recebida.", awsFila);
