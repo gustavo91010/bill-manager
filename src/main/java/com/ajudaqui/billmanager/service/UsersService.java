@@ -2,14 +2,19 @@ package com.ajudaqui.billmanager.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.ajudaqui.billmanager.config.RequestLoggingInterceptor;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.UsersRepository;
 import com.ajudaqui.billmanager.service.vo.UserUpdateVo;
 import com.ajudaqui.billmanager.service.vo.UsersVO;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UsersService {
@@ -58,8 +63,17 @@ public class UsersService {
 
   }
 
+  public Users registerUserBySqs(String message) {
+    JsonElement jsonRegister = JsonParser.parseString(message);
+    String accessToken = jsonRegister.getAsJsonObject().get("access_token").getAsString();
+    return save(new Users(accessToken));
+  }
+
   public Users create(UsersVO userVo) {
     return new Users();
   }
 
+  private Users save(Users users) {
+    return usersRepository.save(users);
+  }
 }

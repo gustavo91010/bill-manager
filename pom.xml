@@ -83,8 +83,14 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
 
-    <!-- dependencia necessari opara consumir mensagens da aws -->
+    <!-- Dependência do Spring Boot para trabalhar com o AWS SDK -->
+    <!-- - para o spring ter acesso as credencias da [[AWS]] -->
+    <!-- Dependência do SDK para produzer mensagens na AWS para SQS -->
 
     <dependency>
       <groupId>io.awspring.cloud</groupId>
@@ -92,20 +98,17 @@
       <version>3.0.1</version>
     </dependency>
 
-
-    <!-- Dependência do Spring Boot para trabalhar com o AWS SDK -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-    <!-- - para o spring ter acesso as credencias da [[AWS]] -->
-    <!-- Dependência do SDK para produzer mensagens na AWS para SQS -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>sqs</artifactId>
       <version>2.20.15</version>  <!-- Use a versão mais recente -->
     </dependency>
-
+    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.12.1</version>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>

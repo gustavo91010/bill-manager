@@ -2,10 +2,15 @@ package com.ajudaqui.billmanager.service.sqs;
 
 import java.util.List;
 
+import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
+import com.ajudaqui.billmanager.service.UsersService;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,9 @@ public class SqsService {
 
   @Value("${aws.region}")
   private String region;
+
+  @Autowired
+  private UsersService usersService;
 
   private final SqsClient sqsClient;
   private final QueueService queueService;
@@ -64,13 +72,29 @@ public class SqsService {
         .build();
     ReceiveMessageResponse response = sqsClient.receiveMessage(receiveMessageRequest);
     List<Message> messages = response.messages();
+
     if (!messages.isEmpty()) {
       for (Message message : messages) {
+        if (isBillMessage(message.body())) {
 
-        LOGGER.info("Mensagem da fila {} recebida.", awsFila);
-        deleteMessage(awsFila, message);
+          LOGGER.info("Mensagem da fila {} recebida.", awsFila);
+          Users userSave = usersService.registerUserBySqs(message.body());
+          if (userSave.getId() != null) {
+
+            deleteMessage(awsFila, message);
+            LOGGER.info("Usuario id: {} e accessToken: {} registrado com sucesso!", userSave.getId(),
+                userSave.getAccessToken());
+          }
+        }
       }
     }
+  }
+
+  private boolean isBillMessage(String message) {
+
+    JsonElement messageJson = JsonParser.parseString(message);
+    String application = messageJson.getAsJsonObject().get("application").getAsString();
+    return application.equals("bill-manager");
   }
 
   private void deleteMessage(String awsFila, Message message) {

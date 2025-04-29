@@ -22,6 +22,14 @@ public class Users {
   @OneToMany
   private List<Payment> payaments = new ArrayList<>();
 
+  public Users() {
+  }
+
+  public Users(String accessToken) {
+    this.accessToken = accessToken;
+    this.active= true;
+}
+
   public Long getId() {
     return id;
   }

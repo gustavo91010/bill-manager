@@ -53,7 +53,6 @@ public class QueueService {
   public String deleteQueue(String queueName) {
     List<String> queueList = queueList();
     for (String urlSqs : queueList) {
-      System.out.println(urlSqs);
       if (nameFile(urlSqs).equals(queueName)) {
         DeleteQueueRequest deleteQueueRequest = DeleteQueueRequest.builder().queueUrl(urlSqs).build();
         sqsClient.deleteQueue(deleteQueueRequest);
