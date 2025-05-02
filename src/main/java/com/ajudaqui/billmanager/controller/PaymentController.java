@@ -37,6 +37,11 @@ public class PaymentController {
   @Autowired
   private PaymentService paymentSerivce;
 
+  @GetMapping("/health")
+  public ApiResponse health() {
+    return new ApiResponse("ok");
+  }
+
   @PostMapping("/repeat/{repeat}")
   public ResponseEntity<?> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,

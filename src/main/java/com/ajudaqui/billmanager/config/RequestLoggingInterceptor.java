@@ -18,16 +18,23 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
       throws Exception {
 
     if (handler instanceof HandlerMethod) {
+
+      String authHeader = "";
+
+      if (request.getHeader("Authorization") != null) {
+        authHeader = "| token: " + request.getHeader("Authorization");
+      }
+
       HandlerMethod method = (HandlerMethod) handler;
       String controller = method.getBeanType().getSimpleName();
       String methodName = method.getMethod().getName();
       String path = request.getRequestURI();
       String httpMethod = request.getMethod();
-
-      logger.info("{} | {} : [{}] {}", controller, methodName, httpMethod, path);
+      String ip = request.getRemoteAddr();
+      logger.info("{} | {} | {} : [{}] {} {}", ip, controller, methodName, httpMethod, path, authHeader);
     }
 
-    return true; 
+    return true;
   }
 
 }

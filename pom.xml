@@ -51,21 +51,6 @@
       <artifactId>spring-cloud-starter-openfeign</artifactId>
       <version>3.0.4</version>
     </dependency>
-    <!-- para achar a configuração no confi server -->
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.cloud</groupId> -->
-    <!--   <artifactId>spring-cloud-starter-config</artifactId> -->
-    <!-- </dependency> -->
-    <!-- <!-1- Parac ser sreconhecido pelo eureka -1-> -->
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.cloud</groupId> -->
-    <!--   <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
-    <!-- </dependency> -->
-    <!-- <!-1- Para reconhecer os endpoints -1-> -->
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.boot</groupId> -->
-    <!--   <artifactId>spring-boot-starter-actuator</artifactId> -->
-    <!-- </dependency> -->
 
     <!-- Para adicionar os validadores de parametro para o dto -->
     <dependency>
@@ -109,6 +94,26 @@
       <artifactId>gson</artifactId>
       <version>2.12.1</version>
     </dependency>
+
+    <!-- Ela ativa endpoints prontos para monitoramento da aplicação, como /actuator/health, /actuator/info -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- <!- Dependencia necessaria para comunicação com o gateway api -> -->
+    <!-- <dependency> -->
+    <!--   <groupId>org.springframework.cloud</groupId> -->
+    <!--   <artifactId>spring-cloud-starter-config</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <!-1- Parac ser sreconhecido pelo eureka -1-> -->
+    <!-- <dependency> -->
+    <!--   <groupId>org.springframework.cloud</groupId> -->
+    <!--   <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
+    <!-- </dependency> -->
+    <!-- comentar para rodar localmente -->
+
+
   </dependencies>
 
   <dependencyManagement>
