@@ -95,22 +95,23 @@
       <version>2.12.1</version>
     </dependency>
 
-    <!-- Ela ativa endpoints prontos para monitoramento da aplicação, como /actuator/health, /actuator/info -->
+    <!-- Ela ativa endpoints prontos para monitoramento da aplicação, como /actuator/health,
+    /actuator/info -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
     <!-- <!- Dependencia necessaria para comunicação com o gateway api -> -->
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.cloud</groupId> -->
-    <!--   <artifactId>spring-cloud-starter-config</artifactId> -->
-    <!-- </dependency> -->
-    <!-- <!-1- Parac ser sreconhecido pelo eureka -1-> -->
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.cloud</groupId> -->
-    <!--   <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
-    <!-- </dependency> -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+    <!-- Parac ser sreconhecido pelo eureka -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
     <!-- comentar para rodar localmente -->
 
 

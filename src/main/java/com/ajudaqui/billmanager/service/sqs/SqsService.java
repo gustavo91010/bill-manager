@@ -35,11 +35,9 @@ public class SqsService {
   private UsersService usersService;
 
   private final SqsClient sqsClient;
-  private final QueueService queueService;
 
-  public SqsService(SqsClient sqsClient, QueueService queueService) {
+  public SqsService(SqsClient sqsClient) {
     this.sqsClient = sqsClient;
-    this.queueService = queueService;
   }
 
   public void sendMessage(String awsFila, String messageBody) {
@@ -57,10 +55,6 @@ public class SqsService {
   private void checkingFila(String awsFila) {
     if (awsFila.isEmpty()) {
       throw new MsgException("O campo fila é obrigatorio");
-    }
-
-    if (!queueService.queueNameList().contains(awsFila)) {
-      throw new MsgException("Fila não registrada.");
     }
   }
 
