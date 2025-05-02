@@ -2,6 +2,7 @@ package com.ajudaqui.billmanager.service;
 
 import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -226,27 +227,34 @@ public class PaymentService {
 
   }
 
-  public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finsh,
+  public void lalala(String accessToken, String description, LocalDate start, LocalDate finsh,
+      String status) {
+
+  }
+
+  public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
       String status) {
 
     Users user = usersService.findByAccessToken(accessToken);
     start = (start == null) ? LocalDate.now() : start;
-    finsh = (finsh == null) ? LocalDate.now() : finsh;
-    if (!description.isEmpty()) {
-      if (!status.isEmpty()) {
-        return paymentRepository.findPayaments(user.getId(), description, start, finsh, StatusBoleto.valueOf(status));
-      }
-      return paymentRepository.findPayaments(user.getId(), description, start, finsh);
+    finish = (finish == null) ? LocalDate.now() : finish;
+    boolean hasDescription = !description.isEmpty();
+    boolean hasStatus = !status.isEmpty();
+
+    List<Payment> response = new ArrayList<>();
+
+    if (hasDescription && hasStatus) {
+      response = paymentRepository.findPayaments(user.getId(), description, start, finish,
+          StatusBoleto.valueOf(status));
+    } else if (hasDescription) {
+      response = paymentRepository.findPayaments(user.getId(), description, start, finish);
+    } else if (hasStatus) {
+      response = paymentRepository.findPayaments(user.getId(), start, finish, StatusBoleto.valueOf(status));
     } else {
-
-      if (status.isEmpty()) {
-
-        return paymentRepository.findPayaments(user.getId(), start, finsh);
-      }
-
-      return paymentRepository.findPayaments(user.getId(), start, finsh, StatusBoleto.valueOf(status));
+      response = paymentRepository.findPayaments(user.getId(), start, finish);
     }
 
+    return response;
   }
 
 }

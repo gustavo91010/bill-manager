@@ -7,40 +7,36 @@ import java.util.List;
 import com.ajudaqui.billmanager.entity.Payment;
 
 public class ApiPayments {
-	private List<Payment> payments = new ArrayList<Payment>();
-	private BigDecimal totalValue;
+  private List<Payment> payments = new ArrayList<Payment>();
+  private BigDecimal totalValue;
 
-	public ApiPayments(List<Payment> payments) {
-		this.payments = payments;
-		this.totalValue = sumTotal(payments);
-	}
+  public ApiPayments(List<Payment> payments) {
+    this.payments = payments;
+    this.totalValue = sumTotal(payments);
+  }
 
-	public List<Payment> getPayments() {
-		return payments;
-	}
+  public List<Payment> getPayments() {
+    return payments;
+  }
 
-	public void setPayments(List<Payment> payments) {
-		this.payments = payments;
-	}
+  public void setPayments(List<Payment> payments) {
+    this.payments = payments;
+  }
 
-	public BigDecimal getTotalValue() {
-		return totalValue;
-	}
+  public BigDecimal getTotalValue() {
+    return totalValue;
+  }
 
-	public void setTotalValue(BigDecimal totalValue) {
-		this.totalValue = totalValue;
-	}
+  public void setTotalValue(BigDecimal totalValue) {
+    this.totalValue = totalValue;
+  }
 
-	public BigDecimal sumTotal(List<Payment> payments) {
-		BigDecimal totalValue = BigDecimal.ZERO;
+  public BigDecimal sumTotal(List<Payment> payments) {
 
-		for (Payment payment : payments) {
-			BigDecimal paymentValue = payment.getValue();
-			totalValue = totalValue.add(paymentValue);
-		}
+    return payments.stream()
+        .map(Payment::getValue)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		return totalValue;
-
-	}
+  }
 
 }
