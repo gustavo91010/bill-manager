@@ -72,13 +72,10 @@ public class SqsService {
         if (isBillMessage(message.body())) {
 
           LOGGER.info("Mensagem da fila {} recebida.", awsFila);
-          Users userSave = usersService.registerUserBySqs(message.body());
-          if (userSave.getId() != null) {
+          usersService.registerUserBySqs(message.body());
 
-            deleteMessage(awsFila, message);
-            LOGGER.info("Usuario id: {} e accessToken: {} registrado com sucesso!", userSave.getId(),
-                userSave.getAccessToken());
-          }
+          deleteMessage(awsFila, message);
+          LOGGER.info("Mensagem id {} processada.", message.messageId());
         }
       }
     }
@@ -98,7 +95,6 @@ public class SqsService {
         .build();
 
     sqsClient.deleteMessage(deleteMessageRequest);
-    LOGGER.info("Mensagem deletada: " + message.messageId());
   }
 
 }

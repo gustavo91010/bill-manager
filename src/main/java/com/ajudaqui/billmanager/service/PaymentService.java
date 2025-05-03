@@ -241,7 +241,7 @@ public class PaymentService {
     boolean hasDescription = !description.isEmpty();
     boolean hasStatus = !status.isEmpty();
 
-    List<Payment> response = new ArrayList<>();
+   List<Payment> response = new ArrayList<>();
 
     if (hasDescription && hasStatus) {
       response = paymentRepository.findPayaments(user.getId(), description, start, finish,
