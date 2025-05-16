@@ -4,7 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 readme.txt
-infra_kafka_001.pem
+vm_006.pem
 
 ### STS ###
 .apt_generated
