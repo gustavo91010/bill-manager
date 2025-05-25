@@ -1,6 +1,7 @@
 package com.ajudaqui.billmanager.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,8 @@ import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
+import com.ajudaqui.billmanager.service.vo.Sumary;
+import com.ajudaqui.billmanager.utils.StatusBoleto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,6 +113,118 @@ public class PaymentServiceTest {
 
     assertEquals("test boleto", paymentCaptor.getValue().getDescription());
     assertEquals("23.40", paymentCaptor.getValue().getValue().toString());
+  }
+
+  @Test
+  @DisplayName("Deee computar o resumo")
+  public void shouldComputeTheSummary() {
+
+    LocalDate start = LocalDate.now();
+    LocalDate finsh = start.plusDays(30);
+
+    String accessToken = "";
+    Users user = new Users();
+    List<Payment> listPayments = listPayments();
+    listPayments.get(1).setStatus(StatusBoleto.VENCIDO);
+
+    listPayments.get(2).setValue(new BigDecimal("100.00"));
+    listPayments.get(2).setStatus(StatusBoleto.PAGO);
+
+    when(usersService.findByAccessToken(accessToken)).thenReturn(user);
+    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+
+    // Execução:
+    Sumary response = payamentService.sumary(accessToken, start, finsh);
+
+    // Verificação:
+    // total do periodo
+    assertEquals("120.20", response.getTotalDue().toString());
+    // ja pago
+    assertEquals("100.00", response.getAmountPaid().toString());
+    // resta pagar
+    assertEquals("20.20", response.getRemaining().toString());
+  }
+
+  @Test
+  @DisplayName("Deve trazer montante pago vazio se nenhuma conta tiver sido paga")
+  public void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
+
+    LocalDate start = LocalDate.now();
+    LocalDate finsh = start.plusDays(30);
+
+    String accessToken = "";
+    Users user = new Users();
+    List<Payment> listPayments = listPayments();
+    listPayments.get(1).setStatus(StatusBoleto.VENCIDO);
+
+    listPayments.get(2).setValue(new BigDecimal("100.00"));
+    listPayments.get(2).setStatus(StatusBoleto.EM_DIAS);
+
+    when(usersService.findByAccessToken(accessToken)).thenReturn(user);
+    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+
+    // Execução:
+    Sumary response = payamentService.sumary(accessToken, start, finsh);
+
+    // Verificação:
+    // total do periodo
+    assertEquals("120.20", response.getTotalDue().toString());
+    // ja pago
+    assertEquals("0.00", response.getAmountPaid().toString());
+    // resta pagar
+    assertEquals("120.20", response.getRemaining().toString());
+  }
+
+  @Test
+  @DisplayName("Deve trazer restante vazio se todas as contas tiverem sido paga")
+  public void mustBringAnZeroRemainingIfAllBillHaveBeenPaid() {
+
+    LocalDate start = LocalDate.now();
+    LocalDate finsh = start.plusDays(30);
+
+    String accessToken = "";
+    Users user = new Users();
+    List<Payment> listPayments = listPayments();
+    listPayments.get(0).setStatus(StatusBoleto.PAGO);
+    listPayments.get(1).setStatus(StatusBoleto.PAGO);
+    listPayments.get(2).setStatus(StatusBoleto.PAGO);
+
+    when(usersService.findByAccessToken(accessToken)).thenReturn(user);
+    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+
+    // Execução:
+    Sumary response = payamentService.sumary(accessToken, start, finsh);
+
+    // Verificação:
+    // total do periodo
+    assertEquals("30.30", response.getTotalDue().toString());
+    // ja pago
+    assertEquals("30.30", response.getAmountPaid().toString());
+    // resta pagar
+    assertEquals("0.00", response.getRemaining().toString());
+  }
+
+  private List<Payment> listPayments() {
+
+    Payment payment_01 = new Payment();
+    payment_01.setDescription("test boleto");
+    payment_01.setValue(new BigDecimal(10.10));
+    payment_01.setDue_date(LocalDate.now());
+    payment_01.setStatus(StatusBoleto.EM_DIAS);
+
+    Payment payment_02 = new Payment();
+    payment_02.setDescription("test boleto");
+    payment_02.setValue(new BigDecimal(10.10));
+    payment_02.setDue_date(LocalDate.now());
+    payment_02.setStatus(StatusBoleto.EM_DIAS);
+
+    Payment payment_03 = new Payment();
+    payment_03.setDescription("test boleto");
+    payment_03.setValue(new BigDecimal(10.10));
+    payment_03.setDue_date(LocalDate.now());
+
+    payment_03.setStatus(StatusBoleto.EM_DIAS);
+    return List.of(payment_01, payment_02, payment_03);
   }
 
 }

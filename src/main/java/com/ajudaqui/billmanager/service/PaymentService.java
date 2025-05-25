@@ -21,6 +21,7 @@ import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
+import com.ajudaqui.billmanager.service.vo.Sumary;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
 
@@ -234,14 +235,13 @@ public class PaymentService {
 
   public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
       String status) {
-
     Users user = usersService.findByAccessToken(accessToken);
     start = (start == null) ? LocalDate.now() : start;
     finish = (finish == null) ? LocalDate.now() : finish;
     boolean hasDescription = !description.isEmpty();
     boolean hasStatus = !status.isEmpty();
 
-   List<Payment> response = new ArrayList<>();
+    List<Payment> response = new ArrayList<>();
 
     if (hasDescription && hasStatus) {
       response = paymentRepository.findPayaments(user.getId(), description, start, finish,
@@ -255,6 +255,26 @@ public class PaymentService {
     }
 
     return response;
+  }
+
+  /**
+   * @param accessToken
+   * @param start
+   * @param finsh
+   * @return
+   */
+  public Sumary sumary(String accessToken, LocalDate start, LocalDate finsh) {
+    List<Payment> payments = periodTime(accessToken, "", start, finsh, "");
+    BigDecimal totalDue = payments.stream()
+        .map(Payment::getValue)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    BigDecimal amountPaid = payments.stream()
+        .filter(payment -> payment.getStatus().equals(StatusBoleto.PAGO))
+        .map(Payment::getValue)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    return new Sumary(totalDue, amountPaid);
   }
 
 }

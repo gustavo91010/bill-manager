@@ -25,7 +25,7 @@ public class UsersService {
 
   public Users findByAccessToken(String accessToken) {
     return usersRepository.findByAccessToken(accessToken)
-        .orElseThrow(() -> new NotFoundEntityException("Usuario não encontrado."));
+        .orElseThrow(() -> new NotFoundEntityException("hum... Usuario não encontrado."));
   }
 
   public boolean userExist(Long userID) {

@@ -70,14 +70,13 @@ public class HandleException {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
-
   // Tratar exception em geral:
-@ExceptionHandler(Exception.class)
-	public ResponseEntity<Object> handleException(Exception exception) {
-		HttpStatus status = determineHttpStatus(exception);
-		infoTrace(exception);
-		return new ResponseEntity<>(new ApiException(exception.getMessage(), status.value()), status);
-	}
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleException(Exception exception) {
+    HttpStatus status = determineHttpStatus(exception);
+    infoTrace(exception);
+    return new ResponseEntity<>(new ApiException(exception.getMessage(), status.value()), status);
+  }
 
   // tratar a validação do localdate
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -96,7 +95,7 @@ public class HandleException {
   private void infoTrace(Exception exception) {
     StackTraceElement element = exception.getStackTrace()[0];
     StackTraceElement callElement = exception.getStackTrace()[1];
-    // exception.printStackTrace();
+
     logger.error("Exception occurred at: [{}] {}, line: {} with error Details: [{}] {}, line: {} | {}",
         callElement.getFileName(), callElement.getMethodName(),
         callElement.getLineNumber(), element.getFileName(), element.getMethodName(),
