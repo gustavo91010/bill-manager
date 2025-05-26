@@ -99,6 +99,18 @@ public class PaymentController {
   }
 
   @CrossOrigin
+  @PutMapping("/confirm-paymeny/{id}")
+  public ResponseEntity<?> confirmPayment(@RequestHeader("Authorization") String accessToken,
+      @PathVariable("id") Long paymentId) {
+    try {
+      Payment paymentAtt = paymentSerivce.confirmPayment(accessToken, paymentId);
+      return ResponseEntity.ok(new ApiPayment(paymentAtt));
+    } catch (RuntimeException msg) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
+    }
+  }
+
+  @CrossOrigin
   @PutMapping("/{id}")
   public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId,

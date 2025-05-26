@@ -277,4 +277,12 @@ public class PaymentService {
     return new Sumary(totalDue, amountPaid);
   }
 
+  public Payment confirmPayment(String accessToken, Long paymentId) {
+    Payment payment = findByIdForUsers(accessToken, paymentId);
+
+    payment.setStatus(StatusBoleto.PAGO);
+    payment.setUpdated_at(LocalDateTime.now());
+    return paymentRepository.save(payment);
+  }
+
 }
