@@ -127,8 +127,7 @@ public class PaymentController {
   @CrossOrigin
   @DeleteMapping("/{id}")
   public ResponseEntity<?> remover(@RequestHeader("Authorization") String accessToken,
-      @PathVariable("id") Long paymentId,
-      @RequestBody BoletoFrom from) {
+      @PathVariable("id") Long paymentId) {
     try {
       paymentSerivce.deleteById(accessToken, paymentId);
 
