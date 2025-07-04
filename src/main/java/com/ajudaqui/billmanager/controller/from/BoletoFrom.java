@@ -6,53 +6,22 @@ import java.time.LocalDate;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.validacao.ValidacaoStatusBoleto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class BoletoFrom {
-  private String descricao;
-  private BigDecimal valor;
-  private LocalDate vencimento;
+  private String description;
+  private BigDecimal value;
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  private LocalDate due_date;
   private String status;
   // private StatusBoleto status=
   // ValidacaoStatusBoleto.validacao(this.vencimento);
 
-  public String getDescricao() {
-    return descricao;
-  }
-
-  public void setDescricao(String descricao) {
-    this.descricao = descricao;
-  }
-
-  public BigDecimal getValor() {
-    return valor;
-  }
-
-  public void setValor(BigDecimal valor) {
-    this.valor = valor;
-  }
-
-  public LocalDate getVencimento() {
-    return vencimento;
-  }
-
-  public void setVencimento(LocalDate vencimento) {
-    this.vencimento = vencimento;
-  }
-
-  public String getStatus() {
-    // return ValidacaoStatusBoleto.validacao(this.vencimento);
-    return status;
-  }
-
-  // public void setStatus(StatusBoleto status) {
-  // this.status = status;
-  // }
-
   public Payment convert() {
     Payment payament = new Payment();
-    payament.setDescription(this.descricao);
-    payament.setValue(this.valor);
-    payament.setDue_date(this.vencimento);
+    payament.setDescription(this.description);
+    payament.setValue(this.value);
+    payament.setDue_date(this.due_date);
     // payament.setStatus(ValidacaoStatusBoleto.validacao(this.vencimento));
     payament.setStatus(StatusBoleto.valueOf(status));
 
@@ -61,6 +30,34 @@ public class BoletoFrom {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public BigDecimal getValue() {
+    return value;
+  }
+
+  public void setValue(BigDecimal value) {
+    this.value = value;
+  }
+
+  public LocalDate getDue_date() {
+    return due_date;
+  }
+
+  public void setDue_date(LocalDate due_date) {
+    this.due_date = due_date;
+  }
+
+  public String getStatus() {
+    return status;
   }
 
 }

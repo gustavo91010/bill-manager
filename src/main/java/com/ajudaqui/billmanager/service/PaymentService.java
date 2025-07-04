@@ -194,14 +194,14 @@ public class PaymentService {
 
     Payment payment = findByIdForUsers(accessToken, paymentId);
 
-    if (!from.getDescricao().isEmpty()) {
-      payment.setDescription(from.getDescricao());
+    if (!from.getDescription().isEmpty()) {
+      payment.setDescription(from.getDescription());
     }
-    if (from.getValor() != null) {
-      payment.setValue(from.getValor());
+    if (from.getValue() != null) {
+      payment.setValue(from.getValue());
     }
-    if (from.getVencimento() != null) {
-      payment.setDue_date(from.getVencimento());
+    if (from.getDue_date() != null) {
+      payment.setDue_date(from.getDue_date());
     }
     payment.setUpdated_at(LocalDateTime.now());
     return paymentRepository.save(payment);
