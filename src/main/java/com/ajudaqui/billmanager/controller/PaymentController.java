@@ -51,7 +51,6 @@ public class PaymentController {
       @RequestHeader("Authorization") String accessToken,
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh) {
-    System.out.println("vehou no sumary??");
     return paymentSerivce.sumary(accessToken, start, finsh);
   }
 

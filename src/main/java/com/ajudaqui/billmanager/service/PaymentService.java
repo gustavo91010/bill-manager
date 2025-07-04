@@ -7,13 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
@@ -24,6 +19,11 @@ import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentService {
@@ -254,6 +254,7 @@ public class PaymentService {
       response = paymentRepository.findPayaments(user.getId(), start, finish);
     }
 
+    response.sort(Comparator.comparing(Payment::getDue_date));
     return response;
   }
 
