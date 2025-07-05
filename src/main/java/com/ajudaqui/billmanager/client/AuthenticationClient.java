@@ -16,6 +16,7 @@ public interface AuthenticationClient {
   @PostMapping(value = "/auth/signin", consumes = "multipart/form-data")
   SigninResponse signin(@RequestBody SigninDTO SigninDTO);
 
+
   @PostMapping(value = "/auth/signup", consumes = "multipart/form-data")
   String signup(@RequestHeader("Authorization") String jwtToken, @RequestBody SignupDTO SigninDTO);
 
