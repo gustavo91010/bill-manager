@@ -111,7 +111,7 @@ public class PaymentController {
 
   @CrossOrigin
   @PutMapping("/{id}")
-  public ResponseEntity<?> atualizar(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<?> update(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
 
@@ -129,7 +129,6 @@ public class PaymentController {
       @PathVariable("id") Long paymentId) {
     try {
       paymentSerivce.deleteById(accessToken, paymentId);
-
       return ResponseEntity.ok(new ApiResponse("Pagamento excluido com sucesso."));
     } catch (RuntimeException msg) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));

@@ -2,6 +2,7 @@ package com.ajudaqui.billmanager.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,12 +24,14 @@ public class Users {
   private List<Payment> payaments = new ArrayList<>();
 
   public Users() {
+    this.active = true;
+    this.accessToken = UUID.randomUUID().toString();
   }
 
   public Users(String accessToken) {
     this.accessToken = accessToken;
-    this.active= true;
-}
+    this.active = true;
+  }
 
   public Long getId() {
     return id;

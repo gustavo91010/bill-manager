@@ -97,4 +97,11 @@ public class SqsService {
     sqsClient.deleteMessage(deleteMessageRequest);
   }
 
+  public Users create(String authorization) {
+    if (!"lalala-tocomsono-oiuygoysai754rfio8y9p8".equals(authorization))
+      throw new MsgException("Solicitação não autorizada");
+
+    return usersService.create();
+  }
+
 }

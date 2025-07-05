@@ -25,7 +25,7 @@ public class UsersService {
 
   public Users findByAccessToken(String accessToken) {
     return usersRepository.findByAccessToken(accessToken)
-        .orElseThrow(() -> new NotFoundEntityException("hum... Usuario não encontrado."));
+        .orElseThrow(() -> new NotFoundEntityException("Usuario não encontrado."));
   }
 
   public boolean userExist(Long userID) {
@@ -63,15 +63,12 @@ public class UsersService {
   public Users registerUserBySqs(String message) {
     JsonElement jsonRegister = JsonParser.parseString(message);
     String accessToken = jsonRegister.getAsJsonObject().get("access_token").getAsString();
-    Users user = usersRepository.findByAccessToken(accessToken).orElse(null);
-    if (user == null) {
-      user = save(new Users(accessToken));
-    }
-    return user;
+    return usersRepository.findByAccessToken(accessToken).orElse(save(new Users(accessToken)));
   }
 
-  public Users create(UsersVO userVo) {
-    return new Users();
+  public Users create() {
+
+    return save(new Users());
   }
 
   private Users save(Users users) {
