@@ -8,7 +8,7 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
-// @Configuration
+@Configuration
 public class SqsConfig {
 
   @Value("${aws.region}")
