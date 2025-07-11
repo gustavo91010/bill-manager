@@ -20,8 +20,8 @@ public class Users {
   private Long id;
   private Boolean active;
   private String accessToken;
-  @OneToMany
-  private List<Payment> payaments = new ArrayList<>();
+  @OneToMany(mappedBy = "user")
+  private List<Payment> payments = new ArrayList<>();
 
   public Users() {
     this.active = true;
@@ -50,11 +50,11 @@ public class Users {
   }
 
   public List<Payment> getPayaments() {
-    return payaments;
+    return payments;
   }
 
   public void setPayaments(List<Payment> payaments) {
-    this.payaments = payaments;
+    this.payments = payaments;
   }
 
   public String getAccessToken() {

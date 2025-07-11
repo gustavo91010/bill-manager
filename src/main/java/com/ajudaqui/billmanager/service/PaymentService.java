@@ -37,7 +37,7 @@ public class PaymentService {
 
   public Payment register(PayamentDto paymentDto, String accessToken) {
     Users users = usersService.findByAccessToken(accessToken);
-    Payment payment = paymentDto.toDatabase(users.getId());
+    Payment payment = paymentDto.toDatabase(users);
 
     if (isRegistery(payment))
       throw new MsgException("pagamento já cadastrado");
@@ -57,7 +57,7 @@ public class PaymentService {
     int index = 0;
     Users users = usersService.findByAccessToken(accessToken);
     while (index < repeticao) {
-      Payment newPayment = paymentDto.toDatabase(users.getId());
+      Payment newPayment = paymentDto.toDatabase(users);
       newPayment.setDue_date(newPayment.getDue_date().plusMonths(index));
 
       if (isRegistery(newPayment)) {
@@ -73,7 +73,7 @@ public class PaymentService {
   }
 
   private boolean isRegistery(Payment payment) {
-    List<Payment> paymentForMonth = findAllMonth(payment.getUserId(), payment.getDue_date().getMonthValue(),
+    List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(), payment.getDue_date().getMonthValue(),
         payment.getDue_date().getYear());
 
     if (paymentForMonth.isEmpty()) {
@@ -87,7 +87,7 @@ public class PaymentService {
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
 
     Users users = usersService.findByAccessToken(accessToken);
-    Payment boleto = paymentRepository.findByIdForUsers(users.getId(), paymentId)
+    Payment boleto = paymentRepository.findByIdForUsers(users.getAccessToken(), paymentId)
         .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
     return boleto;
   }
@@ -99,11 +99,11 @@ public class PaymentService {
     return boleto;
   }
 
-  public List<Payment> findByPayamentsForUser(Long userId) {
-    return paymentRepository.findByPayamentsForUser(userId);
+  public List<Payment> findByPayamentsForUser(String accessToken) {
+    return paymentRepository.findByPaymentsForUserAccessToken(accessToken);
   }
 
-  public List<Payment> findPaymentsWeek(Long usersId, String date, String status) {
+  public List<Payment> findPaymentsWeek(String accessToken, String date, String status) {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate dayWeek = LocalDate.parse(date, formatter);
@@ -113,21 +113,21 @@ public class PaymentService {
     List<Payment> payments = new ArrayList<Payment>();
 
     if (status.isEmpty()) {
-      payments = paymentRepository.findPayaments(usersId, monday, sunday);
+      payments = paymentRepository.findPayaments(accessToken, monday, sunday);
 
     } else {
-      payments = paymentRepository.findPayaments(usersId, monday, sunday,
+      payments = paymentRepository.findPayaments(accessToken, monday, sunday,
           valueOf(status));
     }
     return payments;
 
   }
 
-  public List<Payment> findAllMonth(Long userId, Integer month, Integer year) {
+  public List<Payment> findAllMonth(String accessToken, Integer month, Integer year) {
 
     LocalDate startMonth = LocalDate.of(year, month, 1);
     LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
-    List<Payment> resultt = paymentRepository.findPayaments(userId, startMonth, endMonth);
+    List<Payment> resultt = paymentRepository.findPayaments(accessToken, startMonth, endMonth);
     return resultt;
 
   }
@@ -175,14 +175,14 @@ public class PaymentService {
     List<Payment> response = new ArrayList<>();
 
     if (hasDescription && hasStatus) {
-      response = paymentRepository.findPayaments(user.getId(), description, start, finish,
+      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish,
           StatusBoleto.valueOf(status));
     } else if (hasDescription) {
-      response = paymentRepository.findPayaments(user.getId(), description, start, finish);
+      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish);
     } else if (hasStatus) {
-      response = paymentRepository.findPayaments(user.getId(), start, finish, StatusBoleto.valueOf(status));
+      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish, StatusBoleto.valueOf(status));
     } else {
-      response = paymentRepository.findPayaments(user.getId(), start, finish);
+      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish);
     }
 
     response.sort(Comparator.comparing(Payment::getDue_date));
