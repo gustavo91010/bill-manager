@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
-@Service
+// @Service
 public class SqsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SqsService.class.getSimpleName());

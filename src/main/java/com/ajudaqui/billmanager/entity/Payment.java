@@ -4,13 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.ajudaqui.billmanager.utils.StatusBoleto;
@@ -22,8 +23,9 @@ public class Payment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  @Column(name = "users_id")
-  private Long userId;
+  @ManyToOne
+  @JoinColumn(name = "users_id")
+  private Users user;
   private String description;
   private BigDecimal value;
   private LocalDate due_date;
@@ -89,20 +91,19 @@ public class Payment {
     this.status = status;
   }
 
-  public Long getUserId() {
-    return userId;
+  public Users getUser() {
+    return user;
   }
 
-  public void setUserId(Long userId) {
-    this.userId = userId;
+  public void setUser(Users user) {
+    this.user = user;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((user == null) ? 0 : user.hashCode());
     result = prime * result + ((value == null) ? 0 : value.hashCode());
     result = prime * result + ((due_date == null) ? 0 : due_date.hashCode());
     return result;
@@ -120,18 +121,11 @@ public class Payment {
       return false;
     }
     Payment other = (Payment) obj;
-    if (userId == null) {
-      if (other.userId != null) {
+    if (user == null) {
+      if (other.user != null) {
         return false;
       }
-    } else if (!userId.equals(other.userId)) {
-      return false;
-    }
-    if (description == null) {
-      if (other.description != null) {
-        return false;
-      }
-    } else if (!description.equals(other.description)) {
+    } else if (!user.equals(other.user)) {
       return false;
     }
     if (value == null) {

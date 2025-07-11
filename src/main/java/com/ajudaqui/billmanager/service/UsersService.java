@@ -6,7 +6,6 @@ import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.UsersRepository;
 import com.ajudaqui.billmanager.service.vo.UserUpdateVo;
-import com.ajudaqui.billmanager.service.vo.UsersVO;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
