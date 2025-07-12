@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -18,19 +21,22 @@ public class Users {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private Boolean active;
-  private String accessToken;
-  @OneToMany
-  private List<Payment> payaments = new ArrayList<>();
 
-  public Users() {
-    this.active = true;
-    this.accessToken = UUID.randomUUID().toString();
-  }
+  private Boolean active;
+
+  @Column(name = "access_token", nullable = false)
+  private String accessToken;
+
+  @OneToMany(mappedBy = "user")
+  @JsonIgnore
+  private List<Payment> payments = new ArrayList<>();
 
   public Users(String accessToken) {
     this.accessToken = accessToken;
     this.active = true;
+  }
+
+  public Users() {
   }
 
   public Long getId() {
@@ -49,20 +55,20 @@ public class Users {
     this.active = active;
   }
 
-  public List<Payment> getPayaments() {
-    return payaments;
-  }
-
-  public void setPayaments(List<Payment> payaments) {
-    this.payaments = payaments;
-  }
-
   public String getAccessToken() {
     return accessToken;
   }
 
   public void setAccessToken(String accessToken) {
     this.accessToken = accessToken;
+  }
+
+  public List<Payment> getPayments() {
+    return payments;
+  }
+
+  public void setPayments(List<Payment> payments) {
+    this.payments = payments;
   }
 
 }

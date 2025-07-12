@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
-import com.ajudaqui.billmanager.utils.validacao.ValidacaoStatusBoleto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class BoletoFrom {

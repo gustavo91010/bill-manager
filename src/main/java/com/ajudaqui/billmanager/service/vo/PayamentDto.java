@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.ajudaqui.billmanager.entity.Payment;
+import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -65,9 +66,9 @@ public class PayamentDto {
     this.status = status;
   }
 
-  public Payment toDatabase(Long userId) {
+  public Payment toDatabase(Users users) {
     Payment payament = new Payment();
-    payament.setUserId(userId);
+    payament.setUser(users);
     payament.setDescription(this.description);
     payament.setValue(this.value);
     payament.setCreated_at(LocalDateTime.now());
