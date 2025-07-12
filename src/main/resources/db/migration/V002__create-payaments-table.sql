@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE IF NOT EXISTS public.payment
 (
     status character varying(20) NOT NULL,
@@ -9,10 +7,6 @@ CREATE TABLE IF NOT EXISTS public.payment
     due_date timestamp with time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NULL,
-	users_id bigserial REFERENCES users(id),
+    users_id bigint REFERENCES users(id),
     PRIMARY KEY (id)
 );
-
-
-    
-END;

@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.ajudaqui.billmanager.utils.StatusBoleto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "payment")
@@ -24,6 +25,7 @@ public class Payment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @ManyToOne
+  @JsonIgnore
   @JoinColumn(name = "users_id")
   private Users user;
   private String description;
