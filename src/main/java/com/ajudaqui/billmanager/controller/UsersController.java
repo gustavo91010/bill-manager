@@ -20,7 +20,6 @@ public class UsersController {
 
   @GetMapping("/permission") // ok
   public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken) {
-
     return ResponseEntity.ok(usersService.findByAccessToken(accessToken));
   }
 

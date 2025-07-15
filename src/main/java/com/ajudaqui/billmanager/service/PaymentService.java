@@ -1,6 +1,7 @@
 package com.ajudaqui.billmanager.service;
 
 import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
+import static com.ajudaqui.billmanager.utils.ValidarStatus.statusAtualizado;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -73,7 +74,8 @@ public class PaymentService {
   }
 
   private boolean isRegistery(Payment payment) {
-    List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(), payment.getDue_date().getMonthValue(),
+    List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
+        payment.getDue_date().getMonthValue(),
         payment.getDue_date().getYear());
 
     if (paymentForMonth.isEmpty()) {
@@ -146,7 +148,7 @@ public class PaymentService {
       payment.setDue_date(from.getDue_date());
     }
     payment.setUpdated_at(LocalDateTime.now());
-    return paymentRepository.save(payment);
+    return paymentRepository.save(statusAtualizado(payment));
   }
 
   // atualização do estado em execução

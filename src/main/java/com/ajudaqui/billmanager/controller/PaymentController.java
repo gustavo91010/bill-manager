@@ -59,25 +59,15 @@ public class PaymentController {
   public ResponseEntity<?> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
-    try {
-      List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
-      return ResponseEntity.status(HttpStatus.CREATED).body(new ApiPayments(response));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(e.getMessage()));
-    }
+    List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new ApiPayments(response));
   }
 
   @CrossOrigin
   @GetMapping(value = "/id/{id}") // ok
   public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
-    try {
-
-      Payment boleto = paymentSerivce.findByIdForUsers(accessToken, paymentId);
-      return ResponseEntity.ok(new PayamentDto(boleto));
-    } catch (RuntimeException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage()));
-    }
+    return ResponseEntity.ok(new PayamentDto(paymentSerivce.findByIdForUsers(accessToken, paymentId)));
   }
 
   @CrossOrigin
@@ -88,25 +78,16 @@ public class PaymentController {
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh,
       @RequestParam(value = "description", defaultValue = "") String description,
       @RequestParam(value = "status", defaultValue = "") String status) {
-    try {
-
-      List<Payment> payments = paymentSerivce.periodTime(accessToken, description, start, finsh, status);
-      return ResponseEntity.ok(new ApiPayments(payments));
-    } catch (RuntimeException msg) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
-    }
+    List<Payment> payments = paymentSerivce.periodTime(accessToken, description, start, finsh, status);
+    return ResponseEntity.ok(new ApiPayments(payments));
   }
 
   @CrossOrigin
   @PutMapping("/confirm-paymeny/{id}")
   public ResponseEntity<?> confirmPayment(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
-    try {
-      Payment paymentAtt = paymentSerivce.confirmPayment(accessToken, paymentId);
-      return ResponseEntity.ok(new ApiPayment(paymentAtt));
-    } catch (RuntimeException msg) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
-    }
+    Payment paymentAtt = paymentSerivce.confirmPayment(accessToken, paymentId);
+    return ResponseEntity.ok(new ApiPayment(paymentAtt));
   }
 
   @CrossOrigin
@@ -114,24 +95,15 @@ public class PaymentController {
   public ResponseEntity<?> update(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
-
-    try {
-      Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
-      return ResponseEntity.ok(new ApiPayment(paymentAtt));
-    } catch (RuntimeException msg) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
-    }
+    Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
+    return ResponseEntity.ok(new ApiPayment(paymentAtt));
   }
 
   @CrossOrigin
   @DeleteMapping("/{id}")
   public ResponseEntity<?> remover(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
-    try {
-      paymentSerivce.deleteById(accessToken, paymentId);
-      return ResponseEntity.ok(new ApiResponse("Pagamento excluido com sucesso."));
-    } catch (RuntimeException msg) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(msg.getMessage()));
-    }
+    paymentSerivce.deleteById(accessToken, paymentId);
+    return ResponseEntity.ok(new ApiResponse("Pagamento excluido com sucesso."));
   }
 }

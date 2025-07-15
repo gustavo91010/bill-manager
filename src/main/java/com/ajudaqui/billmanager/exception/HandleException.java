@@ -22,7 +22,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import feign.FeignException;
 
-// @RestControllerAdvice
+@RestControllerAdvice
 public class HandleException {
 
   private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
