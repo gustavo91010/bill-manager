@@ -24,25 +24,32 @@ public class CategoryService {
     repository.findByName(name).ifPresent(cat -> {
       throw new MsgException("Categoria já cadastrada");
     });
-    Users users = usersService.findByAccessToken(accessToken);
-    Category category = new Category(name);
-    category.setUsers(users);
-    return save(category);
+    return save(new Category(name, usersService.findByAccessToken(accessToken)));
   }
 
   public List<Category> findAll(String accessToken) {
     return repository.findAll(accessToken);
   }
 
-  private Category findById(Long id) {
+  public Category findByNameOrRegister(String name, Users users) {
+    return repository.findByName(name).orElseGet(() -> {
+      return save(new Category(name, users));
+    });
+  }
+
+  public Category findById(Long id) {
     return repository.findById(id).orElseThrow(() -> new MsgException("Categoria não localizada"));
   }
 
-  private Category findByName(String name) {
+  public Category findByName(String name) {
     return repository.findByName(name).orElseThrow(() -> new MsgException("Categoria não localizada"));
   }
 
   private Category save(Category category) {
     return repository.save(category);
+  }
+
+  public Category update(Category category) {
+    return save(category);
   }
 }

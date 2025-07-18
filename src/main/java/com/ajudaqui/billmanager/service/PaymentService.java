@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
+import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
@@ -41,6 +42,9 @@ public class PaymentService {
   private PaymentsRepository paymentRepository;
   @Autowired
   private UsersService usersService;
+
+  @Autowired
+  private CategoryService categoryService;
 
   private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
 
@@ -204,9 +208,26 @@ public class PaymentService {
     List<Payment> payments = periodTime(accessToken, "", start, finsh, "");
     Map<String, BigDecimal> sumary = payments.stream()
         .collect(groupingBy(
-            p -> p.getCategory().getName(),
+            p -> nameCategoryFactor(p.getCategory()),
             mapping(Payment::getValue, Collectors.reducing(ZERO, BigDecimal::add))));
     sumary.replaceAll((k, v) -> v.setScale(2, HALF_UP));
     return sumary;
+  }
+
+  private String nameCategoryFactor(Category category) {
+    return category != null ? category.getName() : "sem-categoria";
+  }
+
+  public Payment addCategory(String accessToken, Long paymentId, String name) {
+
+    Users users = usersService.findByAccessToken(accessToken);
+    Category category = categoryService.findByNameOrRegister(name, users);
+    Payment payment = findById(paymentId);
+
+    category.getPayments().add(payment);
+    payment.setCategory(category);
+
+    categoryService.update(category);
+    return payment;
   }
 }

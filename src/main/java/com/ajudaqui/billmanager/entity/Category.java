@@ -29,6 +29,11 @@ public class Category {
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Payment> payments = new HashSet<>();
 
+  public Category(String name, Users users) {
+    this.name = name;
+    this.users = users;
+  }
+
   public Category(String name) {
     this.name = name;
   }

@@ -8,6 +8,7 @@ import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.response.ApiPayment;
 import com.ajudaqui.billmanager.response.ApiPayments;
 import com.ajudaqui.billmanager.response.ApiResponse;
+import com.ajudaqui.billmanager.response.ApiSumaryCategory;
 import com.ajudaqui.billmanager.service.PaymentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
@@ -42,6 +43,16 @@ public class PaymentController {
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh) {
     return paymentSerivce.sumary(accessToken, start, finsh);
+  }
+
+  @CrossOrigin
+  @GetMapping("/sumary-category")
+  public ResponseEntity<?> getSumaryCategory(
+      @RequestHeader("Authorization") String accessToken,
+      @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
+      @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh) {
+    // return ResponseEntity.ok(paymentSerivce.sumaryCategory(accessToken, start, finsh));
+    return ResponseEntity.ok(new ApiSumaryCategory(paymentSerivce.sumaryCategory(accessToken, start, finsh)));
   }
 
   @CrossOrigin
@@ -86,6 +97,15 @@ public class PaymentController {
       @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
     Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
+    return ResponseEntity.ok(new ApiPayment(paymentAtt));
+  }
+
+  @CrossOrigin
+  @PutMapping("/add/category")
+  public ResponseEntity<?> addCategry(@RequestHeader("Authorization") String accessToken,
+      @RequestParam Long paymentId,
+      @RequestParam String category) {
+    Payment paymentAtt = paymentSerivce.addCategory(accessToken, paymentId, category);
     return ResponseEntity.ok(new ApiPayment(paymentAtt));
   }
 
