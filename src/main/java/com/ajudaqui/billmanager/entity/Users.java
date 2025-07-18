@@ -1,9 +1,11 @@
 package com.ajudaqui.billmanager.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,6 +32,10 @@ public class Users {
   @OneToMany(mappedBy = "user")
   @JsonIgnore
   private List<Payment> payments = new ArrayList<>();
+
+  @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private Set<Category> categories = new HashSet<>();
 
   public Users(String accessToken) {
     this.accessToken = accessToken;
@@ -69,6 +75,14 @@ public class Users {
 
   public void setPayments(List<Payment> payments) {
     this.payments = payments;
+  }
+
+  public Set<Category> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(Set<Category> categories) {
+    this.categories = categories;
   }
 
 }

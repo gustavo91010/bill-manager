@@ -37,6 +37,10 @@ public class Payment {
   @Enumerated(EnumType.STRING)
   private StatusBoleto status;
 
+  @ManyToOne
+  @JoinColumn(name = "category_id")
+  private Category category;
+
   public Long getId() {
     return id;
   }
@@ -145,6 +149,14 @@ public class Payment {
       return false;
     }
     return true;
+  }
+
+  public Category getCategory() {
+    return category;
+  }
+
+  public void setCategory(Category category) {
+    this.category = category;
   }
 
 }
