@@ -1,84 +1,97 @@
 package com.ajudaqui.billmanager.service.vo;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
-import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 import com.ajudaqui.billmanager.utils.ValidarStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class PayamentDto {
-	private String description;
-	private BigDecimal value;
-	private LocalDate due_date;
-	private StatusBoleto status;
+  @NotBlank(message = "O campo descrição é obrigatorio")
+  private String description;
+  @NotNull(message = "O campo valor é obrigatório")
+  private BigDecimal value;
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  private LocalDate due_date;
+  private String category;
+  private StatusBoleto status;
 
-	public PayamentDto() {
-	}
-	
-	public PayamentDto(Payment payaments) {
-		this.description = payaments.getDescription();
-		this.value = payaments.getValue();
-		this.due_date = payaments.getDue_date();
-//		this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
-		this.status = payaments.getStatus();
-	}
+  public PayamentDto() {
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public PayamentDto(Payment payaments) {
+    this.description = payaments.getDescription();
+    this.value = payaments.getValue();
+    this.due_date = payaments.getDue_date();
+    // this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
+    this.status = payaments.getStatus();
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public Payment toDatabase(Users users) {
+    Payment payament = new Payment();
+    payament.setUser(users);
+    payament.setDescription(this.description);
+    payament.setValue(this.value);
+    payament.setCreated_at(LocalDateTime.now());
+    payament.setUpdated_at(LocalDateTime.now());
 
-	public BigDecimal getValue() {
-		return value;
-	}
+    payament.setDue_date(this.due_date);
+    ValidarStatus.statusAtualizado(payament);
+    return payament;
+  }
 
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public LocalDate getDue_date() {
-		return due_date;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setDue_date(LocalDate due_date) {
-		this.due_date = due_date;
-	}
+  public BigDecimal getValue() {
+    return value;
+  }
 
-	public StatusBoleto getStatus() {
-		return status;
-	}
+  public void setValue(BigDecimal value) {
+    this.value = value.setScale(2, RoundingMode.HALF_UP);
+  }
 
-	public void setStatus(StatusBoleto status) {
-		this.status = status;
-	}
+  public LocalDate getDue_date() {
+    return due_date;
+  }
 
-	public Payment toDatabase(PaymentsRepository boletoRepository, Users users) {
-		Payment payament = new Payment();
-		payament.setUserId(users.getId());
-		payament.setDescription(this.description);
-		payament.setValue(this.value);
-		payament.setCreated_at(LocalDateTime.now());
-		payament.setUpdated_at(LocalDateTime.now());
+  public void setDue_date(LocalDate due_date) {
+    this.due_date = due_date;
+  }
 
-		
-		payament.setDue_date(this.due_date);
-		ValidarStatus.statusAtualizado(payament, boletoRepository);
-		return payament;
-	}
+  public StatusBoleto getStatus() {
+    return status;
+  }
 
-	@Override
-	public String toString() {
-		return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
-				+ status + "]";
-	}
-	
+  public void setStatus(StatusBoleto status) {
+    this.status = status;
+  }
+
+  @Override
+  public String toString() {
+    return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
+        + status + "]";
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
 
 }

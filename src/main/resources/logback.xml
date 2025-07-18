@@ -1,0 +1,17 @@
+<configuration>
+
+    <!-- Appender para o console com cores e padrão melhorado -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                <!-- %highlight(%d{yyyy-MM-dd HH:mm:ss.SSS}) | %boldMagenta(%thread) | %highlight([%-5level]) | %cyan(%logger{36}) | %blue(%M) : %msg  %n%rEx{full}  <!-1- Exceções exibidas com detalhes completos -1-> -->
+                %highlight(%d{yyyy-MM-dd HH:mm:ss.SSS}) | %boldMagenta(%thread) | %highlight([%-5level]) | %msg  %n%rEx{full}  <!-- Exceções exibidas com detalhes completos -->
+            </pattern>
+        </encoder>
+    </appender>
+    <!-- Configuração do log root -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

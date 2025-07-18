@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  app:
+    container_name: "bill-manager-api-${APP_VERSION}"
+    build: .
+    ports:
+      - "8183:8183"
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://172.18.0.2:5432/bill_manager
+      - SPRING_DATASOURCE_USERNAME=${DATA_SOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATA_SOURCE_PASSWORD}
+      - AWS_PROFILE=${AWS_PROFILE}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ID=${AWS_ID}
+      - AWS_FILA=${AWS_FILA}
+      - CLOUD_GATEWAY_IP=${CLOUD_GATEWAY_IP}
+    networks:
+      - database_default
+
+networks:
+  database_default:
+    external: true
+

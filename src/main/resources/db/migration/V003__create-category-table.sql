@@ -1,0 +1,10 @@
+CREATE TABLE category (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE payment
+ADD COLUMN category_id BIGINT,
+ADD CONSTRAINT fk_payment_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE;
+

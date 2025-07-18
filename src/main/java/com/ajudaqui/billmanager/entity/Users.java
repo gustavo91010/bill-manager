@@ -1,9 +1,12 @@
 package com.ajudaqui.billmanager.entity;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,66 +14,75 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-@Entity
-@Table(name="users")
-public class Users {
-	
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String name;
-	private String email;
-	private Boolean active;
-	private LocalDateTime created_at;
-	private LocalDateTime updated_at ;
-	@OneToMany
-	private List<Payment> payaments = new ArrayList<>();
-	
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public Boolean getActive() {
-		return active;
-	}
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-	public LocalDateTime getCreated_at() {
-		return created_at;
-	}
-	public void setCreated_at(LocalDateTime created_at) {
-		this.created_at = created_at;
-	}
-	public LocalDateTime getUpdated_at() {
-		return updated_at;
-	}
-	public void setUpdated_at(LocalDateTime updated_at) {
-		this.updated_at = updated_at;
-	}
-	public List<Payment> getPayaments() {
-		return payaments;
-	}
-	public void setPayaments(List<Payment> payaments) {
-		this.payaments = payaments;
-	}
-	
-	
+@Entity
+@Table(name = "users")
+public class Users {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private Boolean active;
+
+  @Column(name = "access_token", nullable = false)
+  private String accessToken;
+
+  @OneToMany(mappedBy = "user")
+  @JsonIgnore
+  private List<Payment> payments = new ArrayList<>();
+
+  @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private Set<Category> categories = new HashSet<>();
+
+  public Users(String accessToken) {
+    this.accessToken = accessToken;
+    this.active = true;
+  }
+
+  public Users() {
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  public List<Payment> getPayments() {
+    return payments;
+  }
+
+  public void setPayments(List<Payment> payments) {
+    this.payments = payments;
+  }
+
+  public Set<Category> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(Set<Category> categories) {
+    this.categories = categories;
+  }
 
 }

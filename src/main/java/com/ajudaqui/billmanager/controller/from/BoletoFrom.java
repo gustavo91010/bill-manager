@@ -5,55 +5,58 @@ import java.time.LocalDate;
 
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
-import com.ajudaqui.billmanager.utils.validacao.ValidacaoStatusBoleto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class BoletoFrom {
-	private String descricao;
-	private BigDecimal valor;
-	private LocalDate vencimento;
-//	private StatusBoleto status= ValidacaoStatusBoleto.validacao(this.vencimento);
+  private String description;
+  private BigDecimal value;
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  private LocalDate due_date;
+  private String status;
+  // private StatusBoleto status=
+  // ValidacaoStatusBoleto.validacao(this.vencimento);
 
-	public String getDescricao() {
-		return descricao;
-	}
+  public Payment convert() {
+    Payment payament = new Payment();
+    payament.setDescription(this.description);
+    payament.setValue(this.value);
+    payament.setDue_date(this.due_date);
+    // payament.setStatus(ValidacaoStatusBoleto.validacao(this.vencimento));
+    payament.setStatus(StatusBoleto.valueOf(status));
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+    return payament;
+  }
 
-	public BigDecimal getValor() {
-		return valor;
-	}
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public LocalDate getVencimento() {
-		return vencimento;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setVencimento(LocalDate vencimento) {
-		this.vencimento = vencimento;
-	}
-	
+  public BigDecimal getValue() {
+    return value;
+  }
 
-	public StatusBoleto getStatus() {
-		return ValidacaoStatusBoleto.validacao(this.vencimento);
-	}
+  public void setValue(BigDecimal value) {
+    this.value = value;
+  }
 
-//	public void setStatus(StatusBoleto status) {
-//		this.status = status;
-//	}
+  public LocalDate getDue_date() {
+    return due_date;
+  }
 
-	public Payment convert() {
-		Payment payament= new Payment();
-		payament.setDescription(this.descricao);
-		payament.setValue(this.valor);
-		payament.setDue_date(this.vencimento);
-		payament.setStatus(ValidacaoStatusBoleto.validacao(this.vencimento));
+  public void setDue_date(LocalDate due_date) {
+    this.due_date = due_date;
+  }
 
-		return payament;
-	}
+  public String getStatus() {
+    return status;
+  }
 
 }
