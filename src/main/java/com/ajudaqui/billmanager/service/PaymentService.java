@@ -1,15 +1,23 @@
 package com.ajudaqui.billmanager.service;
 
+import static com.ajudaqui.billmanager.utils.StatusBoleto.PAGO;
 import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
 import static com.ajudaqui.billmanager.utils.ValidarStatus.statusAtualizado;
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.HALF_UP;
+import static java.time.LocalDate.of;
+import static java.time.LocalDateTime.now;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
@@ -66,7 +74,6 @@ public class PaymentService {
             newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDue_date().toString()));
         continue;
       }
-
       registeredPayments.add(save(newPayment));
       index++;
     }
@@ -77,28 +84,20 @@ public class PaymentService {
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
         payment.getDue_date().getMonthValue(),
         payment.getDue_date().getYear());
-
-    if (paymentForMonth.isEmpty()) {
-
+    if (paymentForMonth.isEmpty())
       return false;
-    }
-
     return paymentForMonth.contains(payment);
   }
 
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
-
-    Users users = usersService.findByAccessToken(accessToken);
-    Payment boleto = paymentRepository.findByIdForUsers(users.getAccessToken(), paymentId)
+    // Users users = usersService.findByAccessToken(accessToken);
+    return paymentRepository.findByIdForUsers(accessToken, paymentId)
         .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
-    return boleto;
   }
 
   public Payment findById(Long paymentId) {
-
-    Payment boleto = paymentRepository.findById(paymentId)
+    return paymentRepository.findById(paymentId)
         .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
-    return boleto;
   }
 
   public List<Payment> findByPayamentsForUser(String accessToken) {
@@ -106,14 +105,12 @@ public class PaymentService {
   }
 
   public List<Payment> findPaymentsWeek(String accessToken, String date, String status) {
-
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate dayWeek = LocalDate.parse(date, formatter);
     LocalDate monday = dayWeek.minusDays(dayWeek.getDayOfWeek().getValue() - 1);
     LocalDate sunday = monday.plusDays(6);
 
     List<Payment> payments = new ArrayList<Payment>();
-
     if (status.isEmpty()) {
       payments = paymentRepository.findPayaments(accessToken, monday, sunday);
 
@@ -122,32 +119,24 @@ public class PaymentService {
           valueOf(status));
     }
     return payments;
-
   }
 
   public List<Payment> findAllMonth(String accessToken, Integer month, Integer year) {
-
-    LocalDate startMonth = LocalDate.of(year, month, 1);
-    LocalDate endMonth = LocalDate.of(year, month, startMonth.lengthOfMonth());
+    LocalDate startMonth = of(year, month, 1);
+    LocalDate endMonth = of(year, month, startMonth.lengthOfMonth());
     List<Payment> resultt = paymentRepository.findPayaments(accessToken, startMonth, endMonth);
     return resultt;
-
   }
 
   public Payment update(String accessToken, Long paymentId, BoletoFrom from) {
-
     Payment payment = findByIdForUsers(accessToken, paymentId);
-
-    if (!from.getDescription().isEmpty()) {
+    if (!from.getDescription().isEmpty())
       payment.setDescription(from.getDescription());
-    }
-    if (from.getValue() != null) {
+    if (from.getValue() != null)
       payment.setValue(from.getValue());
-    }
-    if (from.getDue_date() != null) {
+    if (from.getDue_date() != null)
       payment.setDue_date(from.getDue_date());
-    }
-    payment.setUpdated_at(LocalDateTime.now());
+    payment.setUpdated_at(now());
     return paymentRepository.save(statusAtualizado(payment));
   }
 
@@ -166,6 +155,7 @@ public class PaymentService {
     paymentRepository.delete(findById(id));
   }
 
+  // Melhorar esse um dia!
   public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
       String status) {
     Users user = usersService.findByAccessToken(accessToken);
@@ -186,7 +176,6 @@ public class PaymentService {
     } else {
       response = paymentRepository.findPayaments(user.getAccessToken(), start, finish);
     }
-
     response.sort(Comparator.comparing(Payment::getDue_date));
     return response;
   }
@@ -195,22 +184,29 @@ public class PaymentService {
     List<Payment> payments = periodTime(accessToken, "", start, finsh, "");
     BigDecimal totalDue = payments.stream()
         .map(Payment::getValue)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        .reduce(ZERO, BigDecimal::add);
 
     BigDecimal amountPaid = payments.stream()
-        .filter(payment -> payment.getStatus().equals(StatusBoleto.PAGO))
+        .filter(payment -> payment.getStatus().equals(PAGO))
         .map(Payment::getValue)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
+        .reduce(ZERO, BigDecimal::add);
     return new Sumary(totalDue, amountPaid);
   }
 
   public Payment confirmPayment(String accessToken, Long paymentId) {
     Payment payment = findByIdForUsers(accessToken, paymentId);
-
-    payment.setStatus(StatusBoleto.PAGO);
-    payment.setUpdated_at(LocalDateTime.now());
+    payment.setStatus(PAGO);
+    payment.setUpdated_at(now());
     return paymentRepository.save(payment);
   }
 
+  public Map<String, BigDecimal> sumaryCategory(String accessToken, LocalDate start, LocalDate finsh) {
+    List<Payment> payments = periodTime(accessToken, "", start, finsh, "");
+    Map<String, BigDecimal> sumary = payments.stream()
+        .collect(groupingBy(
+            p -> p.getCategory().getName(),
+            mapping(Payment::getValue, Collectors.reducing(ZERO, BigDecimal::add))));
+    sumary.replaceAll((k, v) -> v.setScale(2, HALF_UP));
+    return sumary;
+  }
 }

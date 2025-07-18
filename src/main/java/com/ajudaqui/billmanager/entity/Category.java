@@ -29,6 +29,13 @@ public class Category {
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Payment> payments = new HashSet<>();
 
+  public Category(String name) {
+    this.name = name;
+  }
+
+  public Category() {
+  }
+
   public Long getId() {
     return id;
   }

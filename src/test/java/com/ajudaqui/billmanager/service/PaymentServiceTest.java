@@ -7,8 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
@@ -145,6 +148,24 @@ public class PaymentServiceTest {
   }
 
   @Test
+  @DisplayName("Deve trazer o total das categorias")
+  public void mustComputerTheSumayByCategory() {
+
+    LocalDate start = LocalDate.now();
+    LocalDate finsh = start.plusDays(30);
+
+    String accessToken = "";
+    when(usersService.findByAccessToken(accessToken)).thenReturn(new Users());
+    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments());
+
+    // Execução:
+    Map<String, BigDecimal> response = payamentService.sumaryCategory(accessToken, start, finsh);
+    // Verificação
+    assertEquals(2, response.size());
+    assertEquals("20.20", response.get("casa").toString());
+  }
+
+  @Test
   @DisplayName("Deve trazer montante pago vazio se nenhuma conta tiver sido paga")
   public void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
 
@@ -208,11 +229,13 @@ public class PaymentServiceTest {
     Payment payment_01 = new Payment();
     payment_01.setDescription("test boleto");
     payment_01.setValue(new BigDecimal(10.10));
+    payment_01.setCategory(new Category("casa"));
     payment_01.setDue_date(LocalDate.now());
     payment_01.setStatus(StatusBoleto.EM_DIAS);
 
     Payment payment_02 = new Payment();
     payment_02.setDescription("test boleto");
+    payment_02.setCategory(new Category("casa"));
     payment_02.setValue(new BigDecimal(10.10));
     payment_02.setDue_date(LocalDate.now());
     payment_02.setStatus(StatusBoleto.EM_DIAS);
@@ -222,8 +245,15 @@ public class PaymentServiceTest {
     payment_03.setValue(new BigDecimal(10.10));
     payment_03.setDue_date(LocalDate.now());
 
+    payment_03.setCategory(new Category("estudo"));
     payment_03.setStatus(StatusBoleto.EM_DIAS);
-    return List.of(payment_01, payment_02, payment_03);
+
+
+    List<Payment> listPayments= new ArrayList<>();
+    listPayments.add(payment_02);
+    listPayments.add(payment_03);
+    listPayments.add(payment_01);
+    return listPayments;
   }
 
 }
