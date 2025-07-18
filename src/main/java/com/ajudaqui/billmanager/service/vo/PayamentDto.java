@@ -21,6 +21,7 @@ public class PayamentDto {
   private BigDecimal value;
   @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate due_date;
+  private String category;
   private StatusBoleto status;
 
   public PayamentDto() {
@@ -32,6 +33,19 @@ public class PayamentDto {
     this.due_date = payaments.getDue_date();
     // this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
     this.status = payaments.getStatus();
+  }
+
+  public Payment toDatabase(Users users) {
+    Payment payament = new Payment();
+    payament.setUser(users);
+    payament.setDescription(this.description);
+    payament.setValue(this.value);
+    payament.setCreated_at(LocalDateTime.now());
+    payament.setUpdated_at(LocalDateTime.now());
+
+    payament.setDue_date(this.due_date);
+    ValidarStatus.statusAtualizado(payament);
+    return payament;
   }
 
   public String getDescription() {
@@ -66,23 +80,18 @@ public class PayamentDto {
     this.status = status;
   }
 
-  public Payment toDatabase(Users users) {
-    Payment payament = new Payment();
-    payament.setUser(users);
-    payament.setDescription(this.description);
-    payament.setValue(this.value);
-    payament.setCreated_at(LocalDateTime.now());
-    payament.setUpdated_at(LocalDateTime.now());
-
-    payament.setDue_date(this.due_date);
-    ValidarStatus.statusAtualizado(payament);
-    return payament;
-  }
-
   @Override
   public String toString() {
     return "PayamentDto [description=" + description + ", value=" + value + ", due_date=" + due_date + ", status="
         + status + "]";
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
 }
