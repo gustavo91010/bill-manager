@@ -41,7 +41,9 @@ jobs:
       - name: Run SonarQube analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN
+        run: mvn sonar:sonar \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.host.url=https://sonarcloud.io
 
   deploy:
     needs: [build-test, sonar]
