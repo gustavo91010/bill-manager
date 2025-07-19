@@ -13,7 +13,6 @@ import com.ajudaqui.billmanager.service.PaymentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,11 @@ import jakarta.validation.Valid;
 @Validated
 public class PaymentController {
 
-  @Autowired
   private PaymentService paymentSerivce;
+
+  public PaymentController(PaymentService paymentSerivce) {
+    this.paymentSerivce = paymentSerivce;
+  }
 
   @CrossOrigin
   @GetMapping("/health")
@@ -47,17 +49,16 @@ public class PaymentController {
 
   @CrossOrigin
   @GetMapping("/sumary-category")
-  public ResponseEntity<?> getSumaryCategory(
+  public ResponseEntity<ApiSumaryCategory> getSumaryCategory(
       @RequestHeader("Authorization") String accessToken,
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh) {
-    // return ResponseEntity.ok(paymentSerivce.sumaryCategory(accessToken, start, finsh));
     return ResponseEntity.ok(new ApiSumaryCategory(paymentSerivce.sumaryCategory(accessToken, start, finsh)));
   }
 
   @CrossOrigin
   @PostMapping("/repeat/{repeat}")
-  public ResponseEntity<?> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
+  public ResponseEntity<ApiPayments> boletosRecorrentes(@RequestBody @Valid PayamentDto payamentDto,
       @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
     List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
@@ -66,14 +67,14 @@ public class PaymentController {
 
   @CrossOrigin
   @GetMapping(value = "/id/{id}") // ok
-  public ResponseEntity<?> findById(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<PayamentDto> findById(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
     return ResponseEntity.ok(new PayamentDto(paymentSerivce.findByIdForUsers(accessToken, paymentId)));
   }
 
   @CrossOrigin
   @GetMapping()
-  public ResponseEntity<?> periodTime(
+  public ResponseEntity<ApiPayments> periodTime(
       @RequestHeader("Authorization") String accessToken,
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh,
@@ -85,7 +86,7 @@ public class PaymentController {
 
   @CrossOrigin
   @PutMapping("/confirm-paymeny/{id}")
-  public ResponseEntity<?> confirmPayment(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<ApiPayment> confirmPayment(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
     Payment paymentAtt = paymentSerivce.confirmPayment(accessToken, paymentId);
     return ResponseEntity.ok(new ApiPayment(paymentAtt));
@@ -93,7 +94,7 @@ public class PaymentController {
 
   @CrossOrigin
   @PutMapping("/{id}")
-  public ResponseEntity<?> update(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<ApiPayment> update(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId,
       @RequestBody BoletoFrom from) {
     Payment paymentAtt = paymentSerivce.update(accessToken, paymentId, from);
@@ -102,7 +103,7 @@ public class PaymentController {
 
   @CrossOrigin
   @PutMapping("/add/category")
-  public ResponseEntity<?> addCategry(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<ApiPayment> addCategry(@RequestHeader("Authorization") String accessToken,
       @RequestParam Long paymentId,
       @RequestParam String category) {
     Payment paymentAtt = paymentSerivce.addCategory(accessToken, paymentId, category);
@@ -111,7 +112,7 @@ public class PaymentController {
 
   @CrossOrigin
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> remover(@RequestHeader("Authorization") String accessToken,
+  public ResponseEntity<ApiResponse> remover(@RequestHeader("Authorization") String accessToken,
       @PathVariable("id") Long paymentId) {
     paymentSerivce.deleteById(accessToken, paymentId);
     return ResponseEntity.ok(new ApiResponse("Pagamento excluido com sucesso."));

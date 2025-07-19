@@ -1,5 +1,7 @@
 package com.ajudaqui.billmanager.exception;
 
+import static org.springframework.http.HttpStatus.*;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -67,7 +69,7 @@ public class HandleException {
     Map<String, String> error = new HashMap<>();
     error.put("error", "Rota não encontrada");
     error.put("path", ex.getRequestURL());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    return ResponseEntity.status(NOT_FOUND).body(error);
   }
 
   // Tratar exception em geral:
@@ -104,27 +106,23 @@ public class HandleException {
   }
 
   private HttpStatus determineHttpStatus(Exception exception) {
-    return EXCEPTION_STATUS.getOrDefault(exception.getClass(), HttpStatus.INTERNAL_SERVER_ERROR);
+    return EXCEPTION_STATUS.getOrDefault(exception.getClass(), INTERNAL_SERVER_ERROR);
   }
 
   // Map das classes de exeção
   private static final Map<Class<? extends Exception>, HttpStatus> EXCEPTION_STATUS = new HashMap<>();
 
   static {
-    EXCEPTION_STATUS.put(FeignException.class, HttpStatus.BAD_GATEWAY);
+    EXCEPTION_STATUS.put(FeignException.class, BAD_GATEWAY);
 
-    EXCEPTION_STATUS.put(MsgException.class, HttpStatus.BAD_REQUEST);
-    EXCEPTION_STATUS.put(IllegalArgumentException.class, HttpStatus.BAD_REQUEST);
-    EXCEPTION_STATUS.put(NullPointerException.class, HttpStatus.BAD_REQUEST);
+    EXCEPTION_STATUS.put(MsgException.class, BAD_REQUEST);
+    EXCEPTION_STATUS.put(IllegalArgumentException.class, BAD_REQUEST);
+    EXCEPTION_STATUS.put(NullPointerException.class, BAD_REQUEST);
 
-    // EXCEPTION_STATUS.put(AccessDeniedException.class, HttpStatus.FORBIDDEN);
-
-    EXCEPTION_STATUS.put(IOException.class, HttpStatus.INTERNAL_SERVER_ERROR);
-    EXCEPTION_STATUS.put(IndexOutOfBoundsException.class, HttpStatus.INTERNAL_SERVER_ERROR);
-    EXCEPTION_STATUS.put(RuntimeException.class, HttpStatus.INTERNAL_SERVER_ERROR);
-    EXCEPTION_STATUS.put(Exception.class, HttpStatus.INTERNAL_SERVER_ERROR);
-
-    EXCEPTION_STATUS.put(NotFoundEntityException.class, HttpStatus.NOT_FOUND);
-
+    EXCEPTION_STATUS.put(IOException.class, INTERNAL_SERVER_ERROR);
+    EXCEPTION_STATUS.put(IndexOutOfBoundsException.class, INTERNAL_SERVER_ERROR);
+    EXCEPTION_STATUS.put(RuntimeException.class, INTERNAL_SERVER_ERROR);
+    EXCEPTION_STATUS.put(Exception.class, INTERNAL_SERVER_ERROR);
+    EXCEPTION_STATUS.put(NotFoundEntityException.class, NOT_FOUND);
   }
 }

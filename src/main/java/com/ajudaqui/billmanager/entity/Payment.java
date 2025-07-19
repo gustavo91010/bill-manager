@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -30,9 +31,12 @@ public class Payment {
   private Users user;
   private String description;
   private BigDecimal value;
-  private LocalDate due_date;
-  private LocalDateTime created_at;
-  private LocalDateTime updated_at;
+  @Column(name="due_date")
+  private LocalDate dueDate;
+  @Column(name="create_at")
+  private LocalDateTime createdAt;
+  @Column(name="update_at")
+  private LocalDateTime updatedAt;
 
   @Enumerated(EnumType.STRING)
   private StatusBoleto status;
@@ -65,28 +69,28 @@ public class Payment {
     this.value = value;
   }
 
-  public LocalDate getDue_date() {
-    return due_date;
+  public LocalDate getDueDate() {
+    return dueDate;
   }
 
-  public void setDue_date(LocalDate due_date) {
-    this.due_date = due_date;
+  public void setDueDate(LocalDate dueDate) {
+    this.dueDate = dueDate;
   }
 
-  public LocalDateTime getCreated_at() {
-    return created_at;
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
   }
 
-  public void setCreated_at(LocalDateTime created_at) {
-    this.created_at = created_at;
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
   }
 
-  public LocalDateTime getUpdated_at() {
-    return updated_at;
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
   }
 
-  public void setUpdated_at(LocalDateTime updated_at) {
-    this.updated_at = updated_at;
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   public StatusBoleto getStatus() {
@@ -111,7 +115,7 @@ public class Payment {
     int result = 1;
     result = prime * result + ((user == null) ? 0 : user.hashCode());
     result = prime * result + ((value == null) ? 0 : value.hashCode());
-    result = prime * result + ((due_date == null) ? 0 : due_date.hashCode());
+    result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
     return result;
   }
 
@@ -141,11 +145,11 @@ public class Payment {
     } else if (!value.equals(other.value)) {
       return false;
     }
-    if (due_date == null) {
-      if (other.due_date != null) {
+    if (dueDate == null) {
+      if (other.dueDate != null) {
         return false;
       }
-    } else if (!due_date.equals(other.due_date)) {
+    } else if (!dueDate.equals(other.dueDate)) {
       return false;
     }
     return true;

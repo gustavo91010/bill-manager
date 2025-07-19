@@ -10,13 +10,12 @@ public class StatusBoletoVencendoHoje extends Status {
 	private LocalDate hoje= LocalDate.now();
 	public StatusBoletoVencendoHoje(Status proximo) {
 		super(proximo);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public StatusBoleto validar(Payment boleto) {
-		boolean vencendo_hoje = boleto.getDue_date().compareTo(hoje) == 0;
-		if(vencendo_hoje) {
+		boolean vencendoHoje = boleto.getDueDate().compareTo(hoje) == 0;
+		if(vencendoHoje) {
 			return StatusBoleto.VENCENDO_HOJE;
 		}
 		return proximo.validar(boleto);

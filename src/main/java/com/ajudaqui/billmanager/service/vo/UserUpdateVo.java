@@ -36,13 +36,13 @@ public class UserUpdateVo {
 	}
 
 
-	public LocalDateTime getUpdated_at() {
+	public LocalDateTime getUpdatedAt() {
 		return updated_at;
 	}
 
 
-	public void setUpdated_at(LocalDateTime updated_at) {
-		this.updated_at = updated_at;
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updated_at = updatedAt;
 	}
 	
 	

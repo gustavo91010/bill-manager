@@ -9,17 +9,19 @@ import com.ajudaqui.billmanager.utils.validacao.StatusBoletoVencendoHoje;
 import com.ajudaqui.billmanager.utils.validacao.StatusBoletoVencido;
 
 public class ValidarStatus {
-	public static Payment statusAtualizado(Payment boleto) {
-		
-		Status status= new StatusBoletoPago(
-						   new StatusBoletoVencido(
-							   new StatusBoletoVencendoHoje(
-								   new StatusBoletoAVencer(
-										new BoletosEmDias()))));
-		
-		boleto.setStatus(status.validar(boleto));
+  private ValidarStatus() {
+  }
+
+  public static Payment statusAtualizado(Payment boleto) {
+
+    Status status = new StatusBoletoPago(
+        new StatusBoletoVencido(
+            new StatusBoletoVencendoHoje(
+                new StatusBoletoAVencer(
+                    new BoletosEmDias()))));
+
+    boleto.setStatus(status.validar(boleto));
     return boleto;
-		// return repository.save(boleto);
-	}
+  }
 
 }

@@ -12,12 +12,12 @@ public class AuthService {
 
   private AuthenticationClient authenticationClient;
 
-  public SigninResponse signin(SigninDTO SigninDTO) {
-    return authenticationClient.signin(SigninDTO);
+  public SigninResponse signin(SigninDTO SigninDto) {
+    return authenticationClient.signin(SigninDto);
   }
 
-  public String signup(String jwtToken, SignupDTO SigninDTO) {
-    return authenticationClient.signup(jwtToken, SigninDTO);
+  public String signup(String jwtToken, SignupDTO SigninDto) {
+    return authenticationClient.signup(jwtToken, SigninDto);
   }
 
   public Boolean permission(String jwtToken, String accessToken) {

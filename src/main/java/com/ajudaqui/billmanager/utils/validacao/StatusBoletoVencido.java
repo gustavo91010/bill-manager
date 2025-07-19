@@ -14,7 +14,7 @@ public class StatusBoletoVencido extends Status {
 
 	@Override
 	public StatusBoleto validar(Payment boleto) {
-		boolean vencido = boleto.getDue_date().compareTo(hoje) < 0;
+		boolean vencido = boleto.getDueDate().compareTo(hoje) < 0;
 		if (vencido) {
 			return StatusBoleto.VENCIDO;
 		}

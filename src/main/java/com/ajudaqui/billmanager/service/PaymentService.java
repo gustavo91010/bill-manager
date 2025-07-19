@@ -38,13 +38,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentService {
 
-  @Autowired
   private PaymentsRepository paymentRepository;
-  @Autowired
   private UsersService usersService;
-
-  @Autowired
   private CategoryService categoryService;
+
+  public PaymentService(PaymentsRepository paymentRepository, UsersService usersService,
+      CategoryService categoryService) {
+    this.paymentRepository = paymentRepository;
+    this.usersService = usersService;
+    this.categoryService = categoryService;
+  }
 
   private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
 
@@ -80,12 +83,12 @@ public class PaymentService {
       if (category != null)
         newPayment.setCategory(category);
 
-      newPayment.setDue_date(newPayment.getDue_date().plusMonths(index));
+      newPayment.setDueDate(newPayment.getDueDate().plusMonths(index));
 
       index++;
       if (isRegistery(newPayment)) {
         logger.warn(String.format("Boleto descição: %s, valor: %s, Vencimento: %s já registrado.",
-            newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDue_date().toString()));
+            newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDueDate().toString()));
         continue;
       }
       registeredPayments.add(save(newPayment));
@@ -95,15 +98,14 @@ public class PaymentService {
 
   private boolean isRegistery(Payment payment) {
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
-        payment.getDue_date().getMonthValue(),
-        payment.getDue_date().getYear());
+        payment.getDueDate().getMonthValue(),
+        payment.getDueDate().getYear());
     if (paymentForMonth.isEmpty())
       return false;
     return paymentForMonth.contains(payment);
   }
 
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
-    // Users users = usersService.findByAccessToken(accessToken);
     return paymentRepository.findByIdForUsers(accessToken, paymentId)
         .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
   }
@@ -120,7 +122,7 @@ public class PaymentService {
   public List<Payment> findPaymentsWeek(String accessToken, String date, String status) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate dayWeek = LocalDate.parse(date, formatter);
-    LocalDate monday = dayWeek.minusDays(dayWeek.getDayOfWeek().getValue() - 1);
+    LocalDate monday = dayWeek.minusDays((long) (dayWeek.getDayOfWeek().getValue() - 1));
     LocalDate sunday = monday.plusDays(6);
 
     List<Payment> payments = new ArrayList<Payment>();
@@ -137,8 +139,7 @@ public class PaymentService {
   public List<Payment> findAllMonth(String accessToken, Integer month, Integer year) {
     LocalDate startMonth = of(year, month, 1);
     LocalDate endMonth = of(year, month, startMonth.lengthOfMonth());
-    List<Payment> resultt = paymentRepository.findPayaments(accessToken, startMonth, endMonth);
-    return resultt;
+    return paymentRepository.findPayaments(accessToken, startMonth, endMonth);
   }
 
   public Payment update(String accessToken, Long paymentId, BoletoFrom from) {
@@ -147,9 +148,9 @@ public class PaymentService {
       payment.setDescription(from.getDescription());
     if (from.getValue() != null)
       payment.setValue(from.getValue());
-    if (from.getDue_date() != null)
-      payment.setDue_date(from.getDue_date());
-    payment.setUpdated_at(now());
+    if (from.getDueDate() != null)
+      payment.setDueDate(from.getDueDate());
+    payment.setUpdatedAt(now());
     return paymentRepository.save(statusAtualizado(payment));
   }
 
@@ -189,7 +190,7 @@ public class PaymentService {
     } else {
       response = paymentRepository.findPayaments(user.getAccessToken(), start, finish);
     }
-    response.sort(Comparator.comparing(Payment::getDue_date));
+    response.sort(Comparator.comparing(Payment::getDueDate));
     return response;
   }
 
@@ -209,7 +210,7 @@ public class PaymentService {
   public Payment confirmPayment(String accessToken, Long paymentId) {
     Payment payment = findByIdForUsers(accessToken, paymentId);
     payment.setStatus(PAGO);
-    payment.setUpdated_at(now());
+    payment.setUpdatedAt(now());
     return paymentRepository.save(payment);
   }
 

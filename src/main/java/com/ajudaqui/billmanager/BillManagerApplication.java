@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 public class BillManagerApplication {
-  public static void main(String[] args) throws IllegalArgumentException, IllegalAccessException {
+  public static void main(String[] args) {
     SpringApplication.run(BillManagerApplication.class, args);
   }
 

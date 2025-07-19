@@ -13,15 +13,12 @@ public class BoletoFrom {
   @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate due_date;
   private String status;
-  // private StatusBoleto status=
-  // ValidacaoStatusBoleto.validacao(this.vencimento);
 
   public Payment convert() {
     Payment payament = new Payment();
     payament.setDescription(this.description);
     payament.setValue(this.value);
-    payament.setDue_date(this.due_date);
-    // payament.setStatus(ValidacaoStatusBoleto.validacao(this.vencimento));
+    payament.setDueDate(this.due_date);
     payament.setStatus(StatusBoleto.valueOf(status));
 
     return payament;
@@ -47,12 +44,12 @@ public class BoletoFrom {
     this.value = value;
   }
 
-  public LocalDate getDue_date() {
+  public LocalDate getDueDate() {
     return due_date;
   }
 
-  public void setDue_date(LocalDate due_date) {
-    this.due_date = due_date;
+  public void setDueDate(LocalDate dueDate) {
+    this.due_date = dueDate;
   }
 
   public String getStatus() {

@@ -30,8 +30,7 @@ public class PayamentDto {
   public PayamentDto(Payment payaments) {
     this.description = payaments.getDescription();
     this.value = payaments.getValue();
-    this.due_date = payaments.getDue_date();
-    // this.status = ValidacaoStatusBoleto.validacao(boleto.getVencimento());
+    this.due_date = payaments.getDueDate();
     this.status = payaments.getStatus();
   }
 
@@ -40,10 +39,10 @@ public class PayamentDto {
     payament.setUser(users);
     payament.setDescription(this.description);
     payament.setValue(this.value);
-    payament.setCreated_at(LocalDateTime.now());
-    payament.setUpdated_at(LocalDateTime.now());
+    payament.setCreatedAt(LocalDateTime.now());
+    payament.setUpdatedAt(LocalDateTime.now());
 
-    payament.setDue_date(this.due_date);
+    payament.setDueDate(this.due_date);
     ValidarStatus.statusAtualizado(payament);
     return payament;
   }
@@ -68,8 +67,8 @@ public class PayamentDto {
     return due_date;
   }
 
-  public void setDue_date(LocalDate due_date) {
-    this.due_date = due_date;
+  public void setDue_date(LocalDate dueDate) {
+    this.due_date = dueDate;
   }
 
   public StatusBoleto getStatus() {

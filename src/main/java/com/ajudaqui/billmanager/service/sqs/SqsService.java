@@ -10,9 +10,7 @@ import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
@@ -31,13 +29,13 @@ public class SqsService {
   @Value("${aws.region}")
   private String region;
 
-  @Autowired
   private UsersService usersService;
 
   private final SqsClient sqsClient;
 
-  public SqsService(SqsClient sqsClient) {
+  public SqsService(UsersService usersService, SqsClient sqsClient) {
     this.sqsClient = sqsClient;
+    this.usersService= usersService;
   }
 
   public void sendMessage(String awsFila, String messageBody) {

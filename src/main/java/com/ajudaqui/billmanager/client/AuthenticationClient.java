@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface AuthenticationClient {
 
   @PostMapping(value = "/auth/signin", consumes = "multipart/form-data")
-  SigninResponse signin(@RequestBody SigninDTO SigninDTO);
+  SigninResponse signin(@RequestBody SigninDTO SigninDto);
 
 
   @PostMapping(value = "/auth/signup", consumes = "multipart/form-data")
-  String signup(@RequestHeader("Authorization") String jwtToken, @RequestBody SignupDTO SigninDTO);
+  String signup(@RequestHeader("Authorization") String jwtToken, @RequestBody SignupDTO SigninDto);
 
   @PostMapping(value = "/auth/permission/{accessToken}", consumes = "application/json")
   Boolean permission(@RequestHeader("Authorization") String jwtToken, @PathVariable String accessToken);

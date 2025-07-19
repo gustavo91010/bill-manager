@@ -12,19 +12,19 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PaymentsRepository extends JpaRepository<Payment, Long> {
 
-  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.due_date >= :inicioMes AND b.due_date <= :finalMes")
+  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.dueDate >= :inicioMes AND b.dueDate <= :finalMes")
   List<Payment> findPayaments(String accessToken, LocalDate inicioMes, LocalDate finalMes);
 
-  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.description = :description AND b.due_date >= :inicioMes AND b.due_date <= :finalMes")
+  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.description = :description AND b.dueDate >= :inicioMes AND b.dueDate <= :finalMes")
   List<Payment> findPayaments(String accessToken, String description, LocalDate inicioMes, LocalDate finalMes);
 
-  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.status = :status AND b.due_date >= :inicioMes AND b.due_date <= :finalMes")
+  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.status = :status AND b.dueDate >= :inicioMes AND b.dueDate <= :finalMes")
   List<Payment> findPayaments(String accessToken, LocalDate inicioMes, LocalDate finalMes, StatusBoleto status);
 
-  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.description = :description AND b.status = :status AND b.due_date >= :inicioMes AND b.due_date <= :finalMes")
+  @Query("SELECT b FROM Payment b WHERE b.user.accessToken = :accessToken AND b.description = :description AND b.status = :status AND b.dueDate >= :inicioMes AND b.dueDate <= :finalMes")
   List<Payment> findPayaments(String accessToken, String description, LocalDate inicioMes, LocalDate finalMes, StatusBoleto status);
 
-  @Query(value = "select * from payment where status <> 'PAGO' AND due_date > :deadline ", nativeQuery = true)
+  @Query(value = "select * from payment where status <> 'PAGO' AND dueDate > :deadline ", nativeQuery = true)
   List<Payment> nextPayments(LocalDate deadline);
 
   @Query(value = "select * from payment where users_id = (select id from users where accessToken = :accessToken)", nativeQuery = true)

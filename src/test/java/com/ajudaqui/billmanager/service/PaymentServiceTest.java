@@ -43,7 +43,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve regsitrar uma vez com o recorrente")
-  public void mustRegisterOnceWithTheApplicant() {
+   void mustRegisterOnceWithTheApplicant() {
 
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDue_date(LocalDate.now());
@@ -60,15 +60,15 @@ public class PaymentServiceTest {
     List<Payment> capturedPayments = paymentCaptor.getAllValues();
 
     assertEquals(repeticao, capturedPayments.size());
-    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
+    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDueDate());
     assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
-        capturedPayments.get(capturedPayments.size() - 1).getDue_date());
+        capturedPayments.get(capturedPayments.size() - 1).getDueDate());
     assertEquals(repeticao, response.size());
   }
 
   @Test
   @DisplayName("Deve regsitrar multiplos pagamentos para meses futuro")
-  public void shouldRegisterMultipleàymentsForFutureMonths() {
+   void shouldRegisterMultipleàymentsForFutureMonths() {
 
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDescription("test boleto");
@@ -89,15 +89,15 @@ public class PaymentServiceTest {
     assertEquals("test boleto", paymentCaptor.getValue().getDescription());
     assertEquals("23.40", paymentCaptor.getValue().getValue().toString());
     assertEquals(repeticao, capturedPayments.size());
-    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDue_date());
+    assertEquals(paymentDto.getDue_date(), capturedPayments.get(0).getDueDate());
     assertEquals(paymentDto.getDue_date().plusMonths(repeticao - 1),
-        capturedPayments.get(capturedPayments.size() - 1).getDue_date());
+        capturedPayments.get(capturedPayments.size() - 1).getDueDate());
     assertEquals(repeticao, response.size());
   }
 
   @Test
   @DisplayName("Deve registrar um pagamento")
-  public void mustRegisterPayment() {
+   void mustRegisterPayment() {
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDescription("test boleto");
     paymentDto.setValue(new BigDecimal(23.4));
@@ -119,7 +119,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deee computar o resumo")
-  public void shouldComputeTheSummary() {
+   void shouldComputeTheSummary() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -149,7 +149,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer o total das categorias")
-  public void mustComputerTheSumayByCategory() {
+   void mustComputerTheSumayByCategory() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -167,7 +167,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer montante pago vazio se nenhuma conta tiver sido paga")
-  public void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
+   void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -197,7 +197,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer restante vazio se todas as contas tiverem sido paga")
-  public void mustBringAnZeroRemainingIfAllBillHaveBeenPaid() {
+   void mustBringAnZeroRemainingIfAllBillHaveBeenPaid() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -226,33 +226,33 @@ public class PaymentServiceTest {
 
   private List<Payment> listPayments() {
 
-    Payment payment_01 = new Payment();
-    payment_01.setDescription("test boleto");
-    payment_01.setValue(new BigDecimal(10.10));
-    payment_01.setCategory(new Category("casa"));
-    payment_01.setDue_date(LocalDate.now());
-    payment_01.setStatus(StatusBoleto.EM_DIAS);
+    Payment payment01 = new Payment();
+    payment01.setDescription("test boleto");
+    payment01.setValue(new BigDecimal(10.10));
+    payment01.setCategory(new Category("casa"));
+    payment01.setDueDate(LocalDate.now());
+    payment01.setStatus(StatusBoleto.EM_DIAS);
 
-    Payment payment_02 = new Payment();
-    payment_02.setDescription("test boleto");
-    payment_02.setCategory(new Category("casa"));
-    payment_02.setValue(new BigDecimal(10.10));
-    payment_02.setDue_date(LocalDate.now());
-    payment_02.setStatus(StatusBoleto.EM_DIAS);
+    Payment payment02 = new Payment();
+    payment02.setDescription("test boleto");
+    payment02.setCategory(new Category("casa"));
+    payment02.setValue(new BigDecimal(10.10));
+    payment02.setDueDate(LocalDate.now());
+    payment02.setStatus(StatusBoleto.EM_DIAS);
 
-    Payment payment_03 = new Payment();
-    payment_03.setDescription("test boleto");
-    payment_03.setValue(new BigDecimal(10.10));
-    payment_03.setDue_date(LocalDate.now());
+    Payment payment03 = new Payment();
+    payment03.setDescription("test boleto");
+    payment03.setValue(new BigDecimal(10.10));
+    payment03.setDueDate(LocalDate.now());
 
-    payment_03.setCategory(new Category("estudo"));
-    payment_03.setStatus(StatusBoleto.EM_DIAS);
+    payment03.setCategory(new Category("estudo"));
+    payment03.setStatus(StatusBoleto.EM_DIAS);
 
 
     List<Payment> listPayments= new ArrayList<>();
-    listPayments.add(payment_02);
-    listPayments.add(payment_03);
-    listPayments.add(payment_01);
+    listPayments.add(payment02);
+    listPayments.add(payment03);
+    listPayments.add(payment01);
     return listPayments;
   }
 

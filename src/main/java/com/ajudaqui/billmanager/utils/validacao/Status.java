@@ -6,7 +6,7 @@ import com.ajudaqui.billmanager.utils.StatusBoleto;
 public abstract class Status {
 	protected Status proximo;
 
-	public Status(Status proximo) {
+	protected Status(Status proximo) {
 		super();
 		this.proximo = proximo;
 	}

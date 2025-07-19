@@ -16,10 +16,13 @@ import org.springframework.stereotype.*;
 @Service
 public class CategoryService {
 
-  @Autowired
   private CategoryRepository repository;
-  @Autowired
   private UsersService usersService;
+
+  public CategoryService(CategoryRepository repository, UsersService usersService) {
+    this.repository = repository;
+    this.usersService = usersService;
+  }
 
   public Category create(String accessToken, String name) {
     if (name == null || name.isEmpty())
