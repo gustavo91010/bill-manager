@@ -76,6 +76,7 @@ public class PaymentService {
 
     while (index < repeticao) {
       Payment newPayment = paymentDto.toDatabase(users);
+
       if (category != null)
         newPayment.setCategory(category);
 
