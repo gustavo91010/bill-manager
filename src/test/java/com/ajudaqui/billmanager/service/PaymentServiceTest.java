@@ -37,6 +37,8 @@ public class PaymentServiceTest {
   private PaymentsRepository paymentsRepository;
   @Mock
   private UsersService usersService;
+  @Mock
+  private CategoryService categoryService;
 
   @Captor
   private ArgumentCaptor<Payment> paymentCaptor;
@@ -248,8 +250,7 @@ public class PaymentServiceTest {
     payment_03.setCategory(new Category("estudo"));
     payment_03.setStatus(StatusBoleto.EM_DIAS);
 
-
-    List<Payment> listPayments= new ArrayList<>();
+    List<Payment> listPayments = new ArrayList<>();
     listPayments.add(payment_02);
     listPayments.add(payment_03);
     listPayments.add(payment_01);

@@ -1,5 +1,7 @@
 package com.ajudaqui.billmanager.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,16 +17,15 @@ import com.ajudaqui.billmanager.service.vo.Sumary;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+@Validated
 @RestController
 @RequestMapping("/payment")
-@Validated
 public class PaymentController {
 
   @Autowired
@@ -51,7 +52,6 @@ public class PaymentController {
       @RequestHeader("Authorization") String accessToken,
       @RequestParam(value = "start") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate start,
       @RequestParam(value = "finsh") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finsh) {
-    // return ResponseEntity.ok(paymentSerivce.sumaryCategory(accessToken, start, finsh));
     return ResponseEntity.ok(new ApiSumaryCategory(paymentSerivce.sumaryCategory(accessToken, start, finsh)));
   }
 
@@ -61,7 +61,7 @@ public class PaymentController {
       @PathVariable("repeat") Long repeat,
       @RequestHeader("Authorization") String accessToken) {
     List<Payment> response = paymentSerivce.boletosRecorrentes(payamentDto, repeat, accessToken);
-    return ResponseEntity.status(HttpStatus.CREATED).body(new ApiPayments(response));
+    return ResponseEntity.status(CREATED).body(new ApiPayments(response));
   }
 
   @CrossOrigin
