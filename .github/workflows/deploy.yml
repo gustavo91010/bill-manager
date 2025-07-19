@@ -8,26 +8,6 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-
-      - name: Build with Maven
-        run: mvn clean package
-
-      - name: Run tests
-        run: mvn test
-
-  sonar:
-    needs: build-test
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,6 +17,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Run tests
+        run: mvn test
 
       - name: Run SonarQube analysis
         env:
@@ -49,11 +35,9 @@ jobs:
             -Dsonar.organization=ajudaquicom \
             -Dsonar.java.binaries=target/classes
 
-
   deploy:
-    needs: [build-test, sonar]
+    needs: build-test
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.7
