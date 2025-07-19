@@ -46,7 +46,9 @@ jobs:
             -Dsonar.login=$SONAR_TOKEN \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.projectKey=gustavo91010_bill-manager \
-            -Dsonar.organization=ajudaquicom
+            -Dsonar.organization=ajudaquicom \
+            -Dsonar.java.binaries=target/classes
+
 
   deploy:
     needs: [build-test, sonar]
