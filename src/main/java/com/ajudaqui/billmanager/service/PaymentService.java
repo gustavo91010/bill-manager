@@ -70,11 +70,14 @@ public class PaymentService {
 
     int index = 0;
     Users users = usersService.findByAccessToken(accessToken);
-    Category category = categoryService.findByNameOrRegister(paymentDto.getCategory(), users);
+    Category category = null;
+    if (paymentDto.getCategory() != null)
+      category = categoryService.findByNameOrRegister(paymentDto.getCategory(), users);
 
     while (index < repeticao) {
       Payment newPayment = paymentDto.toDatabase(users);
-      newPayment.setCategory(category);
+      if (category != null)
+        newPayment.setCategory(category);
 
       newPayment.setDue_date(newPayment.getDue_date().plusMonths(index));
 
