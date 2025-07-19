@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test and Deploy
 
 on:
   push:
@@ -24,3 +24,22 @@ jobs:
 
       - name: Run tests
         run: mvn test
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            BACKUP_DIR="/home/ubuntu/bill-manager/api/backup/$(date +'%Y%m%d_%H%M%S')"
+            mkdir -p "$BACKUP_DIR"
+            mv /home/ubuntu/bill-manager/api/current/* "$BACKUP_DIR"
+            cp /home/runner/work/bill-manager/bill-manager/api/target/bill-manager-0.0.1-SNAPSHOT.jar /home/ubuntu/bill-manager/api/current/
+            cd /home/ubuntu/bill-manager/api
+            sudo docker-compose build
