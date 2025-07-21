@@ -1,19 +1,18 @@
 package com.ajudaqui.billmanager.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static java.time.LocalDate.now;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
+import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
@@ -22,10 +21,8 @@ import com.ajudaqui.billmanager.utils.StatusBoleto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
+import org.postgresql.translation.messages_bg;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -42,8 +39,34 @@ public class PaymentServiceTest {
   private ArgumentCaptor<Payment> paymentCaptor;
 
   @Test
+  @DisplayName("Deve retornar false se  não encontra um pagamento registrado")
+  void shouldReturnsFalseIfDoesNotFindRegisteredPayment() {
+    // Ambiente
+    Users users = new Users();
+    users.setAccessToken("");
+    Payment payment = new Payment();
+    payment.setUser(users);
+    payment.setDueDate(LocalDate.now());
+    payment.setDescription("");
+    when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Collections.emptyList());
+    assertFalse(payamentService.isRegistery(payment));
+}@Test
+  @DisplayName("Deve retornar verdadeiro se encontra um pagamento já registrado")
+  void shouldReturnTrueIfPaymentHasAlreadRegistered() {
+    // Ambiente
+    Users users = new Users();
+    users.setAccessToken("");
+    Payment payment = new Payment();
+    payment.setUser(users);
+    payment.setDueDate(LocalDate.now());
+    payment.setDescription("");
+    when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Collections.singletonList(payment));
+    assertTrue(payamentService.isRegistery(payment));
+}
+
+  @Test
   @DisplayName("Deve regsitrar uma vez com o recorrente")
-   void mustRegisterOnceWithTheApplicant() {
+  void mustRegisterOnceWithTheApplicant() {
 
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDue_date(LocalDate.now());
@@ -68,7 +91,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve regsitrar multiplos pagamentos para meses futuro")
-   void shouldRegisterMultipleàymentsForFutureMonths() {
+  void shouldRegisterMultipleàymentsForFutureMonths() {
 
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDescription("test boleto");
@@ -96,8 +119,31 @@ public class PaymentServiceTest {
   }
 
   @Test
+  @DisplayName("Deve lançar uma exception se pagamento já tiver sido registrado")
+  void shouldThrowAnExceptionIfPaymentHasAlreadyRegistered() {
+    PayamentDto paymentDto = new PayamentDto();
+    paymentDto.setDescription("test boleto");
+    paymentDto.setValue(new BigDecimal(23.4));
+    paymentDto.setDue_date(now());
+
+    String accessToken = "";
+    Users user = new Users();
+
+    when(usersService.findByAccessToken(accessToken)).thenReturn(user);
+    Payment payment = paymentDto.toDatabase(user);
+    payment.setUser(user);
+    payment.setDueDate(now());
+    when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Arrays.asList(payment));
+    // Execução:
+    MsgException message = assertThrows(MsgException.class, () -> payamentService.register(paymentDto, accessToken));
+
+    // Verificação:
+    assertEquals("pagamento já cadastrado", message.getMessage());
+  }
+
+  @Test
   @DisplayName("Deve registrar um pagamento")
-   void mustRegisterPayment() {
+  void mustRegisterPayment() {
     PayamentDto paymentDto = new PayamentDto();
     paymentDto.setDescription("test boleto");
     paymentDto.setValue(new BigDecimal(23.4));
@@ -119,7 +165,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deee computar o resumo")
-   void shouldComputeTheSummary() {
+  void shouldComputeTheSummary() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -149,7 +195,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer o total das categorias")
-   void mustComputerTheSumayByCategory() {
+  void mustComputerTheSumayByCategory() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -167,7 +213,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer montante pago vazio se nenhuma conta tiver sido paga")
-   void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
+  void mustBringZeroAmoundPaidIfNoBillHasBeenPaid() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -197,7 +243,7 @@ public class PaymentServiceTest {
 
   @Test
   @DisplayName("Deve trazer restante vazio se todas as contas tiverem sido paga")
-   void mustBringAnZeroRemainingIfAllBillHaveBeenPaid() {
+  void mustBringAnZeroRemainingIfAllBillHaveBeenPaid() {
 
     LocalDate start = LocalDate.now();
     LocalDate finsh = start.plusDays(30);
@@ -248,8 +294,7 @@ public class PaymentServiceTest {
     payment03.setCategory(new Category("estudo"));
     payment03.setStatus(StatusBoleto.EM_DIAS);
 
-
-    List<Payment> listPayments= new ArrayList<>();
+    List<Payment> listPayments = new ArrayList<>();
     listPayments.add(payment02);
     listPayments.add(payment03);
     listPayments.add(payment01);

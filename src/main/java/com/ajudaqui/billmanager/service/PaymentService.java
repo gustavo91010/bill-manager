@@ -32,7 +32,6 @@ import com.ajudaqui.billmanager.utils.ValidarStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -96,7 +95,8 @@ public class PaymentService {
     return registeredPayments;
   }
 
-  private boolean isRegistery(Payment payment) {
+  protected boolean isRegistery(Payment payment) {
+    
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
         payment.getDueDate().getMonthValue(),
         payment.getDueDate().getYear());

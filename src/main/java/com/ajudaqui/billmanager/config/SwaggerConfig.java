@@ -22,3 +22,4 @@ public class SwaggerConfig implements WebMvcConfigurer {
         .build();
   }
 }
+// http://3.226.144.137:8183/swagger-ui.html
