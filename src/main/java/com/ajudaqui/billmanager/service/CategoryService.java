@@ -38,10 +38,7 @@ public class CategoryService {
   }
 
   public Category findByNameOrRegister(String name, Users users) {
-    Category category = repository.findByName(name).orElseGet(() -> {
-      return save(new Category(name, users));
-    });
-
+    Category category = repository.findByName(name).orElseGet(() -> save(new Category(name, users)));
     if (!checkingPermission(users.getAccessToken(), category))
       throw new MsgException("Solicitação não autorizada");
     return category;
