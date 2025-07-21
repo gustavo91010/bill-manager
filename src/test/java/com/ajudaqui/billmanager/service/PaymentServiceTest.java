@@ -1,14 +1,18 @@
 package com.ajudaqui.billmanager.service;
 
+import static java.time.LocalDate.from;
 import static java.time.LocalDate.now;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
+import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.entity.Users;
@@ -17,13 +21,16 @@ import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
-import com.ajudaqui.billmanager.utils.validacao.Status;
 
-import org.apache.tomcat.jni.Local;
+import org.apache.tomcat.jni.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -35,9 +42,209 @@ public class PaymentServiceTest {
   private PaymentsRepository paymentsRepository;
   @Mock
   private UsersService usersService;
-
+  @Mock
+  private CategoryService categoryService;
   @Captor
   private ArgumentCaptor<Payment> paymentCaptor;
+
+  @DisplayName("Deve atualizar a descrição do pagamento")
+  @Test
+  void shouldUpdatePaymentDescription() {
+    String accessToken = "token";
+    Long paymentId = 1L;
+    Payment payment = new Payment();
+    payment.setDescription("old");
+
+    BoletoFrom from = new BoletoFrom();
+    from.setDescription("descrição");
+    from.setValue(BigDecimal.TEN);
+    from.setDueDate(LocalDate.now().plusDays(10));
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
+    when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+
+    Payment updated = paymentService.update(accessToken, paymentId, from);
+
+    assertEquals("descrição", updated.getDescription());
+  }
+
+  @DisplayName("Deve atualizar o valor do pagamento")
+  @Test
+  void shouldUpdatePaymentValue() {
+    String accessToken = "token";
+    Long paymentId = 1L;
+    Payment payment = new Payment();
+    payment.setValue(BigDecimal.ONE);
+
+    BoletoFrom from = new BoletoFrom();
+    from.setDescription("descrição");
+    from.setValue(BigDecimal.TEN);
+    from.setDueDate(LocalDate.now().plusDays(10));
+
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
+    when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+
+    Payment updated = paymentService.update(accessToken, paymentId, from);
+    assertEquals(BigDecimal.TEN, updated.getValue());
+  }
+
+  @DisplayName("Deve atualizar a data de vencimento do pagamento")
+  @Test
+  void shouldUpdatePaymentDueDate() {
+    String accessToken = "token";
+    Long paymentId = 1L;
+    Payment payment = new Payment();
+    payment.setDueDate(LocalDate.now());
+
+    BoletoFrom from = new BoletoFrom();
+    from.setDueDate(LocalDate.now().plusDays(10));
+
+    from.setDescription("descrição");
+    from.setValue(BigDecimal.TEN);
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
+    when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+
+    Payment updated = paymentService.update(accessToken, paymentId, from);
+    assertEquals(from.getDueDate(), updated.getDueDate());
+  }
+
+  @DisplayName("Deve atualizar o campo updatedAt do pagamento")
+  @Test
+  void shouldUpdateUpdatedAt() {
+    String accessToken = "token";
+    Long paymentId = 1L;
+    Payment payment = new Payment();
+
+    BoletoFrom from = new BoletoFrom();
+    from.setDescription("descrição");
+    from.setValue(BigDecimal.TEN);
+    from.setDueDate(LocalDate.now().plusDays(10));
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
+    when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+
+    Payment updated = paymentService.update(accessToken, paymentId, from);
+    assertNotNull(updated.getUpdatedAt());
+  }
+
+  @DisplayName("Deve chamar o save no repository")
+  @Test
+  void shouldCallSaveOnRepository() {
+    String accessToken = "token";
+    Long paymentId = 1L;
+    Payment payment = new Payment();
+
+    BoletoFrom from = new BoletoFrom();
+    from.setDescription("descrição");
+    from.setValue(BigDecimal.TEN);
+    from.setDueDate(LocalDate.now().plusDays(10));
+
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
+    when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+
+    paymentService.update(accessToken, paymentId, from);
+    verify(paymentsRepository).save(any(Payment.class));
+  }
+
+  @Test
+  @DisplayName("Deve ter pagamento na lisat de actegoria categoria ao pagamento")
+  void shouldLinkPaymentToCategory() {
+    // Ambiente
+    String accessToken = "";
+    Long paymentId = 7L;
+    Payment payment = new Payment();
+    payment.setId(paymentId);
+
+    Users users = new Users();
+    users.setId(55l);
+    String categoryName = "casa";
+    Category category = new Category(categoryName, users);
+
+    category.setPayments(new HashSet<Payment>());
+    payment.setCategory(category);
+    when(usersService.findByAccessToken(accessToken)).thenReturn(users);
+    when(categoryService.findByNameOrRegister(categoryName, users)).thenReturn(category);
+    when(paymentsRepository.findById(paymentId)).thenReturn(Optional.of(payment));
+    // Execução
+    Payment responde = paymentService.addCategory(accessToken, paymentId, categoryName);
+    // Veirifcação
+    assertFalse(responde.getCategory().getPayments().isEmpty());
+  }
+
+  @Test
+  @DisplayName("Deve adicionar categoria ao pagamento")
+  void mustAddCategryInThePayment() {
+    // Ambiente
+    String accessToken = "";
+    Long paymentId = 7L;
+    Payment payment = new Payment();
+    payment.setId(paymentId);
+
+    Users users = new Users();
+    users.setId(55l);
+    String categoryName = "casa";
+    Category category = new Category(categoryName, users);
+
+    category.setPayments(new HashSet<Payment>());
+    payment.setCategory(category);
+    when(usersService.findByAccessToken(accessToken)).thenReturn(users);
+    when(categoryService.findByNameOrRegister(categoryName, users)).thenReturn(category);
+    when(paymentsRepository.findById(paymentId)).thenReturn(Optional.of(payment));
+    // Execução
+    Payment responde = paymentService.addCategory(accessToken, paymentId, categoryName);
+    // Veirifcação
+    assertNotNull(payment.getCategory());
+    assertEquals(categoryName, responde.getCategory().getName());
+  }
+
+  @Test
+  @DisplayName("Deve lançar uma exception se não encontrar o pagamento pelo usuáiro")
+  void mustThrowExcertionIfNorForundPaymentByIdForUser() {
+    // Ambiente
+    Long paymentId = 7L;
+    // Execução
+    MsgException message = assertThrows(MsgException.class, () -> paymentService.findByIdForUsers("", paymentId));
+    assertEquals(("Boleto não encontrado."), message.getMessage());
+  }
+
+  @Test
+  @DisplayName("Deve buscar pagamento pelo id e user sem erro")
+  void mustFindPaymentByIdAndUser() {
+    // Ambiente
+    Long paymentId = 7L;
+    String accessToken = "";
+    when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(new Payment()));
+    // Execução
+    assertDoesNotThrow(() -> paymentService.findByIdForUsers(accessToken, paymentId));
+  }
+
+  @Test
+  @DisplayName("Deve lançar uma exception se não encontrar o pagament")
+  void mustThrowExcertionIfNorForundPaymentById() {
+    // Ambiente
+    Long paymentId = 7L;
+    // Execução
+    MsgException message = assertThrows(MsgException.class, () -> paymentService.findById(paymentId));
+    assertEquals(("Boleto não encontrado."), message.getMessage());
+  }
+
+  @Test
+  @DisplayName("Deve buscar pagamento pelo id sem erro")
+  void mustFindPaymentById() {
+    // Ambiente
+    Long paymentId = 7L;
+    when(paymentsRepository.findById(paymentId)).thenReturn(Optional.of(new Payment()));
+    // Execução
+    assertDoesNotThrow(() -> paymentService.findById(paymentId));
+  }
+
+  @Test
+  @DisplayName("Deve trazer todos os pagamentos do usuário")
+  void mustFindAllPaymentByUserId() {
+    // Ambiente
+    String accessToken = "";
+    when(paymentsRepository.findByPaymentsForUserAccessToken(accessToken)).thenReturn(Collections.emptyList());
+    // Execução
+    assertDoesNotThrow(() -> paymentService.findByPayamentsForUser(accessToken));
+  }
 
   @Test
   @DisplayName("Deve trazer os pagamentos da semana de acordo com  o status")

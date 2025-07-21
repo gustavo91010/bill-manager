@@ -107,12 +107,12 @@ public class PaymentService {
 
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
     return paymentRepository.findByIdForUsers(accessToken, paymentId)
-        .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
+        .orElseThrow(() -> new MsgException("Boleto não encontrado."));
   }
 
   public Payment findById(Long paymentId) {
     return paymentRepository.findById(paymentId)
-        .orElseThrow(() -> new RuntimeException("Boleto não encontrado."));
+        .orElseThrow(() -> new MsgException("Boleto não encontrado."));
   }
 
   public List<Payment> findByPayamentsForUser(String accessToken) {
@@ -225,11 +225,10 @@ public class PaymentService {
   }
 
   public Payment addCategory(String accessToken, Long paymentId, String name) {
-
     Users users = usersService.findByAccessToken(accessToken);
+
     Category category = categoryService.findByNameOrRegister(name, users);
     Payment payment = findById(paymentId);
-
     category.getPayments().add(payment);
     payment.setCategory(category);
 
