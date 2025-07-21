@@ -109,64 +109,12 @@ public class Payment {
     this.user = user;
   }
 
-  // @Override
-  // public int hashCode() {
-  //   final int prime = 31;
-  //   int result = 1;
-  //   result = prime * result + ((user == null) ? 0 : user.hashCode());
-  //   result = prime * result + ((value == null) ? 0 : value.hashCode());
-  //   result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
-  //   return result;
-  // }
-
-  // @Override
-  // public boolean equals(Object obj) {
-  //   if (this == obj) {
-  //     return true;
-  //   }
-  //   if (obj == null) {
-  //     return false;
-  //   }
-  //   if (getClass() != obj.getClass()) {
-  //     return false;
-  //   }
-  //   Payment other = (Payment) obj;
-  //   if (user == null) {
-  //     if (other.user != null) {
-  //       return false;
-  //     }
-  //   } else if (!user.equals(other.user)) {
-  //     return false;
-  //   }
-  //   if (value == null) {
-  //     if (other.value != null) {
-  //       return false;
-  //     }
-  //   } else if (!value.equals(other.value)) {
-  //     return false;
-  //   }
-  //   if (dueDate == null) {
-  //     if (other.dueDate != null) {
-  //       return false;
-  //     }
-  //   } else if (!dueDate.equals(other.dueDate)) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
   public Category getCategory() {
     return category;
   }
 
   public void setCategory(Category category) {
     this.category = category;
-  }
-
-
-  @Override
-  public String toString() {
-    return "Payment{description=" + description + ", value=" + value + ", dueDate=" + dueDate + "}";
   }
 
   @Override
@@ -214,6 +162,4 @@ public class Payment {
     }
     return true;
   }
-
-
 }

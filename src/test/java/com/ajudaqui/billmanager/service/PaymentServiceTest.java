@@ -17,19 +17,20 @@ import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
+import com.ajudaqui.billmanager.utils.validacao.Status;
 
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.postgresql.translation.messages_bg;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 public class PaymentServiceTest {
 
   @InjectMocks
-  private PaymentService payamentService;
+  private PaymentService paymentService;
   @Mock
   private PaymentsRepository paymentsRepository;
   @Mock
@@ -37,6 +38,30 @@ public class PaymentServiceTest {
 
   @Captor
   private ArgumentCaptor<Payment> paymentCaptor;
+
+  @Test
+  @DisplayName("Deve trazer os pagamentos da semana de acordo com  o status")
+  void shouldBringTheWeeksPaymentsInLineWithTheStatus() {
+    // Execução
+    List<Payment> response = paymentService.findPaymentsWeek("", now().toString(), "EM_DIAS");
+    // Verificação
+    assertEquals(0, response.size());
+    verify(paymentsRepository, times(1))
+        .findPayaments(anyString(), any(LocalDate.class), any(LocalDate.class), any(StatusBoleto.class));
+    verify(paymentsRepository, times(0)).findPayaments(anyString(), any(LocalDate.class), any(LocalDate.class));
+  }
+
+  @Test
+  @DisplayName("Deve trazer os pagamentos da semana sem verificar o status")
+  void shouldBringUptheWeeksPaymentsWithouseCheckoingTheStatus() {
+    // Execução
+    List<Payment> response = paymentService.findPaymentsWeek("", now().toString(), "");
+    // Verificação
+    assertEquals(0, response.size());
+    verify(paymentsRepository, times(0))
+        .findPayaments(anyString(), any(LocalDate.class), any(LocalDate.class), any(StatusBoleto.class));
+    verify(paymentsRepository, times(1)).findPayaments(anyString(), any(LocalDate.class), any(LocalDate.class));
+  }
 
   @Test
   @DisplayName("Deve retornar false se  não encontra um pagamento registrado")
@@ -49,8 +74,10 @@ public class PaymentServiceTest {
     payment.setDueDate(LocalDate.now());
     payment.setDescription("");
     when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Collections.emptyList());
-    assertFalse(payamentService.isRegistery(payment));
-}@Test
+    assertFalse(paymentService.isRegistery(payment));
+  }
+
+  @Test
   @DisplayName("Deve retornar verdadeiro se encontra um pagamento já registrado")
   void shouldReturnTrueIfPaymentHasAlreadRegistered() {
     // Ambiente
@@ -61,8 +88,8 @@ public class PaymentServiceTest {
     payment.setDueDate(LocalDate.now());
     payment.setDescription("");
     when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Collections.singletonList(payment));
-    assertTrue(payamentService.isRegistery(payment));
-}
+    assertTrue(paymentService.isRegistery(payment));
+  }
 
   @Test
   @DisplayName("Deve regsitrar uma vez com o recorrente")
@@ -77,7 +104,7 @@ public class PaymentServiceTest {
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
 
     // Execução:
-    List<Payment> response = payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
+    List<Payment> response = paymentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
 
     verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
     List<Payment> capturedPayments = paymentCaptor.getAllValues();
@@ -104,7 +131,7 @@ public class PaymentServiceTest {
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
 
     // Execução:
-    List<Payment> response = payamentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
+    List<Payment> response = paymentService.boletosRecorrentes(paymentDto, repeticao, accessToken);
 
     verify(paymentsRepository, times(repeticao.intValue())).save(paymentCaptor.capture());
     List<Payment> capturedPayments = paymentCaptor.getAllValues();
@@ -135,7 +162,7 @@ public class PaymentServiceTest {
     payment.setDueDate(now());
     when(paymentsRepository.findPayaments(any(), any(), any())).thenReturn(Arrays.asList(payment));
     // Execução:
-    MsgException message = assertThrows(MsgException.class, () -> payamentService.register(paymentDto, accessToken));
+    MsgException message = assertThrows(MsgException.class, () -> paymentService.register(paymentDto, accessToken));
 
     // Verificação:
     assertEquals("pagamento já cadastrado", message.getMessage());
@@ -154,7 +181,7 @@ public class PaymentServiceTest {
 
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
     // Execução:
-    payamentService.register(paymentDto, accessToken);
+    paymentService.register(paymentDto, accessToken);
 
     // Verificação:
     verify(paymentsRepository).save(paymentCaptor.capture());
@@ -179,10 +206,10 @@ public class PaymentServiceTest {
     listPayments.get(2).setStatus(StatusBoleto.PAGO);
 
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
-    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+    when(paymentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
 
     // Execução:
-    Sumary response = payamentService.sumary(accessToken, start, finsh);
+    Sumary response = paymentService.sumary(accessToken, start, finsh);
 
     // Verificação:
     // total do periodo
@@ -202,10 +229,10 @@ public class PaymentServiceTest {
 
     String accessToken = "";
     when(usersService.findByAccessToken(accessToken)).thenReturn(new Users());
-    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments());
+    when(paymentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments());
 
     // Execução:
-    Map<String, BigDecimal> response = payamentService.sumaryCategory(accessToken, start, finsh);
+    Map<String, BigDecimal> response = paymentService.sumaryCategory(accessToken, start, finsh);
     // Verificação
     assertEquals(2, response.size());
     assertEquals("20.20", response.get("casa").toString());
@@ -227,10 +254,10 @@ public class PaymentServiceTest {
     listPayments.get(2).setStatus(StatusBoleto.EM_DIAS);
 
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
-    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+    when(paymentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
 
     // Execução:
-    Sumary response = payamentService.sumary(accessToken, start, finsh);
+    Sumary response = paymentService.sumary(accessToken, start, finsh);
 
     // Verificação:
     // total do periodo
@@ -256,10 +283,10 @@ public class PaymentServiceTest {
     listPayments.get(2).setStatus(StatusBoleto.PAGO);
 
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
-    when(payamentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
+    when(paymentService.periodTime(accessToken, "", start, finsh, "")).thenReturn(listPayments);
 
     // Execução:
-    Sumary response = payamentService.sumary(accessToken, start, finsh);
+    Sumary response = paymentService.sumary(accessToken, start, finsh);
 
     // Verificação:
     // total do periodo

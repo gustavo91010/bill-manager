@@ -96,7 +96,7 @@ public class PaymentService {
   }
 
   protected boolean isRegistery(Payment payment) {
-    
+
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
         payment.getDueDate().getMonthValue(),
         payment.getDueDate().getYear());
@@ -122,18 +122,14 @@ public class PaymentService {
   public List<Payment> findPaymentsWeek(String accessToken, String date, String status) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     LocalDate dayWeek = LocalDate.parse(date, formatter);
-    LocalDate monday = dayWeek.minusDays((long) (dayWeek.getDayOfWeek().getValue() - 1));
+    LocalDate monday = dayWeek.minusDays(dayWeek.minusDays(1).getDayOfWeek().getValue());
     LocalDate sunday = monday.plusDays(6);
 
-    List<Payment> payments = new ArrayList<Payment>();
-    if (status.isEmpty()) {
-      payments = paymentRepository.findPayaments(accessToken, monday, sunday);
+    if (status.isEmpty())
+      return paymentRepository.findPayaments(accessToken, monday, sunday);
 
-    } else {
-      payments = paymentRepository.findPayaments(accessToken, monday, sunday,
-          valueOf(status));
-    }
-    return payments;
+    return paymentRepository.findPayaments(accessToken, monday, sunday,
+        valueOf(status));
   }
 
   public List<Payment> findAllMonth(String accessToken, Integer month, Integer year) {
