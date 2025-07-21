@@ -1,16 +1,27 @@
 package com.ajudaqui.billmanager.service;
 
-import static java.time.LocalDate.from;
 import static java.time.LocalDate.now;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
@@ -22,8 +33,6 @@ import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 
-import org.apache.tomcat.jni.User;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

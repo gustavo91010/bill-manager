@@ -1,7 +1,6 @@
 package com.ajudaqui.billmanager.config;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,9 +41,6 @@ public class CustomInfoContributor implements InfoContributor {
     builder.withDetail("app", appDetails)
         .withDetail("developer", developerDetails)
         .withDetail("environment", environment)
-        .withDetail("buildTime", LocalDateTime.now().toString())
-    // .withDetail("features", Arrays.asList("create-event", "delete-event",
-    // "list-events"));
-    ;
+        .withDetail("buildTime", LocalDateTime.now().toString());
   }
 }
