@@ -58,10 +58,10 @@ public class ApiException {
     this.timestamp = timestamp;
   }
 
-  @Override
-  public String toString() {
-    return "{ \"message\":" + "\"" + getMessage() + "\"" + "," + "\"error\":" + "\"" + getError() + "\"" + ","
-        + "\"timestamp\":" + "\"" + getTimestamp() + "\"" + "," + "\"status\":" + getStatus() + "}";
+  public String toJson() {
+    return String.format(
+        "{ \"message\": \"%s\", \"error\": \"%s\", \"timestamp\": \"%s\", \"status\": %d }",
+        getMessage(), getError(), getTimestamp(), getStatus());
   }
 
 }

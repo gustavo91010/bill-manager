@@ -10,14 +10,16 @@ import com.ajudaqui.billmanager.service.vo.UserUpdateVo;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsersService {
-  @Autowired
   private UsersRepository usersRepository;
+
+  public UsersService(UsersRepository usersRepository) {
+    this.usersRepository = usersRepository;
+  }
 
   @Value("${secretKey}")
   private String secretKey;

@@ -1,7 +1,5 @@
 package com.ajudaqui.billmanager.service;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.List;
 
 import com.ajudaqui.billmanager.entity.Category;
@@ -10,7 +8,6 @@ import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.repository.CategoryRepository;
 import com.ajudaqui.billmanager.service.vo.CategoryVO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.*;
 
 @Service
@@ -84,32 +81,9 @@ public class CategoryService {
   }
 
   public Category update(String accessToken, Long id, CategoryVO categoryVO) {
-    try {
-      return checkinUpdateValues(findById(accessToken, id), categoryVO);
-    } catch (IllegalArgumentException | IllegalAccessException e) {
-      throw new MsgException("Problema na verificação dos campos no update");
-    }
-  }
-
-  private Category checkinUpdateValues(Category category, CategoryVO vo)
-      throws IllegalArgumentException, IllegalAccessException {
-    Field[] catFields = category.getClass().getDeclaredFields();
-    for (Field voField : vo.getClass().getDeclaredFields()) {
-      voField.setAccessible(true);
-      Object voValue = voField.get(vo);
-      boolean isEmpty = voValue == null ||
-          (voValue instanceof String && ((String) voValue).isEmpty()) ||
-          (voValue.getClass().isArray() && Array.getLength(voValue) == 0);
-
-      if (!isEmpty) {
-        for (Field catField : catFields) {
-          catField.setAccessible(true);
-          if (catField.getName().equals(voField.getName())) {
-            catField.set(category, voValue);
-          }
-        }
-      }
-    }
-    return category;
+    Category category = findById(accessToken, id);
+    if (categoryVO.getName().isBlank())
+      category.setName(categoryVO.getName());
+    return save(category);
   }
 }
