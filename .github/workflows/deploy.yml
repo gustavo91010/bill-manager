@@ -48,7 +48,7 @@ jobs:
           script: |
             BACKUP_DIR="/home/ubuntu/bill-manager/api/backup/$(date +'%Y%m%d_%H%M%S')"
             mkdir -p "$BACKUP_DIR"
-            mv /home/ubuntu/bill-manager/api/* "$BACKUP_DIR"
+            mv /home/ubuntu/bill-manager/api/src /home/ubuntu/bill-manager/api/pom.xml "$BACKUP_DIR"/
             mkdir -p /home/ubuntu/bill-manager/api
             cd /home/ubuntu/bill-manager
             if [ -d api/.git ]; then
