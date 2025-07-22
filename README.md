@@ -2,6 +2,7 @@ Bill Manager API
 
 API para gerenciamento de contas e despesas, desenvolvida em Java com Spring Boot.
 Permite cadastrar, listar e gerenciar despesas pessoais ou empresariais, integrando-se com serviços externos e com um frontend Next.js.
+
 ✨ Funcionalidades
 
     📦 Registro de contas via AWS SQS
