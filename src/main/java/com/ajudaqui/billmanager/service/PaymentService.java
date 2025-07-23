@@ -1,4 +1,5 @@
 package com.ajudaqui.billmanager.service;
+import com.ajudaqui.billmanager.service.filter.payments.*;
 
 import static com.ajudaqui.billmanager.utils.StatusBoleto.PAGO;
 import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
@@ -11,6 +12,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -86,8 +88,10 @@ public class PaymentService {
 
       index++;
       if (isRegistery(newPayment)) {
-        logger.warn(String.format("Boleto descição: %s, valor: %s, Vencimento: %s já registrado.",
-            newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDueDate().toString()));
+        logger.warn("Boleto descrição: {}, valor: {}, Vencimento: {} já registrado.",
+            newPayment.getDescription(),
+            newPayment.getValue(),
+            newPayment.getDueDate());
         continue;
       }
       registeredPayments.add(save(newPayment));
@@ -162,6 +166,9 @@ public class PaymentService {
   }
 
   public void deleteById(String accessToken, Long id) {
+    Payment payment = findById(id);
+    if (!accessToken.equals(payment.getUser().getAccessToken()))
+      throw new MsgException("Solicitação não autorizada");
     paymentRepository.delete(findById(id));
   }
 
@@ -174,20 +181,27 @@ public class PaymentService {
     boolean hasDescription = !description.isEmpty();
     boolean hasStatus = !status.isEmpty();
 
-    List<Payment> response = new ArrayList<>();
+    return PaymentSearcheStrategy.search(paymentRepository, user.getAccessToken(), description, start, finish,
+        status);
 
-    if (hasDescription && hasStatus) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish,
-          StatusBoleto.valueOf(status));
-    } else if (hasDescription) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish);
-    } else if (hasStatus) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish, StatusBoleto.valueOf(status));
-    } else {
-      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish);
-    }
-    response.sort(Comparator.comparing(Payment::getDueDate));
-    return response;
+    // List<Payment> response;
+
+    // if (hasDescription && hasStatus) {
+    // response = paymentRepository.findPayaments(user.getAccessToken(),
+    // description, start, finish,
+    // StatusBoleto.valueOf(status));
+    // } else if (hasDescription) {
+    // response = paymentRepository.findPayaments(user.getAccessToken(),
+    // description, start, finish);
+    // } else if (hasStatus) {
+    // response = paymentRepository.findPayaments(user.getAccessToken(), start,
+    // finish, StatusBoleto.valueOf(status));
+    // } else {
+    // response = paymentRepository.findPayaments(user.getAccessToken(), start,
+    // finish);
+    // }
+    // response.sort(Comparator.comparing(Payment::getDueDate));
+    // return response;
   }
 
   public Sumary sumary(String accessToken, LocalDate start, LocalDate finsh) {
