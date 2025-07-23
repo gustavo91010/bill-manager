@@ -58,7 +58,8 @@ jobs:
 
             if [ -d api/.git ]; then
               cd api
-              git pull
+              git fetch --all
+              git reset --hard origin/main
             else
               rm -rf api
               git clone https://github.com/gustavo91010/bill-manager.git api
