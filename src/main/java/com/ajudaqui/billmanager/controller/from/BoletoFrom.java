@@ -13,6 +13,7 @@ public class BoletoFrom {
   @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate due_date;
   private String status;
+  private String category;
 
   public Payment convert() {
     Payment payament = new Payment();
@@ -54,6 +55,27 @@ public class BoletoFrom {
 
   public String getStatus() {
     return status;
+  }
+
+  public LocalDate getDue_date() {
+    return due_date;
+  }
+
+  public void setDue_date(LocalDate due_date) {
+    this.due_date = due_date;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  @Override
+  public String toString() {
+    return "BoletoFrom{description=" + description + ", category=" + category + "}";
   }
 
 }
