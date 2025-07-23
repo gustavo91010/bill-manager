@@ -26,6 +26,7 @@ public class CustomInfoContributor implements InfoContributor {
 
   @Value("${info.app.contact}")
   private String contact;
+  private String buildTime = LocalDateTime.now().toString(); 
 
   @Override
   public void contribute(Info.Builder builder) {
@@ -41,6 +42,6 @@ public class CustomInfoContributor implements InfoContributor {
     builder.withDetail("app", appDetails)
         .withDetail("developer", developerDetails)
         .withDetail("environment", environment)
-        .withDetail("buildTime", LocalDateTime.now().toString());
+        .withDetail("buildTime", buildTime);
   }
 }
