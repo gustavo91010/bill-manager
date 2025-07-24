@@ -7,16 +7,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchFilterPayments {
+public class FilterSelection {
 
   public static List<Payment> searchFilter(PaymentsRepository repository, String accessToken, String description,
       LocalDate start,
       LocalDate finish, String status) {
 
-    PaymentSearcheStrategy selectetd = new PaymentSearchByDescriptionAndStatus(
-        new PaymentSearchByDescription(
-            new PaymentSearchByStatus(
-                new PaymentSearchByDateRange())));
+    PaymentSearcheStrategy selectetd = new DescriptionAndStatus(
+        new SearchByDescription(
+            new SearchByStatus(
+                new SearchByDateRange())));
 
     return selectetd.search(repository, accessToken, description, start, finish, status)
         .stream()

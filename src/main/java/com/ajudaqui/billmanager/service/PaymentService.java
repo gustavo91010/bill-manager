@@ -1,4 +1,5 @@
 package com.ajudaqui.billmanager.service;
+
 import com.ajudaqui.billmanager.service.filter.payments.*;
 
 import static com.ajudaqui.billmanager.utils.StatusBoleto.PAGO;
@@ -182,10 +183,8 @@ public class PaymentService {
     Users user = usersService.findByAccessToken(accessToken);
     start = (start == null) ? LocalDate.now() : start;
     finish = (finish == null) ? LocalDate.now() : finish;
-    boolean hasDescription = !description.isEmpty();
-    boolean hasStatus = !status.isEmpty();
 
-    return PaymentSearcheStrategy.search(paymentRepository, user.getAccessToken(), description, start, finish,
+    return FilterSelection.searchFilter(paymentRepository, user.getAccessToken(), description, start, finish,
         status);
 
     // List<Payment> response;

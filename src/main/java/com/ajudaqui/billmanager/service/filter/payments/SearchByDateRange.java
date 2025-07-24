@@ -6,17 +6,19 @@ import java.util.List;
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 
-public class PaymentSearchByDescription extends PaymentSearcheStrategy {
+public class SearchByDateRange extends PaymentSearcheStrategy {
 
-  public PaymentSearchByDescription(PaymentSearcheStrategy next) {
-    super(next);
+  public SearchByDateRange() {
+    super(null);
   }
-
+// paymentRepository.findPayaments(user.getAccessToken(), start,
+    // finish)
   @Override
   public List<Payment> search(PaymentsRepository repository, String accessToken, String description, LocalDate start,
       LocalDate finish, String status) {
-    if (!description.isEmpty())
-      repository.findPayaments(accessToken, description, start, finish);
-    return next.search(repository, accessToken, description, start, finish, status);
+
+    // return next.search(repository, accessToken, description, start, finish, status);
+    return repository.findPayaments(accessToken, start, finish);
   }
+
 }

@@ -7,9 +7,9 @@ import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
 import com.ajudaqui.billmanager.utils.StatusBoleto;
 
-public class PaymentSearchByStatus extends PaymentSearcheStrategy {
+public class SearchByStatus extends PaymentSearcheStrategy {
 
-  public PaymentSearchByStatus(PaymentSearcheStrategy next) {
+  public SearchByStatus(PaymentSearcheStrategy next) {
     super(next);
   }
 

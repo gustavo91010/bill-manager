@@ -5,20 +5,18 @@ import java.util.List;
 
 import com.ajudaqui.billmanager.entity.Payment;
 import com.ajudaqui.billmanager.repository.PaymentsRepository;
-import com.ajudaqui.billmanager.utils.StatusBoleto;
 
-public class PaymentSearchByDescriptionAndStatus extends PaymentSearcheStrategy {
+public class SearchByDescription extends PaymentSearcheStrategy {
 
-  public PaymentSearchByDescriptionAndStatus(PaymentSearcheStrategy next) {
+  public SearchByDescription(PaymentSearcheStrategy next) {
     super(next);
   }
 
   @Override
   public List<Payment> search(PaymentsRepository repository, String accessToken, String description, LocalDate start,
       LocalDate finish, String status) {
-    if (!description.isEmpty() && !status.isEmpty())
-      return repository.findPayaments(accessToken, description, start, finish,
-          StatusBoleto.valueOf(status));
+    if (!description.isEmpty())
+      repository.findPayaments(accessToken, description, start, finish);
     return next.search(repository, accessToken, description, start, finish, status);
   }
 }
