@@ -81,12 +81,9 @@ public class PaymentService {
 
     while (index < repeticao) {
       Payment newPayment = paymentDto.toDatabase(users);
-
       if (category != null)
         newPayment.setCategory(category);
-
       newPayment.setDueDate(newPayment.getDueDate().plusMonths(index));
-
       index++;
       if (isRegistery(newPayment)) {
         logger.warn("Boleto descrição: {}, valor: {}, Vencimento: {} já registrado.",
@@ -101,7 +98,6 @@ public class PaymentService {
   }
 
   protected boolean isRegistery(Payment payment) {
-
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
         payment.getDueDate().getMonthValue(),
         payment.getDueDate().getYear());
@@ -177,7 +173,6 @@ public class PaymentService {
     paymentRepository.delete(findById(id));
   }
 
-  // Melhorar esse um dia!
   public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
       String status) {
     Users user = usersService.findByAccessToken(accessToken);
@@ -186,25 +181,6 @@ public class PaymentService {
 
     return FilterSelection.searchFilter(paymentRepository, user.getAccessToken(), description, start, finish,
         status);
-
-    // List<Payment> response;
-
-    // if (hasDescription && hasStatus) {
-    // response = paymentRepository.findPayaments(user.getAccessToken(),
-    // description, start, finish,
-    // StatusBoleto.valueOf(status));
-    // } else if (hasDescription) {
-    // response = paymentRepository.findPayaments(user.getAccessToken(),
-    // description, start, finish);
-    // } else if (hasStatus) {
-    // response = paymentRepository.findPayaments(user.getAccessToken(), start,
-    // finish, StatusBoleto.valueOf(status));
-    // } else {
-    // response = paymentRepository.findPayaments(user.getAccessToken(), start,
-    // finish);
-    // }
-    // response.sort(Comparator.comparing(Payment::getDueDate));
-    // return response;
   }
 
   public Sumary sumary(String accessToken, LocalDate start, LocalDate finsh) {
