@@ -150,6 +150,10 @@ public class PaymentService {
       payment.setValue(from.getValue());
     if (from.getDueDate() != null)
       payment.setDueDate(from.getDueDate());
+    if (from.getCategory() != null && !from.getCategory().isEmpty()) {
+      Category category = categoryService.findByNameOrRegister(from.getCategory(), payment.getUser());
+      payment.setCategory(category);
+    }
     payment.setUpdatedAt(now());
     return paymentRepository.save(statusAtualizado(payment));
   }
