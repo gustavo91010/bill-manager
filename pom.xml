@@ -160,12 +160,13 @@
           </execution>
           <execution>
             <id>report</id>
-            <phase>test</phase>
+            <phase>verify</phase>
             <goals>
               <goal>report</goal>
             </goals>
             <configuration>
               <formats>
+                <format>HTML</format>
                 <format>XML</format>
               </formats>
             </configuration>
