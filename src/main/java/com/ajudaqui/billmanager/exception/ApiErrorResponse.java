@@ -3,14 +3,14 @@ package com.ajudaqui.billmanager.exception;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 
-public class ApiException {
+public class ApiErrorResponse {
 
   private String message;
   private String timestamp;
   private Integer status;
   private String error;
 
-  public ApiException(String message, Integer status) {
+  public ApiErrorResponse(String message, Integer status) {
     setTimestamp();
     setMessage(message);
     HttpStatus httpStatus = HttpStatus.resolve(status);
@@ -18,7 +18,7 @@ public class ApiException {
     setError(httpStatus.toString());
   }
 
-  public ApiException() {
+  public ApiErrorResponse() {
 
   }
 
@@ -58,10 +58,10 @@ public class ApiException {
     this.timestamp = timestamp;
   }
 
-  @Override
-  public String toString() {
-    return "{ \"message\":" + "\"" + getMessage() + "\"" + "," + "\"error\":" + "\"" + getError() + "\"" + ","
-        + "\"timestamp\":" + "\"" + getTimestamp() + "\"" + "," + "\"status\":" + getStatus() + "}";
+  public String toJson() {
+    return String.format(
+        "{ \"message\": \"%s\", \"error\": \"%s\", \"timestamp\": \"%s\", \"status\": %d }",
+        getMessage(), getError(), getTimestamp(), getStatus());
   }
 
 }

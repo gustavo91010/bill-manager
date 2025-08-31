@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UsersService {
-  @Autowired
   private UsersRepository usersRepository;
 
   @Autowired
@@ -46,15 +45,13 @@ public class UsersService {
 
   public Users update(Long id, UserUpdateVo userUpdateVo) {
     Users user = findById(id);
-    usersRepository.save(user);
-    return user;
+    return save(user);
   }
 
   public Users changeStats(Long id) {
     Users user = findById(id);
     user.setActive(!user.getActive());
-    usersRepository.save(user);
-    return user;
+    return save(user);
   }
 
   public void delete(Long id) {
@@ -77,8 +74,7 @@ public class UsersService {
 
     if (usersRepository.findByAccessToken(jwtUtils.getAccessTokenFromJwt(accessToken)).isPresent())
       return true;
-
-    Users user = usersRepository.save(new Users(accessToken));
+    Users user = save(new Users(accessToken));
     return user.getId() != null;
   }
 

@@ -25,7 +25,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import feign.FeignException;
 
 @RestControllerAdvice
-public class HandleException {
+public class GlobalExceptionHandler {
 
   private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
@@ -77,7 +77,7 @@ public class HandleException {
   public ResponseEntity<Object> handleException(Exception exception) {
     HttpStatus status = determineHttpStatus(exception);
     infoTrace(exception);
-    return new ResponseEntity<>(new ApiException(exception.getMessage(), status.value()), status);
+    return new ResponseEntity<>(new ApiErrorResponse(exception.getMessage(), status.value()), status);
   }
 
   // tratar a validação do localdate

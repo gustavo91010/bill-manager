@@ -3,7 +3,6 @@ package com.ajudaqui.billmanager.controller;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.service.UsersService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

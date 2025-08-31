@@ -1,5 +1,7 @@
 package com.ajudaqui.billmanager.service;
 
+import com.ajudaqui.billmanager.service.filter.payments.*;
+
 import static com.ajudaqui.billmanager.utils.StatusBoleto.PAGO;
 import static com.ajudaqui.billmanager.utils.ValidarStatus.*;
 import static java.math.BigDecimal.ZERO;
@@ -77,16 +79,15 @@ public class PaymentService {
 
     while (index < repeticao) {
       Payment newPayment = paymentDto.toDatabase(users);
-
       if (category != null)
         newPayment.setCategory(category);
-
       newPayment.setDueDate(newPayment.getDueDate().plusMonths(index));
-
       index++;
       if (isRegistery(newPayment)) {
-        logger.warn(String.format("Boleto descição: %s, valor: %s, Vencimento: %s já registrado.",
-            newPayment.getDescription(), newPayment.getValue().toString(), newPayment.getDueDate().toString()));
+        logger.warn("Boleto descrição: {}, valor: {}, Vencimento: {} já registrado.",
+            newPayment.getDescription(),
+            newPayment.getValue(),
+            newPayment.getDueDate());
         continue;
       }
       registeredPayments.add(save(newPayment));
@@ -95,7 +96,6 @@ public class PaymentService {
   }
 
   protected boolean isRegistery(Payment payment) {
-
     List<Payment> paymentForMonth = findAllMonth(payment.getUser().getAccessToken(),
         payment.getDueDate().getMonthValue(),
         payment.getDueDate().getYear());
@@ -115,7 +115,6 @@ public class PaymentService {
   }
 
   public List<Payment> findByPayamentsForUser(String accessToken) {
-
     return paymentRepository.findByPaymentsForUserAccessToken(jwtUtils.getAccessTokenFromJwt(accessToken));
   }
 
@@ -125,11 +124,9 @@ public class PaymentService {
     LocalDate monday = dayWeek.minusDays(dayWeek.minusDays(1).getDayOfWeek().getValue());
     LocalDate sunday = monday.plusDays(6);
 
-    // TODO retirar quando chegar a anova versão do front
     accessToken = jwtUtils.getAccessTokenFromJwt(accessToken);
     if (status.isEmpty())
       return paymentRepository.findPayaments(accessToken, monday, sunday);
-
     return paymentRepository.findPayaments(accessToken, monday, sunday,
         StatusBoleto.valueOf(status));
   }
@@ -148,6 +145,10 @@ public class PaymentService {
       payment.setValue(from.getValue());
     if (from.getDueDate() != null)
       payment.setDueDate(from.getDueDate());
+    if (from.getCategory() != null && !from.getCategory().isEmpty()) {
+      Category category = categoryService.findByNameOrRegister(from.getCategory(), payment.getUser());
+      payment.setCategory(category);
+    }
     payment.setUpdatedAt(now());
     return paymentRepository.save(statusAtualizado(payment));
   }
@@ -164,32 +165,20 @@ public class PaymentService {
   }
 
   public void deleteById(String accessToken, Long id) {
+    Payment payment = findById(id);
+    if (!accessToken.equals(payment.getUser().getAccessToken()))
+      throw new MsgException("Solicitação não autorizada");
     paymentRepository.delete(findById(id));
   }
 
-  // Melhorar esse um dia!
   public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
       String status) {
     Users user = usersService.findByAccessToken(accessToken);
     start = (start == null) ? LocalDate.now() : start;
     finish = (finish == null) ? LocalDate.now() : finish;
-    boolean hasDescription = !description.isEmpty();
-    boolean hasStatus = !status.isEmpty();
 
-    List<Payment> response = new ArrayList<>();
-
-    if (hasDescription && hasStatus) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish,
-          StatusBoleto.valueOf(status));
-    } else if (hasDescription) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), description, start, finish);
-    } else if (hasStatus) {
-      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish, StatusBoleto.valueOf(status));
-    } else {
-      response = paymentRepository.findPayaments(user.getAccessToken(), start, finish);
-    }
-    response.sort(Comparator.comparing(Payment::getDueDate));
-    return response;
+    return FilterSelection.searchFilter(paymentRepository, user.getAccessToken(), description, start, finish,
+        status);
   }
 
   public Sumary sumary(String accessToken, LocalDate start, LocalDate finsh) {
