@@ -1,8 +1,7 @@
 package com.ajudaqui.billmanager.service;
 
 import static com.ajudaqui.billmanager.utils.StatusBoleto.PAGO;
-import static com.ajudaqui.billmanager.utils.StatusBoleto.valueOf;
-import static com.ajudaqui.billmanager.utils.ValidarStatus.statusAtualizado;
+import static com.ajudaqui.billmanager.utils.ValidarStatus.*;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_UP;
 import static java.time.LocalDate.of;
@@ -13,12 +12,10 @@ import static java.util.stream.Collectors.mapping;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
@@ -37,15 +34,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentService {
 
+  private JwtUtils jwtUtils;
   private PaymentsRepository paymentRepository;
   private UsersService usersService;
   private CategoryService categoryService;
 
   public PaymentService(PaymentsRepository paymentRepository, UsersService usersService,
-      CategoryService categoryService) {
+      CategoryService categoryService, JwtUtils jwtUtils) {
     this.paymentRepository = paymentRepository;
     this.usersService = usersService;
     this.categoryService = categoryService;
+    this.jwtUtils = jwtUtils;
   }
 
   private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
@@ -106,7 +105,7 @@ public class PaymentService {
   }
 
   public Payment findByIdForUsers(String accessToken, Long paymentId) {
-    return paymentRepository.findByIdForUsers(accessToken, paymentId)
+    return paymentRepository.findByIdForUsers(jwtUtils.getAccessTokenFromJwt(accessToken), paymentId)
         .orElseThrow(() -> new MsgException("Boleto não encontrado."));
   }
 
@@ -116,7 +115,8 @@ public class PaymentService {
   }
 
   public List<Payment> findByPayamentsForUser(String accessToken) {
-    return paymentRepository.findByPaymentsForUserAccessToken(accessToken);
+
+    return paymentRepository.findByPaymentsForUserAccessToken(jwtUtils.getAccessTokenFromJwt(accessToken));
   }
 
   public List<Payment> findPaymentsWeek(String accessToken, String date, String status) {
@@ -125,17 +125,19 @@ public class PaymentService {
     LocalDate monday = dayWeek.minusDays(dayWeek.minusDays(1).getDayOfWeek().getValue());
     LocalDate sunday = monday.plusDays(6);
 
+    // TODO retirar quando chegar a anova versão do front
+    accessToken = jwtUtils.getAccessTokenFromJwt(accessToken);
     if (status.isEmpty())
       return paymentRepository.findPayaments(accessToken, monday, sunday);
 
     return paymentRepository.findPayaments(accessToken, monday, sunday,
-        valueOf(status));
+        StatusBoleto.valueOf(status));
   }
 
   public List<Payment> findAllMonth(String accessToken, Integer month, Integer year) {
     LocalDate startMonth = of(year, month, 1);
     LocalDate endMonth = of(year, month, startMonth.lengthOfMonth());
-    return paymentRepository.findPayaments(accessToken, startMonth, endMonth);
+    return paymentRepository.findPayaments(jwtUtils.getAccessTokenFromJwt(accessToken), startMonth, endMonth);
   }
 
   public Payment update(String accessToken, Long paymentId, BoletoFrom from) {

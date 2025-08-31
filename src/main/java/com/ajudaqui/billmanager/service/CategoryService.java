@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
@@ -19,9 +20,12 @@ public class CategoryService {
   private CategoryRepository repository;
   private UsersService usersService;
 
-  public CategoryService(CategoryRepository repository, UsersService usersService) {
+  private JwtUtils jwtUtils;
+
+  public CategoryService(CategoryRepository repository, UsersService usersService, JwtUtils jwtUtils) {
     this.repository = repository;
     this.usersService = usersService;
+    this.jwtUtils = jwtUtils;
   }
 
   public Category create(String accessToken, String name) {
@@ -34,7 +38,7 @@ public class CategoryService {
   }
 
   public List<Category> findAll(String accessToken) {
-    return repository.findAll(accessToken);
+    return repository.findAll(jwtUtils.getAccessTokenFromJwt(accessToken));
   }
 
   public Category findByNameOrRegister(String name, Users users) {
@@ -60,7 +64,7 @@ public class CategoryService {
   }
 
   private boolean checkingPermission(String accessToken, Category category) {
-    return accessToken.equals(category.getUsers().getAccessToken());
+    return jwtUtils.getAccessTokenFromJwt(accessToken).equals(category.getUsers().getAccessToken());
   }
 
   private Category save(Category category) {

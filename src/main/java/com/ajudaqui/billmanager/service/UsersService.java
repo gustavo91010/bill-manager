@@ -2,6 +2,7 @@ package com.ajudaqui.billmanager.service;
 
 import java.util.List;
 
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.MsgException;
 import com.ajudaqui.billmanager.exception.NotFoundEntityException;
@@ -19,6 +20,9 @@ public class UsersService {
   @Autowired
   private UsersRepository usersRepository;
 
+  @Autowired
+  private JwtUtils jwtUtils;
+
   @Value("${secretKey}")
   private String secretKey;
 
@@ -28,7 +32,7 @@ public class UsersService {
   }
 
   public Users findByAccessToken(String accessToken) {
-    return usersRepository.findByAccessToken(accessToken)
+    return usersRepository.findByAccessToken(jwtUtils.getAccessTokenFromJwt(accessToken))
         .orElseThrow(() -> new NotFoundEntityException("Usuario não encontrado."));
   }
 
@@ -71,7 +75,7 @@ public class UsersService {
     if (!secretKey.equals(authorization))
       throw new MsgException("Solicitação não autorizada");
 
-    if (usersRepository.findByAccessToken(accessToken).isPresent())
+    if (usersRepository.findByAccessToken(jwtUtils.getAccessTokenFromJwt(accessToken)).isPresent())
       return true;
 
     Users user = usersRepository.save(new Users(accessToken));
