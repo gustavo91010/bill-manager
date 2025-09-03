@@ -33,9 +33,9 @@ public class Payment {
   private BigDecimal value;
   @Column(name="due_date")
   private LocalDate dueDate;
-  @Column(name="create_at")
+  @Column(name="created_at")
   private LocalDateTime createdAt;
-  @Column(name="update_at")
+  @Column(name="updated_at")
   private LocalDateTime updatedAt;
 
   @Enumerated(EnumType.STRING)
@@ -44,6 +44,13 @@ public class Payment {
   @ManyToOne
   @JoinColumn(name = "category_id")
   private Category category;
+
+  @Override
+  public String toString() {
+    return "Payment{id=" + id + ", description=" + description + ", value=" + value + ", dueDate=" + dueDate
+        + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", status=" + status + ", category=" + category.getName()
+        + "}";
+  }
 
   public Long getId() {
     return id;

@@ -5,10 +5,7 @@ import java.util.List;
 
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Payment;
-import com.ajudaqui.billmanager.response.ApiPayment;
-import com.ajudaqui.billmanager.response.ApiPayments;
-import com.ajudaqui.billmanager.response.ApiResponse;
-import com.ajudaqui.billmanager.response.ApiSumaryCategory;
+import com.ajudaqui.billmanager.response.*;
 import com.ajudaqui.billmanager.service.PaymentService;
 import com.ajudaqui.billmanager.service.vo.PayamentDto;
 import com.ajudaqui.billmanager.service.vo.Sumary;

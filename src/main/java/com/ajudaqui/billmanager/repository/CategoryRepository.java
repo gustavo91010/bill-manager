@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-  Optional<Category> findByName(String name);
+  @Query(value = "SELECT * FROM category WHERE name= :name AND user_id=:userId", nativeQuery = true)
+  Optional<Category> findByName(String name, Long userId);
 
   @Query(value = "SELECT c FROM Category c WHERE c.users.accessToken= :accessToken ORDER BY name asc", nativeQuery = false)
   List<Category> findAll(String accessToken);

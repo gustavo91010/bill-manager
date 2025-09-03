@@ -29,7 +29,8 @@ public class Category {
   @JoinColumn(name = "user_id")
   private Users users;
   @JsonIgnore
-  @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+  // @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "category")
   private Set<Payment> payments = new HashSet<>();
 
   public Category(String name, Users users) {

@@ -28,7 +28,8 @@ public class CategoryService {
   public Category create(String accessToken, String name) {
     if (name == null || name.isEmpty())
       throw new MsgException("O campo nome não pode ser vazio.");
-    repository.findByName(name).ifPresent(cat -> {
+    Users user = usersService.findByAccessToken(accessToken);
+    repository.findByName(name, user.getId()).ifPresent(cat -> {
       throw new MsgException("Categoria já cadastrada");
     });
     return save(new Category(name, usersService.findByAccessToken(accessToken)));
@@ -39,22 +40,21 @@ public class CategoryService {
   }
 
   public Category findByNameOrRegister(String name, Users users) {
-    Category category = repository.findByName(name).orElseGet(() -> save(new Category(name, users)));
-    if (!checkingPermission(users.getAccessToken(), category))
-      throw new MsgException("Solicitação não autorizada");
-    return category;
+    return repository.findByName(name, users.getId())
+        .orElseGet(() -> save(new Category(name, users)));
   }
 
   private Category findById(Long id) {
     return repository.findById(id).orElseThrow(() -> new MsgException("Categoria não localizada"));
   }
 
-  private Category findByName(String name) {
-    return repository.findByName(name).orElseThrow(() -> new MsgException("Categoria não localizada"));
+  private Category findByName(String name, Long userId) {
+    return repository.findByName(name, userId).orElseThrow(() -> new MsgException("Categoria não localizada"));
   }
 
   public Category findByName(String accessToken, String name) {
-    Category category = findByName(name);
+    Users user = usersService.findByAccessToken(accessToken);
+    Category category = findByName(name, user.getId());
     if (!checkingPermission(accessToken, category))
       throw new MsgException("Solicitação não autorizada");
     return category;

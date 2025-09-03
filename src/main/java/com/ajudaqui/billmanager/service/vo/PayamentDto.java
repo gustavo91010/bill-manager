@@ -32,6 +32,8 @@ public class PayamentDto {
     this.value = payaments.getValue();
     this.due_date = payaments.getDueDate();
     this.status = payaments.getStatus();
+    if (payaments.getCategory() != null)
+      this.category = payaments.getCategory().getName();
   }
 
   public Payment toDatabase(Users users) {

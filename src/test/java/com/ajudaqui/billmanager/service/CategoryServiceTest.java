@@ -39,12 +39,12 @@ public class CategoryServiceTest {
     Users user = new Users();
     user.setAccessToken("accessToken");
     Category novaCategoria = new Category(name, user);
-    when(categoryRepository.findByName(name)).thenReturn(Optional.of(novaCategoria));
+    when(categoryRepository.findByName(name,1l)).thenReturn(Optional.of(novaCategoria));
     when(categoryRepository.save(any(Category.class))).thenReturn(novaCategoria);
     // Ececucao
     categoryService.findByNameOrRegister(name, user);
     //Verificação
-    verify(categoryRepository, times(1)).findByName(name);
+    verify(categoryRepository, times(1)).findByName(name, 1l);
     verify(categoryRepository, times(0)).save(any(Category.class));
   }
 
@@ -56,12 +56,12 @@ public class CategoryServiceTest {
     Users user = new Users();
     user.setAccessToken("accessToken");
     Category novaCategoria = new Category(name, user);
-    when(categoryRepository.findByName(name)).thenReturn(Optional.empty());
+    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.empty());
     when(categoryRepository.save(any(Category.class))).thenReturn(novaCategoria);
     // Ececucao
     categoryService.findByNameOrRegister(name, user);
     //Verificação
-    verify(categoryRepository, times(1)).findByName(name);
+    verify(categoryRepository, times(1)).findByName(name,1l);
     verify(categoryRepository, times(1)).save(any(Category.class));
   }
 
@@ -69,7 +69,7 @@ public class CategoryServiceTest {
   @DisplayName("Deve chamar o save category ao registrar")
   void mustCallSaveCaterory() {
     String name = "name";
-    when(categoryRepository.findByName(name)).thenReturn(Optional.empty());
+    when(categoryRepository.findByName(name,1l)).thenReturn(Optional.empty());
     when(usersService.findByAccessToken(anyString())).thenReturn(new Users());
     categoryService.create("accessToken", name);
     verify(categoryRepository, times(1)).save(any(Category.class));
@@ -79,7 +79,7 @@ public class CategoryServiceTest {
   @DisplayName("Deve lancar uma exception se nome já tver regsitrada")
   void msustThrowExceptinIsNameRegsitered() {
     String name = "name";
-    when(categoryRepository.findByName(name)).thenReturn(Optional.of(new Category()));
+    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.of(new Category()));
     MsgException response = assertThrows(MsgException.class, () -> categoryService.create("accessToken", name));
     assertEquals("Categoria já cadastrada", response.getMessage());
   }
