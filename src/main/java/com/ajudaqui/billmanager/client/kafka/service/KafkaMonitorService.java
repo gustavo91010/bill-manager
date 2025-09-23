@@ -2,24 +2,17 @@ package com.ajudaqui.billmanager.client.kafka.service;
 
 import static java.util.Collections.singletonList;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import com.ajudaqui.billmanager.exception.MsgException;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.ConsumerGroupDescription;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
-import org.apache.kafka.clients.admin.DescribeClusterResult;
-import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
-import org.apache.kafka.clients.admin.DescribeTopicsResult;
-import org.apache.kafka.clients.admin.NewTopic;
+
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +20,10 @@ import org.springframework.stereotype.Service;
 public class KafkaMonitorService {
 
   private final AdminClient admin;
+  private final String kafkaServer;
 
   public KafkaMonitorService(@Value("${spring.kafka.bootstrap-servers}") String kafkaServer) {
+    this.kafkaServer = kafkaServer;
     Properties props = new Properties();
     props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
     this.admin = AdminClient.create(props);
@@ -85,32 +80,42 @@ public class KafkaMonitorService {
     return response;
   }
 
-  public Map<String, Object> prooffset() throws InterruptedException, ExecutionException {
+  public Map<String, Object> prooffset(String topicName) {
     Map<String, Object> response = new HashMap<>();
-    DescribeTopicsResult topicos = activesTopics();
 
-    topicos.all().get().forEach((name, t) -> {
-      response.put("Nome: ", name);
-      response.put("total de mensagegs ", t.partitions().size());
-    });
+    try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps())) {
+      List<TopicPartition> partitions = new ArrayList<>();
+      consumer.partitionsFor(topicName)
+          .forEach(info -> partitions.add(new TopicPartition(info.topic(), info.partition())));
+
+      Map<TopicPartition, Long> endOffsets = consumer.endOffsets(partitions);
+      //Pega a a lista dos ofsets com o numero tal de mensagens e soma
+      long totalMensagens = endOffsets.values().stream().mapToLong(Long::longValue).sum();
+
+      response.put("Nome", topicName);
+      response.put("totalMensagens", totalMensagens);
+    }
+
     return response;
   }
 
-  public void criarTopico(String name, int numPartitions, short replicationFactor) {
+  public Map<String, String> criarTopico(String name, int numPartitions, short replicationFactor) {
     try {
       NewTopic newTopic = new NewTopic(name, numPartitions, replicationFactor);
       admin.createTopics(singletonList(newTopic)).all().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new MsgException("Erro na criação do topico: " + name + " Motivo: " + e.getMessage());
     }
+    return Map.of("message", "Topico name: " + name + " criado com sucesso.");
   }
 
-  public void deleteTopico(String name) {
+  public Map<String, String> deleteTopico(String name) {
     try {
       admin.deleteTopics(singletonList(name)).all().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new MsgException("Erro na exclusão  do topico: " + name + " Motivo: " + e.getMessage());
     }
+    return Map.of("message", "Topico name: " + name + " excluido com sucesso.");
   }
 
   public Map<String, Object> allConsumers() {
@@ -139,5 +144,18 @@ public class KafkaMonitorService {
       throw new MsgException("Erro na exclusão  do topico sono! Motivo: " + e.getMessage());
     }
     return response;
+  }
+
+  private Properties consumerProps() {
+    Properties consumerProps = new Properties();
+    // consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+    // "44.219.162.47:9092"); // ou use @Value
+    consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer); // ou use @Value
+    consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "offset-monitor");
+    consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); // garante pegar offset inicial se nunca
+                                                                            // consumiu
+    return consumerProps;
   }
 }

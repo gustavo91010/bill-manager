@@ -1,6 +1,6 @@
 #!/bim/bash
 
-TOPIC="test"
+TOPIC="novo-topico"
 URL="http://localhost:8183/kafka/send"
 MESSAGE="HelloKafka"
 
