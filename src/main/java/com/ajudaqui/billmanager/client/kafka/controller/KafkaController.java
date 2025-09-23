@@ -1,7 +1,8 @@
-package com.ajudaqui.billmanager.client.kafka;
+package com.ajudaqui.billmanager.client.kafka.controller;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import com.ajudaqui.billmanager.client.kafka.service.KafkaProducer;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

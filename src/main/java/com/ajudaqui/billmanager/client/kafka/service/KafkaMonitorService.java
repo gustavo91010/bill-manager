@@ -1,8 +1,7 @@
-package com.ajudaqui.billmanager.service;
+package com.ajudaqui.billmanager.client.kafka.service;
 
 import static java.util.Collections.singletonList;
 
-import java.util.Collection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,17 +15,11 @@ import com.ajudaqui.billmanager.exception.MsgException;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ConsumerGroupDescription;
-import org.apache.kafka.clients.admin.ConsumerGroupDescription;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.clients.admin.DescribeConsumerGroupsResult;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
-import org.apache.kafka.clients.admin.ListConsumerGroupsResult;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.admin.TopicDescription;
-import org.apache.kafka.clients.admin.TopicDescription;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

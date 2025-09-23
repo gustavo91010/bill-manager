@@ -143,6 +143,11 @@
       <artifactId>kafka-avro-serializer</artifactId>
       <version>5.1.2</version>
     </dependency>
+    <!-- Circuit Breaker -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+    </dependency>
   </dependencies>
 
   <repositories>
