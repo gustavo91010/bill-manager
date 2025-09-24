@@ -148,6 +148,13 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
     </dependency>
+    <!-- para poder salvar json no banco -->
+    <dependency>
+      <groupId>com.vladmihalcea</groupId>
+      <artifactId>hibernate-types-52</artifactId>
+      <version>2.20.0</version>
+    </dependency>
+
   </dependencies>
 
   <repositories>

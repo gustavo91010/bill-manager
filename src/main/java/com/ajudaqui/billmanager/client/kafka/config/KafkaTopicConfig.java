@@ -1,4 +1,4 @@
-package com.ajudaqui.billmanager.config;
+package com.ajudaqui.billmanager.client.kafka.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Configuration;
