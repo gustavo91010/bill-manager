@@ -12,6 +12,8 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+
 @Service
 public class KafkaProducer {
   private final KafkaTemplate<String, String> kafkaTemplate;
@@ -35,7 +37,6 @@ public class KafkaProducer {
       return handleKafkaFallback(topic, message, throwable.getMessage());
     });
 
-    // this.kafkaTemplate.send(topic, message);
   }
 
   private ListenableFuture<SendResult<String, String>> handleKafkaFallback(String topic, String message,

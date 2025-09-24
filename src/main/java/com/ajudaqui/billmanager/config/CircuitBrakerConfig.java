@@ -39,9 +39,8 @@ public class CircuitBrakerConfig {
               .build())
           .timeLimiterConfig(TimeLimiterConfig.custom()
               .timeoutDuration(Duration.ofSeconds(5))
-              .build())
-
-          , "kafka-producer");
+              .build()),
+          "kafka-producer");
     };
   }
 
