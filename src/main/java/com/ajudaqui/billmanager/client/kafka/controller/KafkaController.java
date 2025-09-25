@@ -1,5 +1,6 @@
 package com.ajudaqui.billmanager.client.kafka.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ajudaqui.billmanager.client.kafka.service.KafkaProducer;
@@ -22,8 +23,9 @@ public class KafkaController {
 
   @PostMapping("/send")
   public ResponseEntity<Map<String, String>> sendMessage(@RequestParam String topic, @RequestParam String message) {
-
-    kafkaProducer.sendMessage(topic, message);
+    Map<String, Object> lalala = new HashMap<>();
+    lalala.put("message", message);
+    kafkaProducer.sendMessage(topic, lalala);
     return ResponseEntity.ok(Map.of("message", "Enviada com sucesso!"));
   }
 

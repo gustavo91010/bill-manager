@@ -36,6 +36,7 @@ public class CircuitBrakerConfig {
               .failureRateThreshold(60)
               .waitDurationInOpenState(Duration.ofSeconds(60))
               .slidingWindowSize(5)
+              .enableAutomaticTransitionFromOpenToHalfOpen() // habilita o evento de tarnsição de estado
               .build())
           .timeLimiterConfig(TimeLimiterConfig.custom()
               .timeoutDuration(Duration.ofSeconds(5))
