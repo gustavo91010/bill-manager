@@ -2,6 +2,8 @@ package com.ajudaqui.billmanager.client.kafka.service;
 
 import java.util.Map;
 
+import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker;
@@ -25,29 +27,26 @@ public class KafkaProducer {
   }
 
   public void sendMessage(String topic, Map<String, Object> message) {
+    ErrorMessage messageSaved = errorService.create(topic, message);
+    messageSaved.getMessage().put("message_id", messageSaved.getId());
+    System.out.println("salvando a mensagem de id " + messageSaved.getId());
     Resilience4JCircuitBreaker circuitBreaker = circuitBreakerFactory.create("kafka-producer");
 
-    circuitBreaker.run(() -> {
+    Boolean sent = circuitBreaker.run(() -> {
       kafkaTemplate.send(topic, message);
       return true;
     }, throwable -> {
-      handleKafkaFallback(topic, message, throwable.getMessage());
+      handleKafkaFallback(topic, throwable.getMessage());
       return false;
     });
+    System.out.println("sent " + sent);
+    if (sent) {
+      errorService.delete(messageSaved.getId());
+    }
   }
 
-  private void handleKafkaFallback(String topic, Map<String, Object> message,
-      String error) {
-    sendErrorMessage();
+  private void handleKafkaFallback(String topic, String error) {
     log.error("Erro ao enviar mensagem para Kafka [topic={}]: {}", topic, error);
-    errorService.create(topic, message);
   }
 
-  private void sendErrorMessage() {
-    // Resilience4JCircuitBreaker circuitBreaker =
-    // circuitBreakerFactory.create("kafka-producer");
-    // System.out.println("status " + this.kafkaCircuitBreaker.getState());
-    // System.out.println("name " + this.kafkaCircuitBreaker.getName());
-    // System.out.println("tags " + this.kafkaCircuitBreaker.getTags());
-  }
 }

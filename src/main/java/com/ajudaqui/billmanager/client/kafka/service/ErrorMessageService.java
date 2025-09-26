@@ -20,6 +20,7 @@ public class ErrorMessageService {
 
   @Transactional
   public ErrorMessage create(String topic, Map<String, Object> message) {
+
     if (message.get("accessToken") == null)
       message.put("accessToken", UUID.randomUUID().toString());
     return repository.save(new ErrorMessage(topic, message.get("accessToken").toString(), message));
@@ -30,7 +31,12 @@ public class ErrorMessageService {
   }
 
   public void delete(Long id) {
+    System.out.println("deletado o id: " + id);
     repository.deleteById(id);
+  }
+
+  public void sendPendentMessages() {
+    System.out.println("OPa, tamo aqui em!!! ");
   }
 
 }
