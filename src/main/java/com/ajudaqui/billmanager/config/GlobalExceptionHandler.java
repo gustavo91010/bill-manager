@@ -1,12 +1,19 @@
-package com.ajudaqui.billmanager.exception;
+package com.ajudaqui.billmanager.config;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_GATEWAY;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ajudaqui.billmanager.exception.ApiErrorResponse;
+import com.ajudaqui.billmanager.exception.MsgException;
+import com.ajudaqui.billmanager.exception.NotFoundEntityException;
+import com.ajudaqui.billmanager.exception.ResponseError;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import org.slf4j.Logger;

@@ -3,21 +3,16 @@ package com.ajudaqui.billmanager.client.kafka.entity;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 @Table
 @Entity(name = "error_message")
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class) // @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ErrorMessage {
 
   @Id
@@ -28,6 +23,7 @@ public class ErrorMessage {
   @Column(name = "access_token", nullable = false)
   private String accessToken;
 
+  // @Type(type = "json")
   @Type(type = "jsonb")
   @Column(name = "metadata", columnDefinition = "jsonb")
   private Map<String, Object> message;

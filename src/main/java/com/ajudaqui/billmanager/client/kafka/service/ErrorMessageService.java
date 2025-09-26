@@ -31,12 +31,6 @@ public class ErrorMessageService {
   }
 
   public void delete(Long id) {
-    System.out.println("deletado o id: " + id);
     repository.deleteById(id);
   }
-
-  public void sendPendentMessages() {
-    System.out.println("OPa, tamo aqui em!!! ");
-  }
-
 }

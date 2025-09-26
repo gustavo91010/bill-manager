@@ -2,11 +2,9 @@ package com.ajudaqui.billmanager.service;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 
 import com.ajudaqui.billmanager.entity.Users;
