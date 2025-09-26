@@ -22,9 +22,7 @@ public class ErrorMessageService {
   public ErrorMessage create(String topic, Map<String, Object> message) {
     if (message.get("accessToken") == null)
       message.put("accessToken", UUID.randomUUID().toString());
-    ErrorMessage lalala = repository.save(new ErrorMessage(topic, message.get("accessToken").toString(), message));
-    System.out.println(lalala.toString());
-    return lalala;
+    return repository.save(new ErrorMessage(topic, message.get("accessToken").toString(), message));
   }
 
   public List<ErrorMessage> findAll() {
@@ -33,11 +31,6 @@ public class ErrorMessageService {
 
   public void delete(Long id) {
     repository.deleteById(id);
-  }
-
-  public long count() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'count'");
   }
 
 }
