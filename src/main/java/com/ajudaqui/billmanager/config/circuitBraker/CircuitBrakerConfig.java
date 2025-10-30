@@ -1,4 +1,4 @@
-package com.ajudaqui.billmanager.config;
+package com.ajudaqui.billmanager.config.circuitBraker;
 
 import java.time.Duration;
 

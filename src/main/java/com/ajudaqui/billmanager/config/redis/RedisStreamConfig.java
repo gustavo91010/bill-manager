@@ -6,9 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.*;
 
 import org.springframework.data.redis.stream.StreamListener;
+
 @Configuration
 public class RedisStreamConfig {
 
@@ -40,6 +42,16 @@ public class RedisStreamConfig {
         // Define de onde começar a ler (última mensagem consumida)
         StreamOffset.create("retry-stream", ReadOffset.lastConsumed()),
         // Listener responsável por processar as mensagens recebidas
-        new StreamListener());
+        (message) -> {
+          System.out.println("Mensagem recebida: " + message.getValue());
+        });
   }
+
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
+    return template;
+  }
+
 }

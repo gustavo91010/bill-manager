@@ -15,6 +15,7 @@ public class RetryService {
 
   @Autowired
   private RedisTemplate<String, Object> redisTemplate;
+  @Autowired
   private ObjectMapper objectMapper;
 
   public void salvarParaRetry(String topic, Object payload, String error) {
