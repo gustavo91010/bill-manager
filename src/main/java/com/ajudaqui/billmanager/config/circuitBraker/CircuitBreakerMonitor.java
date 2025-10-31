@@ -8,7 +8,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransitionEvent;
 
 @Component
-public class KafkaCircuitBreakerListener {
+public class CircuitBreakerMonitor {
 
   @Autowired
   private Resilience4JCircuitBreakerFactory factory;
