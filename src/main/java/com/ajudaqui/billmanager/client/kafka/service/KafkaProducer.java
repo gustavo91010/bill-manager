@@ -1,5 +1,8 @@
 package com.ajudaqui.billmanager.client.kafka.service;
 
+import static java.util.stream.Collectors.summingInt;
+
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +12,7 @@ import java.util.concurrent.LinkedTransferQueue;
 import javax.annotation.PostConstruct;
 
 import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
+import com.ajudaqui.billmanager.client.redis.RetryService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,8 @@ public class KafkaProducer {
   private Resilience4JCircuitBreakerFactory circuitBreakerFactory;
   @Autowired
   private ErrorMessageService errorService;
+  @Autowired
+  private RetryService retryService;
 
   private BlockingQueue<ErrorMessage> fila;
   private ExecutorService executor;
@@ -46,19 +52,20 @@ public class KafkaProducer {
   }
 
   public void sendMessage(String topic, Map<String, Object> message) {
-    ErrorMessage messageSaved = errorService.create(topic, message);
+    ErrorMessage messageSaved = errorService.factor(topic, message);
     messageSaved.getMessage().put("message_id", messageSaved.getId());
     fila.offer(messageSaved);
-    System.out.println("Mensagem adicionada na fila: " + messageSaved.getId());
+    System.out.println("Mensagem adicionada na fila: " + messageSaved.getAccessToken());
   }
 
   private void processarFila() {
+
     Resilience4JCircuitBreaker circuitBreaker = circuitBreakerFactory.create("kafka-producer");
 
     while (true) {
       try {
         ErrorMessage message = fila.take(); // ele espera ate ter um elemento na fila
-        Boolean sent = circuitBreaker.run(() -> {
+        circuitBreaker.run(() -> {
           try {
             kafkaTemplate.send(message.getTopic(), message.getMessage()).get();
           } catch (InterruptedException | ExecutionException e) {
@@ -70,14 +77,6 @@ public class KafkaProducer {
           return false;
         });
 
-        if (sent) {
-          try {
-            errorService.delete(message.getId());
-            System.out.println("Mensagem deletada: " + message.getId());
-          } catch (Exception e) {
-            fila.offer(message);
-          }
-        }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         break;
@@ -87,6 +86,11 @@ public class KafkaProducer {
 
   private void handleKafkaFallback(String topic, String error, ErrorMessage message) {
     log.error("Erro ao enviar mensagem para Kafka [topic={}]: {}", topic, error);
-    fila.offer(message);
+    retryService.salvarMessage(message);
+  }
+
+  public void reenviarMensagens() {
+    fila.addAll(retryService.getFailedMessagens());
+
   }
 }

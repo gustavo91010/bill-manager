@@ -1,12 +1,13 @@
 package com.ajudaqui.billmanager.client.redis;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,33 +15,38 @@ import org.springframework.stereotype.Service;
 public class RetryService {
 
   @Autowired
-  private RedisTemplate<String, Object> redisTemplate;
+  private RedisTemplate<String, String> redisTemplate;
   @Autowired
   private ObjectMapper objectMapper;
 
-  public void salvarParaRetry(String topic, Object payload, String error) {
-    FailedMessage failedMessage = new FailedMessage(
-        UUID.randomUUID().toString(),
-        topic,
-        payload,
-        System.currentTimeMillis() + 5000, // Primeiro retry em 5s
-        5000, // Delay inicial
-        1,
-        error);
-
+  public void salvarMessage(ErrorMessage message) {
     try {
-      salvarNoRedisStream(failedMessage);
+      String value = objectMapper.writeValueAsString(message);
+      redisTemplate.opsForList().rightPush("failed-messages", value);
     } catch (JsonProcessingException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  public void salvarNoRedisStream(FailedMessage message) throws JsonProcessingException {
-    ObjectRecord<String, String> record = ObjectRecord.create(
-        "retry-stream",
-        objectMapper.writeValueAsString(message));
+  public List<ErrorMessage> getFailedMessagens() {
+    List<String> values = redisTemplate.opsForList().range("failed-messages", 0, -1);
+    List<ErrorMessage> messages = new ArrayList<>();
+    if (values != null) {
+      for (String message : values) {
+        try {
+          messages.add(objectMapper.readValue(message, ErrorMessage.class));
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
+        }
 
-    redisTemplate.opsForStream().add(record);
+      }
+    }
+    return messages;
+
   }
+
+  public void limparFailedMessages() {
+    redisTemplate.delete("failed-messages");
+  }
+
 }

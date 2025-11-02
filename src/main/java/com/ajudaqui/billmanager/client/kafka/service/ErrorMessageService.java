@@ -19,6 +19,13 @@ public class ErrorMessageService {
   private ErrorMessageRepository repository;
 
   @Transactional
+  public ErrorMessage factor(String topic, Map<String, Object> message) {
+
+    if (message.get("accessToken") == null)
+      message.put("accessToken", UUID.randomUUID().toString());
+    return new ErrorMessage(topic, message.get("accessToken").toString(), message);
+  }
+
   public ErrorMessage create(String topic, Map<String, Object> message) {
 
     if (message.get("accessToken") == null)
