@@ -42,7 +42,6 @@ public class KafkaProducer {
     if (fila == null) {
       fila = new LinkedTransferQueue<>();
     }
-    errorService.findAll().forEach(fila::offer);
 
     // 3 threads para processar a fila
     executor = Executors.newFixedThreadPool(3);
@@ -53,7 +52,6 @@ public class KafkaProducer {
 
   public void sendMessage(String topic, Map<String, Object> message) {
     ErrorMessage messageSaved = errorService.factor(topic, message);
-    messageSaved.getMessage().put("message_id", messageSaved.getId());
     fila.offer(messageSaved);
     System.out.println("Mensagem adicionada na fila: " + messageSaved.getAccessToken());
   }

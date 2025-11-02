@@ -5,27 +5,11 @@ import java.util.Map;
 
 import javax.persistence.*;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-
-@Table
-@Entity(name = "error_message")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class) // @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ErrorMessage {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  @Column(name = "topic", nullable = false)
   private String topic;
-  @Column(name = "access_token", nullable = false)
   private String accessToken;
 
-  // @Type(type = "json")
-  @Type(type = "jsonb")
-  @Column(name = "metadata", columnDefinition = "jsonb")
   private Map<String, Object> message;
 
   @Column(name = "created_at")
@@ -36,22 +20,6 @@ public class ErrorMessage {
     this.accessToken = accessToken;
     this.message = metadata;
     this.createdAt = LocalDateTime.now();
-  }
-
-  @Override
-  public String toString() {
-    return "ErrorMessage{id=" + id + ", topic=" + topic + ", accessToken=" + accessToken + "}";
-  }
-
-  public ErrorMessage() {
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public String getTopic() {
