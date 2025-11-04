@@ -226,4 +226,19 @@ public class PaymentService {
     categoryService.update(category);
     return payment;
   }
+
+  public Map<String, Object> payloadPayments(String accessToken, LocalDate start, LocalDate finish) {
+    List<Payment> payments = periodTime(accessToken, "", start, finish, "");
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("accessToken", accessToken);
+    payload.put("day", start);
+    BigDecimal total = payments.stream()
+        .map(Payment::getValue)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    payload.put("total", total);
+    payload.put("payments", payments);
+
+    return payload;
+
+  }
 }

@@ -36,6 +36,8 @@ public class Users {
   @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
   private Set<Category> categories = new HashSet<>();
+  @Column(name = "is_cal_control")
+  public boolean isCalControl;
 
   public Users(String accessToken) {
     this.accessToken = accessToken;
@@ -83,6 +85,14 @@ public class Users {
 
   public void setCategories(Set<Category> categories) {
     this.categories = categories;
+  }
+
+  public boolean isCalControl() {
+    return isCalControl;
+  }
+
+  public void setCalControl(boolean isCalControl) {
+    this.isCalControl = isCalControl;
   }
 
 }

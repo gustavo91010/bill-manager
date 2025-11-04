@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN is_cal_control BOOLEAN DEFAULT FALSE;
+
