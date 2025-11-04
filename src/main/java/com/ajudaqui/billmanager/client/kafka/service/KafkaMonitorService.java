@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import com.ajudaqui.billmanager.exception.MsgException;
-
+import com.ajudaqui.billmanager.service.UsersService;
 
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -21,15 +21,26 @@ public class KafkaMonitorService {
 
   private final AdminClient admin;
   private final String kafkaServer;
+  private final UsersService usersService;
 
-  public KafkaMonitorService(@Value("${spring.kafka.bootstrap-servers}") String kafkaServer) {
+
+  /*Pra nao esquecer:
+   * O cluster gerencia as partições, ele recebe as mensagens e destina para as partições
+   *  As partições são onde chegam as mesganes e ficam a espera dos ouvintes daquele topico
+   *
+   */
+
+  public KafkaMonitorService(@Value("${spring.kafka.bootstrap-servers}") String kafkaServer,
+      UsersService usersService) {
     this.kafkaServer = kafkaServer;
     Properties props = new Properties();
     props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
     this.admin = AdminClient.create(props);
+    this.usersService = usersService;
   }
 
-  public Map<String, Object> getClusterInfo() {
+  public Map<String, Object> getClusterInfo(String accessToken) {
+    usersService.findByAccessToken(accessToken);
     DescribeClusterResult result = admin.describeCluster();
     Map<String, Object> data = new HashMap<>();
     try {
@@ -57,7 +68,8 @@ public class KafkaMonitorService {
     return admin.describeTopics(topics);
   }
 
-  public Map<String, Object> getTopicsInfo() {
+  public Map<String, Object> getTopicsInfo(String accessToken, String accessToken2) {
+    usersService.findByAccessToken(accessToken);
     Map<String, Object> response = new HashMap<>();
 
     try {
@@ -80,7 +92,8 @@ public class KafkaMonitorService {
     return response;
   }
 
-  public Map<String, Object> prooffset(String topicName) {
+  public Map<String, Object> prooffset(String accessToken, String topicName) {
+    usersService.findByAccessToken(accessToken);
     Map<String, Object> response = new HashMap<>();
 
     try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps())) {
@@ -89,7 +102,7 @@ public class KafkaMonitorService {
           .forEach(info -> partitions.add(new TopicPartition(info.topic(), info.partition())));
 
       Map<TopicPartition, Long> endOffsets = consumer.endOffsets(partitions);
-      //Pega a a lista dos ofsets com o numero tal de mensagens e soma
+      // Pega a a lista dos ofsets com o numero tal de mensagens e soma
       long totalMensagens = endOffsets.values().stream().mapToLong(Long::longValue).sum();
 
       response.put("Nome", topicName);
@@ -99,7 +112,9 @@ public class KafkaMonitorService {
     return response;
   }
 
-  public Map<String, String> criarTopico(String name, int numPartitions, short replicationFactor) {
+  public Map<String, String> criarTopico(String accessToken, String name, int numPartitions, short replicationFactor) {
+    usersService.findByAccessToken(accessToken);
+
     try {
       NewTopic newTopic = new NewTopic(name, numPartitions, replicationFactor);
       admin.createTopics(singletonList(newTopic)).all().get();
@@ -109,7 +124,8 @@ public class KafkaMonitorService {
     return Map.of("message", "Topico name: " + name + " criado com sucesso.");
   }
 
-  public Map<String, String> deleteTopico(String name) {
+  public Map<String, String> deleteTopico(String name, String accessToken) {
+    usersService.findByAccessToken(accessToken);
     try {
       admin.deleteTopics(singletonList(name)).all().get();
     } catch (InterruptedException | ExecutionException e) {
@@ -118,7 +134,8 @@ public class KafkaMonitorService {
     return Map.of("message", "Topico name: " + name + " excluido com sucesso.");
   }
 
-  public Map<String, Object> allConsumers() {
+  public Map<String, Object> allConsumers(String accessToken) {
+    usersService.findByAccessToken(accessToken);
     Map<String, Object> response = new HashMap<>();
     try {
       Collection<ConsumerGroupListing> collection = admin.listConsumerGroups().all().get();

@@ -3,16 +3,9 @@ package com.ajudaqui.billmanager.client.kafka.controller;
 
 import com.ajudaqui.billmanager.client.kafka.service.KafkaMonitorService;
 
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/kafka")
@@ -22,37 +15,39 @@ public class KafkaMonitorController {
   private KafkaMonitorService kafkaServer;
 
   @GetMapping("/cluster")
-  public ResponseEntity<?> getClusterInfo() {
-    return ResponseEntity.ok(kafkaServer.getClusterInfo());
+  public ResponseEntity<?> getClusterInfo(@RequestHeader("Authorization") String accessToken) {
+    return ResponseEntity.ok(kafkaServer.getClusterInfo(accessToken));
   }
 
-  @GetMapping("/topics")
-  public ResponseEntity<?> getTopicsInfo() {
-    return ResponseEntity.ok(kafkaServer.getTopicsInfo());
+  @GetMapping("/all-topics")
+  public ResponseEntity<?> getTopicsInfo(@RequestHeader("Authorization") String accessToken) {
+    return ResponseEntity.ok(kafkaServer.getTopicsInfo(accessToken, accessToken));
   }
 
-  @GetMapping("/prooffset/{name}")
-  public ResponseEntity<?> prooffset(@PathVariable String name) {
-    return ResponseEntity.ok(kafkaServer.prooffset(name));
+  @GetMapping("/info-topics/{name}")
+  public ResponseEntity<?> prooffset(@RequestHeader("Authorization") String accessToken, @PathVariable String name) {
+    return ResponseEntity.ok(kafkaServer.prooffset(accessToken, name));
   }
 
   @GetMapping("/allConsumers")
-  public ResponseEntity<?> allConsumers() {
-    return ResponseEntity.ok(kafkaServer.allConsumers());
+  public ResponseEntity<?> allConsumers(@RequestHeader("Authorization") String accessToken) {
+    return ResponseEntity.ok(kafkaServer.allConsumers(accessToken));
   }
 
   @PostMapping("/topics/create")
   public ResponseEntity<?> create(
+      @RequestHeader("Authorization") String accessToken,
       @RequestParam(required = true) String name,
       @RequestParam(required = false, defaultValue = "1") int numPartitions,
       @RequestParam(required = false, defaultValue = "1") short replicationFactor) {
-    return ResponseEntity.ok(kafkaServer.criarTopico(name, numPartitions, replicationFactor));
+    return ResponseEntity.ok(kafkaServer.criarTopico(accessToken, name, numPartitions, replicationFactor));
   }
 
   @DeleteMapping("/topics/delete/{name}")
   public ResponseEntity<?> delete(
+      @RequestHeader("Authorization") String accessToken,
       @PathVariable String name) {
-    return ResponseEntity.ok(kafkaServer.deleteTopico(name));
+    return ResponseEntity.ok(kafkaServer.deleteTopico(name, accessToken));
   }
 
 }

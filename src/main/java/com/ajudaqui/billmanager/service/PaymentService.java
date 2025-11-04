@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ajudaqui.billmanager.client.kafka.service.KafkaProducer;
 import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
@@ -36,17 +37,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentService {
 
+  private static final String ATT_PAYMENT = "att-payment";
   private JwtUtils jwtUtils;
   private PaymentsRepository paymentRepository;
   private UsersService usersService;
   private CategoryService categoryService;
+  private KafkaProducer kafkaProducer;
 
   public PaymentService(PaymentsRepository paymentRepository, UsersService usersService,
-      CategoryService categoryService, JwtUtils jwtUtils) {
+      CategoryService categoryService, JwtUtils jwtUtils, KafkaProducer kafkaProducer) {
     this.paymentRepository = paymentRepository;
     this.usersService = usersService;
     this.categoryService = categoryService;
     this.jwtUtils = jwtUtils;
+    this.kafkaProducer = kafkaProducer;
   }
 
   private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
@@ -61,6 +65,10 @@ public class PaymentService {
   }
 
   private Payment save(Payment payment) {
+    System.out.println("tem? " + payment.getUser().isCalControl());
+    if (payment.getUser().isCalControl())
+      sendToKafka(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()), ATT_PAYMENT);
+
     return paymentRepository.save(payment);
   }
 
@@ -150,7 +158,14 @@ public class PaymentService {
       payment.setCategory(category);
     }
     payment.setUpdatedAt(now());
-    return paymentRepository.save(statusAtualizado(payment));
+    // if (payment.getUser().isCalControl()) {
+    // sendToKafka(payloadPayments(accessToken, payment.getDueDate()),ATT_PAYMENT);
+    // }
+    return save(statusAtualizado(payment));
+  }
+
+  private void sendToKafka(Map<String, Object> payloadPayments, String topic) {
+    kafkaProducer.sendMessage(topic, payloadPayments);
   }
 
   // atualização do estado em execução
@@ -168,7 +183,11 @@ public class PaymentService {
     Payment payment = findById(id);
     if (!accessToken.equals(payment.getUser().getAccessToken()))
       throw new MsgException("Solicitação não autorizada");
-    paymentRepository.delete(findById(id));
+
+    paymentRepository.delete(payment);
+    if (payment.getUser().isCalControl())
+      sendToKafka(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()), ATT_PAYMENT);
+
   }
 
   public List<Payment> periodTime(String accessToken, String description, LocalDate start, LocalDate finish,
@@ -227,8 +246,8 @@ public class PaymentService {
     return payment;
   }
 
-  public Map<String, Object> payloadPayments(String accessToken, LocalDate start, LocalDate finish) {
-    List<Payment> payments = periodTime(accessToken, "", start, finish, "");
+  private Map<String, Object> payloadPayments(String accessToken, LocalDate start) {
+    List<Payment> payments = periodTime(accessToken, "", start, start, "");
     Map<String, Object> payload = new HashMap<>();
     payload.put("accessToken", accessToken);
     payload.put("day", start);
@@ -236,8 +255,8 @@ public class PaymentService {
         .map(Payment::getValue)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     payload.put("total", total);
-    payload.put("payments", payments);
-
+    List<PayamentDto> paymentsDto = payments.stream().map(PayamentDto::new).collect(Collectors.toList());
+    payload.put("payments", paymentsDto);
     return payload;
 
   }
