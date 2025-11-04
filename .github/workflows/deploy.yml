@@ -35,32 +35,25 @@ jobs:
             -Dsonar.organization=ajudaquicom \
             -Dsonar.java.binaries=target/classes
 
-  deploy:
+  docker-deploy:
     needs: build-test
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.7
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            BACKUP_DIR="/home/ubuntu/bill-manager/api/backup/$(date +'%Y%m%d_%H%M%S')"
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            if [ -e /home/ubuntu/bill-manager/api/src ] || [ -e /home/ubuntu/bill-manager/api/pom.xml ]; then
-              mkdir -p "$BACKUP_DIR"
-              [ -e /home/ubuntu/bill-manager/api/src ] && mv /home/ubuntu/bill-manager/api/src "$BACKUP_DIR"/
-              [ -e /home/ubuntu/bill-manager/api/pom.xml ] && mv /home/ubuntu/bill-manager/api/pom.xml "$BACKUP_DIR"/
-            fi
-
-            cd /home/ubuntu/bill-manager
-
-            if [ -d api/.git ]; then
-              cd api
-              git fetch --all
-              git reset --hard origin/main
-            else
-              rm -rf api
-              git clone https://github.com/gustavo91010/bill-manager.git api
-            fi
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:latest
