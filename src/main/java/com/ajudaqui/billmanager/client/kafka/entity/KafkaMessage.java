@@ -3,19 +3,16 @@ package com.ajudaqui.billmanager.client.kafka.entity;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import javax.persistence.*;
-
-public class ErrorMessage {
+public class KafkaMessage {
 
   private String topic;
   private String accessToken;
 
   private Map<String, Object> message;
 
-  @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  public ErrorMessage(String topic, String accessToken, Map<String, Object> metadata) {
+  public KafkaMessage(String topic, String accessToken, Map<String, Object> metadata) {
     this.topic = topic;
     this.accessToken = accessToken;
     this.message = metadata;

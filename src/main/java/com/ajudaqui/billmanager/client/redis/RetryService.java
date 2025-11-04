@@ -3,7 +3,7 @@ package com.ajudaqui.billmanager.client.redis;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
+import com.ajudaqui.billmanager.client.kafka.entity.KafkaMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,7 +19,7 @@ public class RetryService {
   @Autowired
   private ObjectMapper objectMapper;
 
-  public void salvarMessage(ErrorMessage message) {
+  public void salvarMessage(KafkaMessage message) {
     try {
       String value = objectMapper.writeValueAsString(message);
       redisTemplate.opsForList().rightPush("failed-messages", value);
@@ -28,13 +28,13 @@ public class RetryService {
     }
   }
 
-  public List<ErrorMessage> getFailedMessagens() {
+  public List<KafkaMessage> getFailedMessagens() {
     List<String> values = redisTemplate.opsForList().range("failed-messages", 0, -1);
-    List<ErrorMessage> messages = new ArrayList<>();
+    List<KafkaMessage> messages = new ArrayList<>();
     if (values != null) {
       for (String message : values) {
         try {
-          messages.add(objectMapper.readValue(message, ErrorMessage.class));
+          messages.add(objectMapper.readValue(message, KafkaMessage.class));
         } catch (JsonProcessingException e) {
           e.printStackTrace();
         }

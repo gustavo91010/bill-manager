@@ -5,19 +5,19 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
-import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
+import com.ajudaqui.billmanager.client.kafka.entity.KafkaMessage;
 
 import org.springframework.stereotype.Service;
 
 @Service
-public class ErrorMessageService {
+public class KafkaMessageService {
 
   @Transactional
-  public ErrorMessage factor(String topic, Map<String, Object> message) {
+  public KafkaMessage factor(String topic, Map<String, Object> message) {
 
     if (message.get("accessToken") == null)
       message.put("accessToken", UUID.randomUUID().toString());
-    return new ErrorMessage(topic, message.get("accessToken").toString(), message);
+    return new KafkaMessage(topic, message.get("accessToken").toString(), message);
   }
 
 }

@@ -1,17 +1,11 @@
 package com.ajudaqui.billmanager.client.kafka.service;
 
-import static java.util.stream.Collectors.summingInt;
-
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.*;
+
 import javax.annotation.PostConstruct;
 
-import com.ajudaqui.billmanager.client.kafka.entity.ErrorMessage;
+import com.ajudaqui.billmanager.client.kafka.entity.KafkaMessage;
 import com.ajudaqui.billmanager.client.redis.RetryService;
 
 import org.slf4j.Logger;
@@ -29,11 +23,11 @@ public class KafkaProducer {
   @Autowired
   private Resilience4JCircuitBreakerFactory circuitBreakerFactory;
   @Autowired
-  private ErrorMessageService errorService;
+  private KafkaMessageService errorService;
   @Autowired
   private RetryService retryService;
 
-  private BlockingQueue<ErrorMessage> fila;
+  private BlockingQueue<KafkaMessage> fila;
   private ExecutorService executor;
   private static final Logger log = LoggerFactory.getLogger(KafkaProducer.class);
 
@@ -51,7 +45,7 @@ public class KafkaProducer {
   }
 
   public void sendMessage(String topic, Map<String, Object> message) {
-    ErrorMessage messageSaved = errorService.factor(topic, message);
+    KafkaMessage messageSaved = errorService.factor(topic, message);
     fila.offer(messageSaved);
     System.out.println("Mensagem adicionada na fila: " + messageSaved.getAccessToken());
   }
@@ -62,7 +56,7 @@ public class KafkaProducer {
 
     while (true) {
       try {
-        ErrorMessage message = fila.take(); // ele espera ate ter um elemento na fila
+        KafkaMessage message = fila.take(); // ele espera ate ter um elemento na fila
         circuitBreaker.run(() -> {
           try {
             kafkaTemplate.send(message.getTopic(), message.getMessage()).get();
@@ -82,7 +76,7 @@ public class KafkaProducer {
     }
   }
 
-  private void handleKafkaFallback(String topic, String error, ErrorMessage message) {
+  private void handleKafkaFallback(String topic, String error, KafkaMessage message) {
     log.error("Erro ao enviar mensagem para Kafka [topic={}]: {}", topic, error);
     retryService.salvarMessage(message);
   }

@@ -1,10 +1,5 @@
 package com.ajudaqui.billmanager.client.redis;
 
-import java.util.UUID;
-
-// @Data
-// @AllArgsConstructor
-// @NoArgsConstructor
 public class FailedMessage {
   private String id;
   private String originalTopic;
@@ -13,7 +8,6 @@ public class FailedMessage {
   private long delay; // delay atual em ms
   private int retryCount;
   private String errorMessage;
-
 
   public FailedMessage(String id, String originalTopic, Object payload, long retryTime, long delay, int retryCount,
       String error) {
