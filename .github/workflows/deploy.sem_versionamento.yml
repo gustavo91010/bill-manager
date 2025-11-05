@@ -42,26 +42,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get version from commit message
-        id: get_version
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          VERSION=$(echo "$COMMIT_MSG" | grep -oE "\+[0-9]+\.[0-9]+\.[0-9]+")
-          if [ -z "$VERSION" ]; then
-            echo "❌ Nenhum incremento encontrado no commit (ex: +0.1.0)"
-            exit 1
-          fi
-          VERSION=${VERSION#+} # remove o '+'
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Versão detectada: $VERSION"
-
-      - name: Create Git tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag v${{ steps.get_version.outputs.version }}
-          git push origin v${{ steps.get_version.outputs.version }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -76,7 +56,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:${{ steps.get_version.outputs.version }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:latest
-# mandar o commit para a main com tag da nova versão feat: nova feature +0.1.6
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:latest
