@@ -65,7 +65,6 @@ public class PaymentService {
   }
 
   private Payment save(Payment payment) {
-    System.out.println("tem? " + payment.getUser().isCalControl());
     if (payment.getUser().isCalControl())
       sendToKafka(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()), ATT_PAYMENT);
 

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import static org.mockito.Mockito.times;
 
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.entity.Users;
 import com.ajudaqui.billmanager.exception.NotFoundEntityException;
 import com.ajudaqui.billmanager.repository.UsersRepository;
@@ -26,6 +27,8 @@ public class UsersServiceTest {
   @Mock
   private UsersRepository usersRepository;
 
+  @Mock
+  private JwtUtils jwtUtils;
   @Captor
   ArgumentCaptor<Users> usersCaptor;
 
@@ -52,6 +55,7 @@ public class UsersServiceTest {
 
     ReflectionTestUtils.setField(usersService, "secretKey", auth);
 
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     when(usersRepository.findByAccessToken(accessToken)).thenReturn(empty());
     when(usersRepository.save(any())).thenAnswer(inv -> {
       Users u = inv.getArgument(0);
@@ -151,6 +155,7 @@ public class UsersServiceTest {
   @Test
   void mustNotThrowExceptionIfFoundUserAccessToken() {
     String accessToken = "accessToken";
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     when(usersRepository.findByAccessToken(accessToken)).thenReturn(of(new Users()));
     assertDoesNotThrow(() -> usersService.findByAccessToken(accessToken));
   }

@@ -1,28 +1,16 @@
 package com.ajudaqui.billmanager.service;
 
 import static java.time.LocalDate.now;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
 import com.ajudaqui.billmanager.entity.Payment;
@@ -36,10 +24,7 @@ import com.ajudaqui.billmanager.utils.StatusBoleto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -51,6 +36,9 @@ public class PaymentServiceTest {
   private PaymentsRepository paymentsRepository;
   @Mock
   private UsersService usersService;
+  @Mock
+  private JwtUtils jwtUtils;
+
   @Mock
   private CategoryService categoryService;
   @Captor
@@ -64,6 +52,11 @@ public class PaymentServiceTest {
     Payment payment = new Payment();
     payment.setDescription("old");
 
+    Users user = new Users();
+    user.setCalControl(false);
+    payment.setUser(user);
+
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     BoletoFrom from = new BoletoFrom();
     from.setDescription("descrição");
     from.setValue(BigDecimal.TEN);
@@ -84,6 +77,11 @@ public class PaymentServiceTest {
     Payment payment = new Payment();
     payment.setValue(BigDecimal.ONE);
 
+    Users user = new Users();
+    user.setCalControl(false);
+    payment.setUser(user);
+
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     BoletoFrom from = new BoletoFrom();
     from.setDescription("descrição");
     from.setValue(BigDecimal.TEN);
@@ -104,6 +102,11 @@ public class PaymentServiceTest {
     Payment payment = new Payment();
     payment.setDueDate(LocalDate.now());
 
+    Users user = new Users();
+    user.setCalControl(false);
+    payment.setUser(user);
+
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     BoletoFrom from = new BoletoFrom();
     from.setDueDate(LocalDate.now().plusDays(10));
 
@@ -123,6 +126,11 @@ public class PaymentServiceTest {
     Long paymentId = 1L;
     Payment payment = new Payment();
 
+    Users user = new Users();
+    user.setCalControl(false);
+    payment.setUser(user);
+
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     BoletoFrom from = new BoletoFrom();
     from.setDescription("descrição");
     from.setValue(BigDecimal.TEN);
@@ -140,12 +148,16 @@ public class PaymentServiceTest {
     String accessToken = "token";
     Long paymentId = 1L;
     Payment payment = new Payment();
+    Users user = new Users();
+    user.setCalControl(false);
+    payment.setUser(user);
 
     BoletoFrom from = new BoletoFrom();
     from.setDescription("descrição");
     from.setValue(BigDecimal.TEN);
     from.setDueDate(LocalDate.now().plusDays(10));
 
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(payment));
     when(paymentsRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -220,6 +232,7 @@ public class PaymentServiceTest {
     // Ambiente
     Long paymentId = 7L;
     String accessToken = "";
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     when(paymentsRepository.findByIdForUsers(accessToken, paymentId)).thenReturn(Optional.of(new Payment()));
     // Execução
     assertDoesNotThrow(() -> paymentService.findByIdForUsers(accessToken, paymentId));
@@ -258,6 +271,8 @@ public class PaymentServiceTest {
   @Test
   @DisplayName("Deve trazer os pagamentos da semana de acordo com  o status")
   void shouldBringTheWeeksPaymentsInLineWithTheStatus() {
+    when(jwtUtils.getAccessTokenFromJwt(anyString())).thenCallRealMethod();
+
     // Execução
     List<Payment> response = paymentService.findPaymentsWeek("", now().toString(), "EM_DIAS");
     // Verificação
@@ -270,6 +285,7 @@ public class PaymentServiceTest {
   @Test
   @DisplayName("Deve trazer os pagamentos da semana sem verificar o status")
   void shouldBringUptheWeeksPaymentsWithouseCheckoingTheStatus() {
+    when(jwtUtils.getAccessTokenFromJwt(anyString())).thenCallRealMethod();
     // Execução
     List<Payment> response = paymentService.findPaymentsWeek("", now().toString(), "");
     // Verificação
@@ -317,6 +333,7 @@ public class PaymentServiceTest {
 
     String accessToken = "";
     Users user = new Users();
+    when(jwtUtils.getAccessTokenFromJwt(accessToken)).thenCallRealMethod();
     when(usersService.findByAccessToken(accessToken)).thenReturn(user);
 
     // Execução:

@@ -95,4 +95,10 @@ public class Users {
     this.isCalControl = isCalControl;
   }
 
+  @Override
+  public String toString() {
+    return "Users{id=" + id + ", active=" + active + ", accessToken=" + accessToken + ", isCalControl=" + isCalControl
+        + "}";
+  }
+
 }

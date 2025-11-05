@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import com.ajudaqui.billmanager.exception.MsgException;
+import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.entity.*;
 import com.ajudaqui.billmanager.repository.CategoryRepository;
 
@@ -29,21 +30,25 @@ public class CategoryServiceTest {
   @Mock
   private UsersService usersService;
 
-
+  @Mock
+  private JwtUtils jwtUtils;
 
   @Test
   @DisplayName("Deve trazer a categoria se ela existir")
   void shouldBringUpTheCategoryIfItEXists() {
-  // Ambiente
+    // Ambiente
     String name = "name";
     Users user = new Users();
     user.setAccessToken("accessToken");
+    user.setId(1L);
     Category novaCategoria = new Category(name, user);
-    when(categoryRepository.findByName(name,1l)).thenReturn(Optional.of(novaCategoria));
+    when(jwtUtils.getAccessTokenFromJwt(anyString())).thenCallRealMethod();
+
+    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.of(novaCategoria));
     when(categoryRepository.save(any(Category.class))).thenReturn(novaCategoria);
     // Ececucao
     categoryService.findByNameOrRegister(name, user);
-    //Verificação
+    // Verificação
     verify(categoryRepository, times(1)).findByName(name, 1l);
     verify(categoryRepository, times(0)).save(any(Category.class));
   }
@@ -51,17 +56,18 @@ public class CategoryServiceTest {
   @Test
   @DisplayName("Deve registar a categoria se ela não existir")
   void mustRegisterTheCategoryIfDoesNotExist() {
-  // Ambiente
+    // Ambiente
     String name = "name";
     Users user = new Users();
     user.setAccessToken("accessToken");
+    user.setId(1L);
     Category novaCategoria = new Category(name, user);
     when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.empty());
     when(categoryRepository.save(any(Category.class))).thenReturn(novaCategoria);
     // Ececucao
     categoryService.findByNameOrRegister(name, user);
-    //Verificação
-    verify(categoryRepository, times(1)).findByName(name,1l);
+    // Verificação
+    verify(categoryRepository, times(1)).findByName(name, 1l);
     verify(categoryRepository, times(1)).save(any(Category.class));
   }
 
@@ -69,7 +75,7 @@ public class CategoryServiceTest {
   @DisplayName("Deve chamar o save category ao registrar")
   void mustCallSaveCaterory() {
     String name = "name";
-    when(categoryRepository.findByName(name,1l)).thenReturn(Optional.empty());
+    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.empty());
     when(usersService.findByAccessToken(anyString())).thenReturn(new Users());
     categoryService.create("accessToken", name);
     verify(categoryRepository, times(1)).save(any(Category.class));
@@ -79,7 +85,15 @@ public class CategoryServiceTest {
   @DisplayName("Deve lancar uma exception se nome já tver regsitrada")
   void msustThrowExceptinIsNameRegsitered() {
     String name = "name";
-    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.of(new Category()));
+    Users user = new Users();
+    user.setAccessToken("accessToken");
+    user.setId(1L);
+    Category categoria = new Category(name, user);
+
+    when(jwtUtils.getAccessTokenFromJwt(anyString())).thenCallRealMethod();
+    when(usersService.findByAccessToken(anyString())).thenReturn(user);
+    when(categoryRepository.findByName(name, 1l)).thenReturn(Optional.of(categoria));
+
     MsgException response = assertThrows(MsgException.class, () -> categoryService.create("accessToken", name));
     assertEquals("Categoria já cadastrada", response.getMessage());
   }
