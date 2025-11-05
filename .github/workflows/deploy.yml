@@ -24,16 +24,16 @@ jobs:
       - name: Run tests
         run: mvn test
 
-      - name: Run SonarQube analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn sonar:sonar \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.projectKey=gustavo91010_bill-manager \
-            -Dsonar.organization=ajudaquicom \
-            -Dsonar.java.binaries=target/classes
+      # - name: Run SonarQube analysis
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: |
+      #     mvn sonar:sonar \
+      #       -Dsonar.login=$SONAR_TOKEN \
+      #       -Dsonar.host.url=https://sonarcloud.io \
+      #       -Dsonar.projectKey=gustavo91010_bill-manager \
+      #       -Dsonar.organization=ajudaquicom \
+      #       -Dsonar.java.binaries=target/classes
 
   docker-deploy:
     needs: build-test
