@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-test:
+  build-test-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,6 +24,7 @@ jobs:
       - name: Run tests
         run: mvn test
 
+      # --- SonarQube (descomente quando estiver pronto) ---
       # - name: Run SonarQube analysis
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -34,13 +35,7 @@ jobs:
       #       -Dsonar.projectKey=gustavo91010_bill-manager \
       #       -Dsonar.organization=ajudaquicom \
       #       -Dsonar.java.binaries=target/classes
-
-  docker-deploy:
-    needs: build-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # -----------------------------------------------------
 
       - name: Get version from commit message
         id: get_version
@@ -79,4 +74,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:${{ steps.get_version.outputs.version }}
             ${{ secrets.DOCKERHUB_USERNAME }}/bill-manager:latest
-# mandar o commit para a main com tag da nova versão feat: nova feature +0.1.6
