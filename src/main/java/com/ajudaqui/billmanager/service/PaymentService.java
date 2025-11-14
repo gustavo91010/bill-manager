@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.ajudaqui.billmanager.client.kafka.service.KafkaProducer;
 import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
@@ -42,15 +41,13 @@ public class PaymentService {
   private PaymentsRepository paymentRepository;
   private UsersService usersService;
   private CategoryService categoryService;
-  private KafkaProducer kafkaProducer;
 
   public PaymentService(PaymentsRepository paymentRepository, UsersService usersService,
-      CategoryService categoryService, JwtUtils jwtUtils, KafkaProducer kafkaProducer) {
+      CategoryService categoryService, JwtUtils jwtUtils ) {
     this.paymentRepository = paymentRepository;
     this.usersService = usersService;
     this.categoryService = categoryService;
     this.jwtUtils = jwtUtils;
-    this.kafkaProducer = kafkaProducer;
   }
 
   private Logger logger = LoggerFactory.getLogger(PaymentService.class.getSimpleName());
@@ -164,7 +161,7 @@ public class PaymentService {
   }
 
   private void sendToKafka(Map<String, Object> payloadPayments, String topic) {
-    kafkaProducer.sendMessage(topic, payloadPayments);
+    // kafkaProducer.sendMessage(topic, payloadPayments);
   }
 
   // atualização do estado em execução
