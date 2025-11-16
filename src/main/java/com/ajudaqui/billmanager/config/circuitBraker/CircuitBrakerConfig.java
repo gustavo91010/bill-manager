@@ -1,5 +1,7 @@
 package com.ajudaqui.billmanager.config.circuitBraker;
 
+import static com.ajudaqui.billmanager.utils.ClientName.cal_control;
+
 import java.time.Duration;
 
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
@@ -30,18 +32,17 @@ public class CircuitBrakerConfig {
               .build()),
           "http-call");
 
-      // configurado para o producer do kafka
-      // factory.configure(builder -> builder
-      //     .circuitBreakerConfig(CircuitBreakerConfig.custom()
-      //         .failureRateThreshold(60)
-      //         .waitDurationInOpenState(Duration.ofSeconds(60))
-      //         .slidingWindowSize(5)
-      //         .enableAutomaticTransitionFromOpenToHalfOpen() // habilita o evento de tarnsição de estado
-      //         .build())
-      //     .timeLimiterConfig(TimeLimiterConfig.custom()
-      //         .timeoutDuration(Duration.ofSeconds(5))
-      //         .build()),
-      //     "kafka-producer");
+      factory.configure(builder -> builder
+          .circuitBreakerConfig(CircuitBreakerConfig.custom()
+              .failureRateThreshold(60)
+              .waitDurationInOpenState(Duration.ofSeconds(60))
+              .slidingWindowSize(5)
+              .enableAutomaticTransitionFromOpenToHalfOpen() // habilita o evento de tarnsição de estado
+              .build())
+          .timeLimiterConfig(TimeLimiterConfig.custom()
+              .timeoutDuration(Duration.ofSeconds(5))
+              .build()),
+          cal_control.name());
     };
   }
 

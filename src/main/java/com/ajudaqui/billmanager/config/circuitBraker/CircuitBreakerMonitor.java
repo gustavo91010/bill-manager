@@ -1,35 +1,43 @@
-// package com.ajudaqui.billmanager.config.circuitBraker;
+package com.ajudaqui.billmanager.config.circuitBraker;
 
-// import javax.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-// import org.springframework.stereotype.Component;
-// import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-// import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransitionEvent;
+import com.ajudaqui.billmanager.utils.ClientName;
 
-// @Component
-// public class CircuitBreakerMonitor {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
+import org.springframework.stereotype.Component;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransitionEvent;
 
-//   @Autowired
-//   private Resilience4JCircuitBreakerFactory factory;
+@Component
+public class CircuitBreakerMonitor {
 
-//   @Autowired
-//   private com.ajudaqui.billmanager.client.kafka.service.KafkaProducer KafkaProducer;
+  @Autowired
+  private Resilience4JCircuitBreakerFactory factory;
 
-//   @PostConstruct
-//   public void init() {
-//     // recupera o CircuitBreakerRegistry interno da fábrica
-//     var registry = factory.getCircuitBreakerRegistry();
-//     CircuitBreaker breaker = registry.circuitBreaker("kafka-producer");
+  @Autowired
+  private com.ajudaqui.billmanager.client.redis.RetryService RetryService;
 
-//     breaker.getEventPublisher().onStateTransition(this::handleTransition);
-//   }
+  @PostConstruct
+  public void init() {
+    // recupera o CircuitBreakerRegistry interno da fábrica
+    var registry = factory.getCircuitBreakerRegistry();
 
-//   private void handleTransition(CircuitBreakerOnStateTransitionEvent event) {
-//     if (event.getStateTransition().getToState().name().equals("CLOSED")) {
-//       KafkaProducer.reenviarMensagens();
-//       System.out.println("✅ Circuito kafka-producer fechado novamente, reenviando mensagens pendentes...");
-//     }
-//   }
-// }
+    for (ClientName client : ClientName.values()) {
+
+      CircuitBreaker breaker = registry.circuitBreaker(client.name());
+
+      breaker.getEventPublisher().onStateTransition(
+          event -> handleTransition(event, client.name()));
+    }
+  }
+
+  private void handleTransition(CircuitBreakerOnStateTransitionEvent event, String ClientName) {
+    if (event.getStateTransition().getToState().name().equals("CLOSED")) {
+      // KafkaProducer.reenviarMensagens();
+      System.out
+          .println("✅ Circuito para client " + ClientName + " fechado novamente, reenviando mensagens pendentes...");
+    }
+  }
+}
