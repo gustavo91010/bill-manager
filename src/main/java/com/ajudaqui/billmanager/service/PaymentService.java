@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ajudaqui.billmanager.client.model.MessageCalControl;
 import com.ajudaqui.billmanager.config.serucity.JwtUtils;
 import com.ajudaqui.billmanager.controller.from.BoletoFrom;
 import com.ajudaqui.billmanager.entity.Category;
@@ -43,7 +44,7 @@ public class PaymentService {
   private CategoryService categoryService;
 
   public PaymentService(PaymentsRepository paymentRepository, UsersService usersService,
-      CategoryService categoryService, JwtUtils jwtUtils ) {
+      CategoryService categoryService, JwtUtils jwtUtils) {
     this.paymentRepository = paymentRepository;
     this.usersService = usersService;
     this.categoryService = categoryService;
@@ -63,7 +64,7 @@ public class PaymentService {
 
   private Payment save(Payment payment) {
     if (payment.getUser().isCalControl())
-      sendToKafka(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()), ATT_PAYMENT);
+      sendCalControl(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()));
 
     return paymentRepository.save(payment);
   }
@@ -154,13 +155,13 @@ public class PaymentService {
       payment.setCategory(category);
     }
     payment.setUpdatedAt(now());
-    // if (payment.getUser().isCalControl()) {
-    // sendToKafka(payloadPayments(accessToken, payment.getDueDate()),ATT_PAYMENT);
-    // }
+    if (payment.getUser().isCalControl()) {
+      sendCalControl(payloadPayments(accessToken, payment.getDueDate()));
+    }
     return save(statusAtualizado(payment));
   }
 
-  private void sendToKafka(Map<String, Object> payloadPayments, String topic) {
+  private void sendCalControl(MessageCalControl messageCalControl) {
     // kafkaProducer.sendMessage(topic, payloadPayments);
   }
 
@@ -182,7 +183,7 @@ public class PaymentService {
 
     paymentRepository.delete(payment);
     if (payment.getUser().isCalControl())
-      sendToKafka(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()), ATT_PAYMENT);
+      sendCalControl(payloadPayments(payment.getUser().getAccessToken(), payment.getDueDate()));
 
   }
 
@@ -242,10 +243,10 @@ public class PaymentService {
     return payment;
   }
 
-  private Map<String, Object> payloadPayments(String accessToken, LocalDate start) {
+  private MessageCalControl payloadPayments(String accessToken, LocalDate start) {
+
     List<Payment> payments = periodTime(accessToken, "", start, start, "");
     Map<String, Object> payload = new HashMap<>();
-    payload.put("accessToken", accessToken);
     payload.put("day", start);
     BigDecimal total = payments.stream()
         .map(Payment::getValue)
@@ -253,7 +254,10 @@ public class PaymentService {
     payload.put("total", total);
     List<PayamentDto> paymentsDto = payments.stream().map(PayamentDto::new).collect(Collectors.toList());
     payload.put("payments", paymentsDto);
-    return payload;
+
+    MessageCalControl messageCalControl = new MessageCalControl();
+    // messageCalControl.setEmail(payments.get(0).getUser().get);
+    return messageCalControl;
 
   }
 }
