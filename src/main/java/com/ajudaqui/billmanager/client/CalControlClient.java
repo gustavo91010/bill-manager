@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface CalControlClient {
 
 
+  @PostMapping(value = "/template", consumes = "multipart/form-data")
+  String registerTemplate(@RequestHeader("Authorization") String token, @RequestBody MessageCalControl messageCalControl);
+
   @PostMapping(value = "", consumes = "multipart/form-data")
   String sendMessage(@RequestHeader("Authorization") String token, @RequestBody MessageCalControl messageCalControl);
 
